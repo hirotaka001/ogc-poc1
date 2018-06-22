@@ -36,7 +36,7 @@ class StartReceptionAPI(OrionEndpointMixin, MethodView):
         result = {'result': 'failure'}
         try:
             value = orion.get_attr_value(data, 'state')
-            if value is not None:
+            if value is not None and value == 'on':
                 endpoint = StartReceptionAPI.get_orion_endpoint()
                 service = os.environ.get(const.PEPPER_SERVICE, '')
                 service_path = os.environ.get(const.PEPPER_SERVICE_PATH, '')

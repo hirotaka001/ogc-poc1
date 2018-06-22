@@ -738,7 +738,10 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "entities": [{
       "idPattern": "button_sensor.*",
       "type": "button_sensor"
-    }]
+    }],
+    "condition": {
+      "attrs": ["state"]
+    }
   },
   "notification": {
     "http": {
@@ -790,7 +793,9 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
         }
       ],
       "condition": {
-        "attrs": []
+        "attrs": [
+          "state"
+        ]
       }
     },
     "notification": {
