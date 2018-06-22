@@ -11,7 +11,8 @@ Start pods & services on AKS by following steps:
 1. [start duplicate message filter service for idas](#start-duplicate-message-filter-service-for-idas)
 1. [start fiware IDAS(iotagent-ul)](#start-fiware-idasiotagent-ul-on-aks)
 1. [start fiware cygnus](#start-fiware-cygnus-on-aks)
-1. [start command pxory service](#start-command-proxy-service-on-aks)
+1. [start reception service](#start-reception-service-on-aks)
+1. [start destination service](#start-destination-service-on-aks)
 
 **In the following document, replace "example.com" with your domain.**
 
@@ -552,4 +553,63 @@ reception-5d99f87f55-qz6cg   1/1       Running   0          36s
 mac:$ kubectl get services -l service=reception
 NAME        TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)    AGE
 reception   ClusterIP   10.0.163.98   <none>        8888/TCP   1m
+```
+
+## start destination service on AKS
+```bash
+mac:$ az acr login --name fiwareacr
+mac:$ docker build -t ${REPOSITORY}/tech-sketch/destination:0.1.0 ./controller/destination/
+mac:$ docker push ${REPOSITORY}/tech-sketch/destination:0.1.0
+```
+```bash
+mac:$ envsubst < controller/destination.yaml | kubectl apply -f -
+```
+```bash
+mac:$ kubectl get pods -l pod=destination
+NAME                           READY     STATUS    RESTARTS   AGE
+destination-84b86b54f6-7wkl9   1/1       Running   0          19s
+destination-84b86b54f6-rqjjc   1/1       Running   0          19s
+destination-84b86b54f6-sjqhb   1/1       Running   0          19s
+```
+```bash
+$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" https://api.cloudconductor.jp/destinations/ | jq .
+[
+  {
+    "dest_human_sensor_id": "DEST-HUMAN-SENSOR-n8aL7MJuNQk0iJpY",
+    "dest_led_id": "DEST-LED-CK2s264PqyndhUZ7",
+    "dest_led_pos": "0.000000,0.000000",
+    "dest_pos": "0.001151,0.000134",
+    "floor": 1,
+    "id": "dest-n4uRxmtdWv6jOHpI",
+    "name": "管理センター"
+  },
+  {
+    "dest_human_sensor_id": "DEST-HUMAN-SENSOR-oyVYENgHKHmQ6VJE",
+    "dest_led_id": "DEST-LED-12Mz9QcPjoemgU39",
+    "dest_led_pos": "122.001122,91.991122",
+    "dest_pos": "125.12345,92.12345",
+    "floor": 2,
+    "id": "dest-vLBTZbPXc3Al0hMT",
+    "name": "203号室"
+  },
+  {
+    "dest_human_sensor_id": "DEST-HUMAN-SENSOR-9WfJoTmxczWrM4WZ",
+    "dest_led_id": "DEST-LED-MV4isvEfDsLZ75R6",
+    "dest_led_pos": "98.980808,0.881122",
+    "dest_pos": "110.120101,0.993313",
+    "floor": 2,
+    "id": "dest-9QgohxohSmb3AECD",
+    "name": "204号室"
+  },
+  {
+    "dest_human_sensor_id": "DEST-HUMAN-SENSOR-6d8JoY1hR0wS8rqO",
+    "dest_led_id": "DEST-LED-sDAyKhjhXKqJsbr9",
+    "dest_led_pos": "122.001122,91.991122",
+    "dest_pos": "125.12345,92.12345",
+    "floor": 3,
+    "id": "dest-Ymq1aoftEIViZjry",
+    "name": "ProjectRoom 1",
+    "slack_webhook": "https://hooks.slack.com/services/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+  }
+]
 ```
