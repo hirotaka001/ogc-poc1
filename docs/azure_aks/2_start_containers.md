@@ -532,27 +532,24 @@ NAME      TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
 cygnus    ClusterIP   10.103.255.240   <none>        5050/TCP,8081/TCP   1m
 ```
 
-## start command proxy service on AKS
-
-The 'command pxory service' connects 'gamepad' and 'web controller' to 'turtlesim' or 'gopigo'.
-
-In this step, we configure the service as connecting to 'turtlesim'. If you want to start the service as connecting to 'gopigo', use `ROBOT_ID=gopigo` instead of `ROBOT_ID=turtlesim`.
-
-* create three 'cmd-proxy' pods and a 'cmd-proxy' service to control 'turtlesim'.
+## start reception service on AKS
 ```bash
-mac:$ env FIWARE_SERVICE=demo1 FIWARE_SERVICEPATH=/ ROBOT_ID=turtlesim ROBOT_TYPE=demo1 envsubst < controller/fiware-cmd-proxy.yaml | kubectl apply -f -
+mac:$ az acr login --name fiwareacr
+mac:$ docker build -t ${REPOSITORY}/tech-sketch/reception:0.1.0 ./controller/reception/
+mac:$ docker push ${REPOSITORY}/tech-sketch/reception:0.1.0
 ```
-
 ```bash
-mac:$ kubectl get pods -l pod=cmd-proxy
+mac:$ env PEPPER_SERVICE=pepper PEPPER_SERVICEPATH=/ PEPPER_TYPE=pepper PEPPER_1_ID=pepper_0000000000000001 envsubst < controller/reception.yaml | kubectl apply -f -
+```
+```bash
+mac:$ kubectl get pods -l pod=reception
 NAME                         READY     STATUS    RESTARTS   AGE
-cmd-proxy-58c756cbcd-q7jzz   1/1       Running   0          5s
-cmd-proxy-58c756cbcd-rs75j   1/1       Running   0          5s
-cmd-proxy-58c756cbcd-v9ptr   1/1       Running   0          5s
+reception-5d99f87f55-5srqq   1/1       Running   0          36s
+reception-5d99f87f55-dm2fd   1/1       Running   0          36s
+reception-5d99f87f55-qz6cg   1/1       Running   0          36s
 ```
-
 ```bash
-mac:$ kubectl get services -l service=cmd-proxy
-NAME        TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
-cmd-proxy   ClusterIP   10.0.208.226   <none>        8888/TCP   34s
+mac:$ kubectl get services -l service=reception
+NAME        TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)    AGE
+reception   ClusterIP   10.0.163.98   <none>        8888/TCP   1m
 ```

@@ -2,51 +2,48 @@
 
 Configure fiware on AKS by following steps:
 
-1. [register "demo1" service](#register-demo1-service)
-1. [register "gamepad" device](#register-gamepad-device)
-1. [test publishing 'button' attribute from 'gamepad' to 'orion'](#test-publishing-button-attribute-from-gamepad-to-orion)
-1. [register "turtlesim" device](#register-turtlesim-device)
-1. [test publishing 'temperature' attribute from 'turtlesim' to orion, and subscribing 'move' command from orion to 'turtlesim'](#test-publishing-temperature-attribute-from-turtlesim-to-orion-and-subscribing-move-command-from-orion-to-turtlesim)
-1. [register "gopigo" device (if gopigo is available)](#register-gopigo-device-if-gopigo-is-available)
-1. [test subscribing 'move' command from orion to 'gopigo' (if gopigo is available)](#test-subscribing-move-command-from-orion-to-gopigo-if-gopigo-is-available)
-1. [register fiware cygnus as subscriber](#register-fiware-cygnus-as-subscriber)
-1. [register cmd-proxy as subscriber](#register-cmd-proxy-as-subscriber)
+1. [register "BUTTON-SENSOR" service](#register-button-sensor-service)
+1. [register "BUTTON-SENSOR" device](#register-button-sensor-device)
+1. [test "BUTTON-SENSOR" attribute](#test-button-sensor-attribute)
+1. [register "PEPPER" service](#register-pepper-service)
+1. [register "PEPPER" device](#register-pepper-device)
+1. [test "PEPPER" command](#test-pepper-command)
+1. [register cygnus](#register-cygnus)
+1. [register "reception" as a subscriber of "BUTTON-SENSOR"](#register-reception-as-a-subscriber-of-button-sensor)
 
 **In the following document, replace "example.com" with your domain.**
 
-## register "demo1" service
-
+## register BUTTON-SENSOR service
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.example.com/idas/ul20/manage/iot/services/ -X POST -d @- <<__EOS__
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: button_sensor" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.cloudconductor.jp/idas/ul20/manage/iot/services/ -X POST -d @- <<__EOS__
 {
   "services": [
     {
-      "apikey": "demo1",
+      "apikey": "button_sensor",
       "cbroker": "http://orion:1026",
       "resource": "/iot/d",
-      "entity_type": "demo1"
+      "entity_type": "button_sensor"
     }
   ]
 }
 __EOS__
 ```
-
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-Servicepath: /*" https://api.example.com/idas/ul20/manage/iot/services/ | jq .
+mac:$ $ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: button_sensor" -H "Fiware-Servicepath: /*" https://api.cloudconductor.jp/idas/ul20/manage/iot/services/ | jq .
 {
   "count": 1,
   "services": [
     {
-      "_id": "5aea5264d95cfc000124890b",
+      "_id": "5b2c702076c6700001471a69",
       "subservice": "/",
-      "service": "demo1",
-      "apikey": "demo1",
+      "service": "button_sensor",
+      "apikey": "button_sensor",
       "resource": "/iot/d",
       "__v": 0,
       "attributes": [],
       "lazy": [],
       "commands": [],
-      "entity_type": "demo1",
+      "entity_type": "button_sensor",
       "internal_attributes": [],
       "static_attributes": []
     }
@@ -54,21 +51,20 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 ```
 
-## register "gamepad" device
-
+## register BUTTON-SENSOR device
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.example.com/idas/ul20/manage/iot/devices/ -X POST -d @- <<__EOS__
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: button_sensor" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.cloudconductor.jp/idas/ul20/manage/iot/devices/ -X POST -d @- <<__EOS__
 {
   "devices": [
     {
-      "device_id": "gamepad",
-      "entity_name": "gamepad",
-      "entity_type": "demo1",
+      "device_id": "button_sensor_0000000000000001",
+      "entity_name": "button_sensor_0000000000000001",
+      "entity_type": "button_sensor",
       "timezone": "Asia/Tokyo",
       "protocol": "UL20",
       "attributes": [
         {
-          "name": "button",
+          "name": "state",
           "type": "string"
         }
       ],
@@ -78,20 +74,19 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 __EOS__
 ```
-
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-Servicepath: /" https://api.example.com/idas/ul20/manage/iot/devices/gamepad/ | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: button_sensor" -H "Fiware-Servicepath: /" https://api.cloudconductor.jp/idas/ul20/manage/iot/devices/button_sensor_0000000000000001/ | jq .
 {
-  "device_id": "gamepad",
-  "service": "demo1",
+  "device_id": "button_sensor_0000000000000001",
+  "service": "button_sensor",
   "service_path": "/",
-  "entity_name": "gamepad",
-  "entity_type": "demo1",
+  "entity_name": "button_sensor_0000000000000001",
+  "entity_type": "button_sensor",
   "transport": "MQTT",
   "attributes": [
     {
-      "object_id": "button",
-      "name": "button",
+      "object_id": "state",
+      "name": "state",
       "type": "string"
     }
   ],
@@ -101,18 +96,17 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
   "protocol": "UL20"
 }
 ```
-
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-Servicepath: /" https://api.example.com/orion/v2/entities/gamepad/ | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: button_sensor" -H "Fiware-Servicepath: /" https://api.cloudconductor.jp/orion/v2/entities/button_sensor_0000000000000001/ | jq .
 {
-  "id": "gamepad",
-  "type": "demo1",
+  "id": "button_sensor_0000000000000001",
+  "type": "button_sensor",
   "TimeInstant": {
     "type": "ISO8601",
     "value": " ",
     "metadata": {}
   },
-  "button": {
+  "state": {
     "type": "string",
     "value": " ",
     "metadata": {}
@@ -120,98 +114,139 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 ```
 
-## test publishing 'button' attribute from 'gamepad' to 'orion'
-
-* XXXXXXXXXXXX is the password of "iotagent"
-```text
-mac:$ mosquitto_sub -h mqtt.example.com -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXXXXXX
-...
-```
-
-* prepare `fiware-gamepad-controller` on Raspberry Pi
+## test BUTTON-SENSOR attribute
 ```bash
-raspberrypi:$ git clone https://github.com/tech-sketch/fiware-gamepad-controller.git
-raspberrypi:$ cd fiware-gamepad-controller
-raspoberypi:$ pip install -r requirements/common.txt
+mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.cloudconductor.jp -p 8883 --cafile ./secrets/ca.crt -d -t /button_sensor/button_sensor_0000000000000001/attrs -u iotagent -P XXXXXXXX -m "$d|state|on"
+Client mosqpub|92108-Nobuyukin sending CONNECT
+Client mosqpub|92108-Nobuyukin received CONNACK
+Client mosqpub|92108-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/button_sensor/button_sensor_0000000000000001/attrs', ... (44 bytes))
+Client mosqpub|92108-Nobuyukin sending DISCONNECT
 ```
-
-* scp `secrets/ca.crt` to raspberrypi
 ```bash
-mac:$ scp ./secrets/ca.crt pi@raspberrypi.local:~/fiware-gamepad-controller/secrets/ca.crt
+mac:$ mosquitto_sub -h mqtt.cloudconductor.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+...
+Client mosqsub|32291-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/button_sensor/button_sensor_0000000000000001/attrs', ... (44 bytes))
+2018-06-22T15:15:53.1529648153+0900|state|on
 ```
-
-* ssh raspberrypi and start `main.py` (YYYYYYYYYYYY is the password of "raspberrypi")
 ```bash
-raspberrypi:$ env MQTT_HOST="mqtt.example.com" RASPI_RASSWORD="YYYYYYYYYYYY" envsubst < conf/pxkwcr-azure.yaml.template > conf/pxkwcr-azure.yaml
-raspberrypi:$ ./main.py pxkwcr-azure
-2018/06/06 10:46:07 [   INFO] __main__ - run script using pxkwcr-azure.yaml
-2018/06/06 10:46:07 [   INFO] src.controller - initialized FUJIWORK PXKWCR Controller
-2018/06/06 10:46:07 [   INFO] src.controller - start publishing...
-...
-```
-
-* press 'circle' button of gamepad
-```bash
-raspberrypi:raspi_gamepad$ ./main.py pxkwcr-azure
-...
-2018/06/06 10:49:00 [   INFO] src.controller - published "2018-06-06T01:49:00.649952+0000|button|circle" to "/demo1/gamepad/attrs"
-2018/06/06 10:49:00 [   INFO] src.controller - connected mqtt broker[mqtt.cloudconductor.jp:8883], response_code=0
-...
-```
-
-```bash
-mac:$ mosquitto_sub -h mqtt.example.com -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXXXXXX
-...
-...
-Client mosqsub|11667-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/demo1/gamepad/attrs', ... (45 bytes))
-2018-06-06T01:49:00.649952+0000|button|circle
-...
-```
-
-```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-Servicepath: /" https://api.example.com/orion/v2/entities/gamepad/ | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: button_sensor" -H "Fiware-Servicepath: /" https://api.cloudconductor.jp/orion/v2/entities/button_sensor_0000000000000001/ | jq .
 {
-  "id": "gamepad",
-  "type": "demo1",
+  "id": "button_sensor_0000000000000001",
+  "type": "button_sensor",
   "TimeInstant": {
     "type": "ISO8601",
-    "value": "2018-06-06T01:49:00.649952+0000",
+    "value": "2018-06-22T15:15:53.1529648153+0900",
     "metadata": {}
   },
-  "button": {
+  "state": {
     "type": "string",
-    "value": "circle",
+    "value": "on",
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-06-06T01:49:00.649952+0000"
+        "value": "2018-06-22T15:15:53.1529648153+0900"
       }
     }
   }
 }
 ```
 
-## register "turtlesim" device
+## register PEPPER service
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.cloudconductor.jp/idas/ul20/manage/iot/services/ -X POST -d @- <<__EOS__
+{
+  "services": [
+    {
+      "apikey": "pepper",
+      "cbroker": "http://orion:1026",
+      "resource": "/iot/d",
+      "entity_type": "pepper"
+    }
+  ]
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-Servicepath: /*" https://api.cloudconductor.jp/idas/ul20/manage/iot/services/ | jq .
+{
+  "count": 1,
+  "services": [
+    {
+      "_id": "5b2c70b2a74ba7000166da17",
+      "subservice": "/",
+      "service": "pepper",
+      "apikey": "pepper",
+      "resource": "/iot/d",
+      "__v": 0,
+      "attributes": [],
+      "lazy": [],
+      "commands": [],
+      "entity_type": "pepper",
+      "internal_attributes": [],
+      "static_attributes": []
+    }
+  ]
+}
+```
 
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.example.com/idas/ul20/manage/iot/devices/ -X POST -d @- <<__EOS__
+mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.cloudconductor.jp -p 8883 --cafile ./secrets/ca.crt -d -t /button_sensor/button_sensor_0000000000000001/attrs -u iotagent -P XXXXXXXX -m "$d|state|on"
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: button_sensor" -H "Fiware-Servicepath: /" https://api.cloudconductor.jp/orion/v2/entities/button_sensor_0000000000000001/ | jq .
+{
+  "id": "button_sensor_0000000000000001",
+  "type": "button_sensor",
+  "TimeInstant": {
+    "type": "ISO8601",
+    "value": "2018-06-22T13:32:20.1529641940+0900",
+    "metadata": {}
+  },
+  "state": {
+    "type": "string",
+    "value": "on",
+    "metadata": {
+      "TimeInstant": {
+        "type": "ISO8601",
+        "value": "2018-06-22T13:32:20.1529641940+0900"
+      }
+    }
+  }
+}
+```
+
+## register PEPPER device
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.cloudconductor.jp/idas/ul20/manage/iot/devices/ -X POST -d @- <<__EOS__
 {
   "devices": [
     {
-      "device_id": "turtlesim",
-      "entity_name": "turtlesim",
-      "entity_type": "demo1",
+      "device_id": "pepper_0000000000000001",
+      "entity_name": "pepper_0000000000000001",
+      "entity_type": "pepper",
       "timezone": "Asia/Tokyo",
       "protocol": "UL20",
       "attributes": [
         {
-          "name": "temperature",
-          "type": "float32"
+          "name": "face",
+          "type": "string"
+        }, {
+          "name": "dest",
+          "type": "string"
         }
       ],
       "commands": [
         {
-          "name": "move",
+          "name": "welcome",
+          "type": "string"
+        }, {
+          "name": "handover",
+          "type": "string"
+        }, {
+          "name": "facedetect",
+          "type": "string"
+        }, {
+          "name": "retry",
           "type": "string"
         }
       ],
@@ -221,28 +256,47 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 __EOS__
 ```
-
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-Servicepath: /" https://api.example.com/idas/ul20/manage/iot/devices/turtlesim/ | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-Servicepath: /" https://api.cloudconductor.jp/idas/ul20/manage/iot/devices/pepper_0000000000000001/ | jq .
 {
-  "device_id": "turtlesim",
-  "service": "demo1",
+  "device_id": "pepper_0000000000000001",
+  "service": "pepper",
   "service_path": "/",
-  "entity_name": "turtlesim",
-  "entity_type": "demo1",
+  "entity_name": "pepper_0000000000000001",
+  "entity_type": "pepper",
   "transport": "MQTT",
   "attributes": [
     {
-      "object_id": "temperature",
-      "name": "temperature",
-      "type": "float32"
+      "object_id": "face",
+      "name": "face",
+      "type": "string"
+    },
+    {
+      "object_id": "dest",
+      "name": "dest",
+      "type": "string"
     }
   ],
   "lazy": [],
   "commands": [
     {
-      "object_id": "move",
-      "name": "move",
+      "object_id": "welcome",
+      "name": "welcome",
+      "type": "string"
+    },
+    {
+      "object_id": "handover",
+      "name": "handover",
+      "type": "string"
+    },
+    {
+      "object_id": "facedetect",
+      "name": "facedetect",
+      "type": "string"
+    },
+    {
+      "object_id": "retry",
+      "name": "retry",
       "type": "string"
     }
   ],
@@ -250,33 +304,82 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
   "protocol": "UL20"
 }
 ```
-
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-Servicepath: /" https://api.example.com/orion/v2/entities/turtlesim/ | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-Servicepath: /" https://api.cloudconductor.jp/orion/v2/entities/pepper_0000000000000001/ | jq .
 {
-  "id": "turtlesim",
-  "type": "demo1",
+  "id": "pepper_0000000000000001",
+  "type": "pepper",
   "TimeInstant": {
     "type": "ISO8601",
     "value": " ",
     "metadata": {}
   },
-  "move_info": {
+  "dest": {
+    "type": "string",
+    "value": " ",
+    "metadata": {}
+  },
+  "face": {
+    "type": "string",
+    "value": " ",
+    "metadata": {}
+  },
+  "facedetect_info": {
     "type": "commandResult",
     "value": " ",
     "metadata": {}
   },
-  "move_status": {
+  "facedetect_status": {
     "type": "commandStatus",
     "value": "UNKNOWN",
     "metadata": {}
   },
-  "temperature": {
-    "type": "float32",
+  "handover_info": {
+    "type": "commandResult",
     "value": " ",
     "metadata": {}
   },
-  "move": {
+  "handover_status": {
+    "type": "commandStatus",
+    "value": "UNKNOWN",
+    "metadata": {}
+  },
+  "retry_info": {
+    "type": "commandResult",
+    "value": " ",
+    "metadata": {}
+  },
+  "retry_status": {
+    "type": "commandStatus",
+    "value": "UNKNOWN",
+    "metadata": {}
+  },
+  "welcome_info": {
+    "type": "commandResult",
+    "value": " ",
+    "metadata": {}
+  },
+  "welcome_status": {
+    "type": "commandStatus",
+    "value": "UNKNOWN",
+    "metadata": {}
+  },
+  "welcome": {
+    "type": "string",
+    "value": "",
+    "metadata": {}
+  },
+  "handover": {
+    "type": "string",
+    "value": "",
+    "metadata": {}
+  },
+  "facedetect": {
+    "type": "string",
+    "value": "",
+    "metadata": {}
+  },
+  "retry": {
     "type": "string",
     "value": "",
     "metadata": {}
@@ -284,93 +387,19 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 ```
 
-## test publishing 'temperature' attribute from 'turtlesim' to orion, and subscribing 'move' command from orion to 'turtlesim'
-
-* XXXXXXXXXXXX is the password of "iotagent"
+## test PEPPER command
 ```bash
-mac:$ mosquitto_sub -h mqtt.example.com -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXXXXXX
-...
-```
-
-* start X on ros server and login X using RDP
-
-* prepare `fiware-ros-turtlesim` on ROS test server
-```bash
-ros-terminal1:$ cd ~/ros_ws/src
-ros-terminal1:$ git clone https://github.com/tech-sketch/fiware-ros-turtlesim.git
-ros-terminal1:$ cd fiware-ros-turtlesim
-ros-terminal1:$ pip install -r requirements/common.txt
-```
-
-* scp `secrets/ca.crt` to ROS test server
-```bash
-mac:$ scp ./secrets/ca.crt ubuntu@turtlesim.local:~/ros_ws/src/fiware-ros-turtlesim/secrets/ca.crt
-```
-
-* open terminal1 and start `roscore`
-```bash
-ros-terminal1:$ cd ~/ros_ws
-ros-terminal1:$ source devel/setup.bash
-ros-terminal1:$ roscore
-...
-```
-
-* open terminal2 and start `turtlesim`
-```bash
-ros-terminal2:$ cd ~/ros_ws
-ros-terminal2:$ source devel/setup.bash
-ros-terminal2:$ rosrun turtlesim turtlesim_node
-...
-```
-
-* open terminal3 and start `turtlesim_operator` (ZZZZZZZZZZZZ is the password of "turtlesim")
-```bash
-ros-terminal3:$ cd ~/ros_ws
-ros-terminal3:$ catkin_make
-ros-terminal3:$ source devel/setup.bash
-ros-terminal3:$ env MQTT_HOST="mqtt.example.com" TURTLESIM_PASSWORD="ZZZZZZZZZZZZ" envsubst < src/fiware-ros-turtlesim/config/params-azure.yaml.template > src/fiware-ros-turtlesim/config/params.yaml
-ros-terminal3:$ roslaunch fiware-ros-turtlesim fiware-ros-turtlesim.launch
-... logging to /home/ubuntu/.ros/log/2e93ca42-692e-11e8-b04a-02dff3ffcd9e/roslaunch-ubuntu-xenial-12451.log
-Checking log directory for disk usage. This may take awhile.
-Press Ctrl-C to interrupt
-Done checking log file disk usage. Usage is <1GB.
-
-started roslaunch server http://ubuntu-xenial:38200/
-
-SUMMARY
-========
-
-PARAMETERS
-...
-running rosparam delete /command_sender/
-running rosparam delete /attribute_receiver/
-process[command_sender-1]: started with pid [12478]
-process[attribute_receiver-2]: started with pid [12479]
-[INFO] [1528251177.864751]: [__main__:main] Start node : attribute_receiver_node.py
-[INFO] [1528251177.866113]: [__main__:main] Start node : command_sender_node.py [mode=production]
-[INFO] [1528251177.873212]: [fiware_ros_turtlesim.command_sender:CommandSender.connect] Connect mqtt broker
-[INFO] [1528251177.873927]: [fiware_ros_turtlesim.attribute_receiver:AttributeReceiver.connect] Connect mqtt broker
-[INFO] [1528251183.488578]: [fiware_ros_turtlesim.attribute_receiver:AttributeReceiver.start] AttributeReceiver start : attribute_receiver_node.py
-[INFO] [1528251183.489523]: [fiware_ros_turtlesim.command_sender:CommandSender.start] CommandSender start : command_sender_node.py
-[INFO] [1528251184.000669]: [fiware_ros_turtlesim.command_sender:CommandSender._on_connect] mqtt connect status=0
-[INFO] [1528251184.001303]: [fiware_ros_turtlesim.attribute_receiver:AttributeReceiver._on_connect] mqtt connect status=0
-...
-```
-
-* send 'circle' cmd to 'turtlesim' entity
-```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-Servicepath: /" -H "Content-Type: application/json" https://api.example.com/orion/v1/updateContext -d @-<<__EOS__ | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-Servicepath: /" -H "Content-Type: application/json" https://api.cloudconductor.jp/orion/v1/updateContext -d @-<<__EOS__ | jq .
 {
   "contextElements": [
     {
-      "id": "turtlesim",
+      "id": "pepper_0000000000000001",
       "isPattern": "false",
-      "type": "demo1",
+      "type": "pepper",
       "attributes": [
         {
-          "name": "move",
-          "type": "string",
-          "value": "circle"
+          "name": "welcome",
+          "value": "start"
         }
       ]
     }
@@ -379,207 +408,93 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 __EOS__
 ```
-
 ```bash
-mac:$ mosquitto_sub -h mqtt.example.com -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXXXXXX
+mac:$ mosquitto_sub -h mqtt.cloudconductor.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
 ...
-Client mosqsub|12427-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/demo1/turtlesim/cmd', ... (21 bytes))
-turtlesim@move|circle
-Client mosqsub|12427-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/demo1/turtlesim/cmdexe', ... (30 bytes))
-turtlesim@move|executed circle
-...
+Client mosqsub|32291-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/cmd', ... (37 bytes))
+pepper_0000000000000001@welcome|start
 ```
-
 ```bash
-ros-terminal3:ros_ws$ roslaunch turtlesim_operator turtlesim_operator.launch
-...
-[INFO] [1528251288.776914]: [fiware_ros_turtlesim.command_sender:CommandSender._on_message] received message from mqtt: turtlesim@move|circle
-[INFO] [1528251288.778754]: [fiware_ros_turtlesim.command_sender:CommandSender._do_circle] do circle
-...
-```
-
-```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-Servicepath: /" https://api.example.com/orion/v2/entities/turtlesim/ | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-Servicepath: /" https://api.cloudconductor.jp/orion/v2/entities/pepper_0000000000000001/ | jq .
 {
-  "id": "turtlesim",
-  "type": "demo1",
+  "id": "pepper_0000000000000001",
+  "type": "pepper",
   "TimeInstant": {
     "type": "ISO8601",
-    "value": "2018-06-06T02:14:48.00Z",
+    "value": "2018-06-22T04:21:44.00Z",
     "metadata": {}
   },
-  "move_info": {
-    "type": "commandResult",
-    "value": "executed circle",
-    "metadata": {
-      "TimeInstant": {
-        "type": "ISO8601",
-        "value": "2018-06-06T02:14:48.902Z"
-      }
-    }
-  },
-  "move_status": {
-    "type": "commandStatus",
-    "value": "OK",
-    "metadata": {
-      "TimeInstant": {
-        "type": "ISO8601",
-        "value": "2018-06-06T02:14:48.902Z"
-      }
-    }
-  },
-  "temperature": {
-    "type": "float32",
-    "value": " ",
-    "metadata": {}
-  },
-  "move": {
+  "dest": {
     "type": "string",
-    "value": "",
-    "metadata": {}
-  }
-}
-```
-
-* open terminal4 and publish `templerature` to rostopic
-```bash
-ros-terminal4:$ cd ~/ros_ws
-ros-terminal4:$ source devel/setup.bash
-ros-terminal4:$ rostopic pub -1 /turtle1/temperature std_msgs/Float32 -- 25.3
-```
-
-```bash
-ros-terminal3:ros_ws$ roslaunch turtlesim_operator turtlesim_operator.launch
-...
-[INFO] [1528251469.593141]: [fiware_ros_turtlesim.attribute_receiver:AttributeReceiver._on_receive] received message from ros : 25.2999992371
-...
-```
-
-```bash
-mac:$ mosquitto_sub -h mqtt.example.com -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXXXXXX
-...
-Client mosqsub|12427-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/demo1/turtlesim/attrs', ... (57 bytes))
-2018-06-06T02:17:49.593979+0000|temperature|25.2999992371
-...
-```
-
-```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-Servicepath: /" https://api.example.com/orion/v2/entities/turtlesim/ | jq .
-{
-  "id": "turtlesim",
-  "type": "demo1",
-  "TimeInstant": {
-    "type": "ISO8601",
-    "value": "2018-06-06T02:17:49.593979+0000",
+    "value": " ",
     "metadata": {}
   },
-  "move_info": {
-    "type": "commandResult",
-    "value": "executed circle",
-    "metadata": {
-      "TimeInstant": {
-        "type": "ISO8601",
-        "value": "2018-06-06T02:14:48.902Z"
-      }
-    }
-  },
-  "move_status": {
-    "type": "commandStatus",
-    "value": "OK",
-    "metadata": {
-      "TimeInstant": {
-        "type": "ISO8601",
-        "value": "2018-06-06T02:14:48.902Z"
-      }
-    }
-  },
-  "temperature": {
-    "type": "float32",
-    "value": "25.2999992371",
-    "metadata": {
-      "TimeInstant": {
-        "type": "ISO8601",
-        "value": "2018-06-06T02:17:49.593979+0000"
-      }
-    }
-  },
-  "move": {
+  "face": {
     "type": "string",
-    "value": "",
-    "metadata": {}
-  }
-}
-```
-
-## register "gopigo" device (if gopigo is available)
-
-```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.example.com/idas/ul20/manage/iot/devices/ -X POST -d @- <<__EOS__
-{
-  "devices": [
-    {
-      "device_id": "gopigo",
-      "entity_name": "gopigo",
-      "entity_type": "demo1",
-      "timezone": "Asia/Tokyo",
-      "protocol": "UL20",
-      "commands": [
-        {
-          "name": "move",
-          "type": "string"
-        }
-      ],
-      "transport": "MQTT"
-    }
-  ]
-}
-__EOS__
-```
-
-```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-Servicepath: /" https://api.example.com/idas/ul20/manage/iot/devices/gopigo/ | jq .
-{
-  "device_id": "gopigo",
-  "service": "demo1",
-  "service_path": "/",
-  "entity_name": "gopigo",
-  "entity_type": "demo1",
-  "transport": "MQTT",
-  "attributes": [],
-  "lazy": [],
-  "commands": [
-    {
-      "object_id": "move",
-      "name": "move",
-      "type": "string"
-    }
-  ],
-  "static_attributes": [],
-  "protocol": "UL20"
-}
-```
-
-```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-Servicepath: /" https://api.example.com/orion/v2/entities/gopigo/ | jq .
-{
-  "id": "gopigo",
-  "type": "demo1",
-  "TimeInstant": {
-    "type": "ISO8601",
     "value": " ",
     "metadata": {}
   },
-  "move_info": {
+  "facedetect_info": {
     "type": "commandResult",
     "value": " ",
     "metadata": {}
   },
-  "move_status": {
+  "facedetect_status": {
     "type": "commandStatus",
     "value": "UNKNOWN",
     "metadata": {}
   },
-  "move": {
+  "handover_info": {
+    "type": "commandResult",
+    "value": " ",
+    "metadata": {}
+  },
+  "handover_status": {
+    "type": "commandStatus",
+    "value": "UNKNOWN",
+    "metadata": {}
+  },
+  "retry_info": {
+    "type": "commandResult",
+    "value": " ",
+    "metadata": {}
+  },
+  "retry_status": {
+    "type": "commandStatus",
+    "value": "UNKNOWN",
+    "metadata": {}
+  },
+  "welcome_info": {
+    "type": "commandResult",
+    "value": " ",
+    "metadata": {}
+  },
+  "welcome_status": {
+    "type": "commandStatus",
+    "value": "PENDING",
+    "metadata": {
+      "TimeInstant": {
+        "type": "ISO8601",
+        "value": "2018-06-22T04:21:44.067Z"
+      }
+    }
+  },
+  "welcome": {
+    "type": "string",
+    "value": "",
+    "metadata": {}
+  },
+  "handover": {
+    "type": "string",
+    "value": "",
+    "metadata": {}
+  },
+  "facedetect": {
+    "type": "string",
+    "value": "",
+    "metadata": {}
+  },
+  "retry": {
     "type": "string",
     "value": "",
     "metadata": {}
@@ -587,142 +502,99 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 ```
 
-## test subscribing 'move' command from orion to 'gopigo' (if gopigo is available)
-
-* XXXXXXXXXXXX is the password of "iotagent"
 ```bash
-mac:$ mosquitto_sub -h mqtt.example.com -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXXXXXX
-...
+mac:$ mosquitto_pub -h mqtt.cloudconductor.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000001/cmdexe -u iotagent -P XXXXXXXX -m "pepper_0000000000000001@welcome|start exec"
+Client mosqpub|92385-Nobuyukin sending CONNECT
+Client mosqpub|92385-Nobuyukin received CONNACK
+Client mosqpub|92385-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/cmdexe', ... (42 bytes))
+Client mosqpub|92385-Nobuyukin sending DISCONNECT
 ```
-
-* prepare `fiware-ros-gopigo` on gopigo
 ```bash
-ros-terminal1:$ cd ~/gopigo_ws/src
-ros-terminal1:$ git clone https://github.com/tech-sketch/fiware-ros-gopigo.git
-ros-terminal1:$ cd fiware-ros-gopigo
-ros-terminal1:$ /bin/bash update_tools_for_ubuntu.sh
-ros-terminal1:$ pip install -r requirements/common.txt
-ros-terminal1:$ pip install -r requirements/gopigo.txt
-```
-
-* scp `secrets/ca.crt` to gopigo
-```bash
-mac:$ scp ./secrets/ca.crt ubuntu@turtlesim.local:~/gopigo_ws/src/fiware-ros-gopigo/secrets/ca.crt
-```
-
-* ssh to gopigo on terminal1 and start `roscore`
-```bash
-ros-terminal1:$ cd ~/gopigo_ws
-ros-terminal1:$ source devel/setup.bash
-ros-terminal1:$ roscore
-...
-```
-
-* ssh to gopigo on terminal2 and start `ros_gopigo` (ZZZZZZZZZZZZ is the password of "gopigo")
-```bash
-ros-terminal2:$ cd ~/gopigo_ws
-ros-terminal2:$ catkin_make
-ros-terminal2:$ source devel/setup.bash
-ros-terminal2:$ env MQTT_HOST="mqtt.example.com" GOPIGO_PASSWORD="ZZZZZZZZZZZZ" envsubst < src/fiware-ros-gopigo/config/params-azure.yaml.template > src/fiware-ros-gopigo/config/params.yaml
-ros-terminal2:$ roslaunch fiware-ros-gopigo fiware-ros-gopigo.launch
-... logging to /home/ubuntu/.ros/log/2969f28a-6933-11e8-9a92-84afec5283f0/roslaunch-ubuntu-5805.log
-Checking log directory for disk usage. This may take awhile.
-Press Ctrl-C to interrupt
-Done checking log file disk usage. Usage is <1GB.
-
-started roslaunch server http://ubuntu:43469/
-
-SUMMARY
-========
-
-PARAMETERS
-...
-running rosparam delete /gopigo_node/
-ERROR: parameter [/gopigo_node] is not set
-running rosparam delete /fiware2gopigo_node/
-ERROR: parameter [/fiware2gopigo_node] is not set
-process[gopigo_node-1]: started with pid [5832]
-process[fiware2gopigo_node-2]: started with pid [5833]
-[INFO] [1528253006.994686]: [__main__:main] Start node : ros_gopigo
-[INFO] [1528253007.023473]: [__main__:main] Start node : fiware2gopigo
-[INFO] [1528253007.067154]: [fiware_ros_gopigo.gopigo_impl:Gopigo.start] Gopigo start: ros_gopigo
-[INFO] [1528253007.089022]: [fiware_ros_gopigo.fiware2gopigo_impl:Fiware2Gopigo.connect] Connect to MQTT broker
-[INFO] [1528253008.328665]: [fiware_ros_gopigo.fiware2gopigo_impl:Fiware2Gopigo.start] Fiware2Gopigo start: fiware2gopigo
-[INFO] [1528253008.518929]: [fiware_ros_gopigo.fiware2gopigo_impl:Fiware2Gopigo._on_connect] connected to MQTT Broker, status: 0
-```
-
-* send 'circle' cmd to 'gopigo' entity
-```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-Servicepath: /" -H "Content-Type: application/json" https://api.example.com/orion/v1/updateContext -d @-<<__EOS__ | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-Servicepath: /" https://api.cloudconductor.jp/orion/v2/entities/pepper_0000000000000001/ | jq .
 {
-  "contextElements": [
-    {
-      "id": "gopigo",
-      "isPattern": "false",
-      "type": "demo1",
-      "attributes": [
-        {
-          "name": "move",
-          "type": "string",
-          "value": "circle"
-        }
-      ]
-    }
-  ],
-  "updateAction": "UPDATE"
-}
-__EOS__
-```
-
-```bash
-mac:$ mosquitto_sub -h mqtt.example.com -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXXXXXX
-...
-Client mosqsub|12427-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/demo1/gopigo/cmd', ... (18 bytes))
-gopigo@move|circle
-Client mosqsub|12427-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/demo1/gopigo/cmdexe', ... (27 bytes))
-gopigo@move|executed circle
-...
-```
-
-```bash
-ros-terminal2:$ roslaunch fiware_ros_gopigo fiware_ros_gopigo.launch
-...
-[INFO] [1528253171.803069]: [fiware_ros_gopigo.fiware2gopigo_impl:Fiware2Gopigo._on_message] received message from mqtt: gopigo@move|circle
-[INFO] [1528253171.815056]: [fiware_ros_gopigo.fiware2gopigo_impl:Fiware2Gopigo._do_circle] do circle
-...
-```
-
-```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-Servicepath: /" https://api.example.com/orion/v2/entities/gopigo/ | jq .
-{
-  "id": "gopigo",
-  "type": "demo1",
+  "id": "pepper_0000000000000001",
+  "type": "pepper",
   "TimeInstant": {
     "type": "ISO8601",
-    "value": "2018-06-06T02:46:12.00Z",
+    "value": "2018-06-22T04:22:41.00Z",
     "metadata": {}
   },
-  "move_info": {
+  "dest": {
+    "type": "string",
+    "value": " ",
+    "metadata": {}
+  },
+  "face": {
+    "type": "string",
+    "value": " ",
+    "metadata": {}
+  },
+  "facedetect_info": {
     "type": "commandResult",
-    "value": "executed circle",
+    "value": " ",
+    "metadata": {}
+  },
+  "facedetect_status": {
+    "type": "commandStatus",
+    "value": "UNKNOWN",
+    "metadata": {}
+  },
+  "handover_info": {
+    "type": "commandResult",
+    "value": " ",
+    "metadata": {}
+  },
+  "handover_status": {
+    "type": "commandStatus",
+    "value": "UNKNOWN",
+    "metadata": {}
+  },
+  "retry_info": {
+    "type": "commandResult",
+    "value": " ",
+    "metadata": {}
+  },
+  "retry_status": {
+    "type": "commandStatus",
+    "value": "UNKNOWN",
+    "metadata": {}
+  },
+  "welcome_info": {
+    "type": "commandResult",
+    "value": "start exec",
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-06-06T02:46:12.020Z"
+        "value": "2018-06-22T04:22:41.606Z"
       }
     }
   },
-  "move_status": {
+  "welcome_status": {
     "type": "commandStatus",
     "value": "OK",
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-06-06T02:46:12.020Z"
+        "value": "2018-06-22T04:22:41.606Z"
       }
     }
   },
-  "move": {
+  "welcome": {
+    "type": "string",
+    "value": "",
+    "metadata": {}
+  },
+  "handover": {
+    "type": "string",
+    "value": "",
+    "metadata": {}
+  },
+  "facedetect": {
+    "type": "string",
+    "value": "",
+    "metadata": {}
+  },
+  "retry": {
     "type": "string",
     "value": "",
     "metadata": {}
@@ -730,59 +602,96 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 ```
 
-## register fiware cygnus as subscriber
-
+## register cygnus
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.example.com/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: button_sensor" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.cloudconductor.jp/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
 {
   "subject": {
     "entities": [{
-      "idPattern": "gamepad.*",
-      "type": "demo1"
+      "idPattern": "button_sensor.*",
+      "type": "button_sensor"
     }]
   },
   "notification": {
     "http": {
       "url": "http://cygnus:5050/notify"
     },
-    "attrs": ["button"],
+    "attrs": ["state"],
     "attrsFormat": "legacy"
   }
 }
 __EOS__
 ```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: button_sensor" -H "Fiware-ServicePath: /" https://api.cloudconductor.jp/orion/v2/subscriptions/ | jq .
+[
+  {
+    "id": "5b2c7ad4c682df4861905ac7",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "button_sensor.*",
+          "type": "button_sensor"
+        }
+      ],
+      "condition": {
+        "attrs": []
+      }
+    },
+    "notification": {
+      "timesSent": 1,
+      "lastNotification": "2018-06-22T04:28:04.00Z",
+      "attrs": [
+        "state"
+      ],
+      "attrsFormat": "legacy",
+      "http": {
+        "url": "http://cygnus:5050/notify"
+      },
+      "lastSuccess": "2018-06-22T04:28:04.00Z"
+    }
+  }
+]
+```
+```bash
+mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_button_sensor --eval 'db.getCollection("sth_/_button_sensor_0000000000000001_button_sensor").find()'
+MongoDB shell version v3.6.5
+connecting to: mongodb://127.0.0.1:27017/sth_button_sensor
+MongoDB server version: 3.6.5
+{ "_id" : ObjectId("5b2c7bd579828d000af5ae1b"), "recvTime" : ISODate("2018-06-22T04:32:21.299Z"), "attrName" : "state", "attrType" : "string", "attrValue" : "on" }
+```
 
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.example.com/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.cloudconductor.jp/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
 {
   "subject": {
     "entities": [{
-      "idPattern": "turtlesim.*",
-      "type": "demo1"
+      "idPattern": "pepper.*",
+      "type": "pepper"
     }]
   },
   "notification": {
     "http": {
       "url": "http://cygnus:5050/notify"
     },
-    "attrs": ["temperature"],
+    "attrs": ["dest", "face", "welcome_status", "handover_status", "facedetect_status", "retry_status"],
     "attrsFormat": "legacy"
   }
 }
 __EOS__
 ```
-
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-ServicePath: /" https://api.example.com/orion/v2/subscriptions/ | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" https://api.cloudconductor.jp/orion/v2/subscriptions/ | jq .
 [
   {
-    "id": "5b174d6e7526578caaebd4ab",
+    "id": "5b2c7f073f343a30cd7b65df",
     "status": "active",
     "subject": {
       "entities": [
         {
-          "idPattern": "gamepad.*",
-          "type": "demo1"
+          "idPattern": "pepper.*",
+          "type": "pepper"
         }
       ],
       "condition": {
@@ -790,119 +699,67 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       }
     },
     "notification": {
-      "timesSent": 1,
-      "lastNotification": "2018-06-06T02:56:46.00Z",
+      "timesSent": 5,
+      "lastNotification": "2018-06-22T04:49:16.00Z",
       "attrs": [
-        "button"
-      ],
-      "attrsFormat": "legacy",
-      "http": {
-        "url": "http://cygnus:5050/notify"
-      }
-    }
-  },
-  {
-    "id": "5b174d80d142dab9c1a8db92",
-    "status": "active",
-    "subject": {
-      "entities": [
-        {
-          "idPattern": "turtlesim.*",
-          "type": "demo1"
-        }
-      ],
-      "condition": {
-        "attrs": []
-      }
-    },
-    "notification": {
-      "timesSent": 1,
-      "lastNotification": "2018-06-06T02:57:04.00Z",
-      "attrs": [
-        "temperature"
+        "dest",
+        "face",
+        "welcome_status",
+        "handover_status",
+        "facedetect_status",
+        "retry_status"
       ],
       "attrsFormat": "legacy",
       "http": {
         "url": "http://cygnus:5050/notify"
       },
-      "lastSuccess": "2018-06-06T02:57:04.00Z"
+      "lastSuccess": "2018-06-22T04:49:17.00Z"
     }
   }
 ]
 ```
-
 ```bash
-mac:$ kubectl exec mongodb-0 -c mongodb -- mongo --eval 'printjson(db.getMongo().getDBNames())'
-MongoDB shell version v3.6.5
-connecting to: mongodb://127.0.0.1:27017
-MongoDB server version: 3.6.5
-[
-	"admin",
-	"config",
-	"iotagentul",
-	"local",
-	"orion",
-	"orion-demo1",
-	"sth_demo1"
-]
+mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_pepper --eval 'db.getCollection("sth_/_pepper_0000000000000001_pepper").find()'
+{ "_id" : ObjectId("5b2c7fb669d383000a97c3a6"), "recvTime" : ISODate("2018-06-22T04:48:54.951Z"), "attrName" : "facedetect_status", "attrType" : "commandStatus", "attrValue" : "UNKNOWN" }
+{ "_id" : ObjectId("5b2c7fb669d383000a97c3a7"), "recvTime" : ISODate("2018-06-22T04:48:54.951Z"), "attrName" : "handover_status", "attrType" : "commandStatus", "attrValue" : "UNKNOWN" }
+{ "_id" : ObjectId("5b2c7fb669d383000a97c3a8"), "recvTime" : ISODate("2018-06-22T04:48:54.951Z"), "attrName" : "retry_status", "attrType" : "commandStatus", "attrValue" : "UNKNOWN" }
+{ "_id" : ObjectId("5b2c7fb669d383000a97c3a9"), "recvTime" : ISODate("2018-06-22T04:48:54.922Z"), "attrName" : "welcome_status", "attrType" : "commandStatus", "attrValue" : "PENDING" }
+{ "_id" : ObjectId("5b2c7fcd79828d000af5ae20"), "recvTime" : ISODate("2018-06-22T04:49:16.996Z"), "attrName" : "facedetect_status", "attrType" : "commandStatus", "attrValue" : "UNKNOWN" }
+{ "_id" : ObjectId("5b2c7fcd79828d000af5ae21"), "recvTime" : ISODate("2018-06-22T04:49:16.996Z"), "attrName" : "handover_status", "attrType" : "commandStatus", "attrValue" : "UNKNOWN" }
+{ "_id" : ObjectId("5b2c7fcd79828d000af5ae22"), "recvTime" : ISODate("2018-06-22T04:49:16.996Z"), "attrName" : "retry_status", "attrType" : "commandStatus", "attrValue" : "UNKNOWN" }
+{ "_id" : ObjectId("5b2c7fcd79828d000af5ae23"), "recvTime" : ISODate("2018-06-22T04:49:16.973Z"), "attrName" : "welcome_status", "attrType" : "commandStatus", "attrValue" : "OK" }
 ```
 
+## register reception as a subscriber of BUTTON-SENSOR
 ```bash
-mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_demo1 --eval 'printjson(db.getCollectionNames())'
-MongoDB shell version v3.6.5
-connecting to: mongodb://127.0.0.1:27017/sth_demo1
-MongoDB server version: 3.6.5
-[ "sth_/_gamepad_demo1", "sth_/_turtlesim_demo1" ]
-```
-
-```bash
-mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_demo1 --eval 'db.getCollection("sth_/_gamepad_demo1").find()'
-MongoDB shell version v3.6.5
-connecting to: mongodb://127.0.0.1:27017/sth_demo1
-MongoDB server version: 3.6.5
-{ "_id" : ObjectId("5b174d6efc89b5000ad54284"), "recvTime" : ISODate("2018-06-06T02:56:46.156Z"), "attrName" : "button", "attrType" : "string", "attrValue" : "circle" }
-```
-
-```bash
-mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_demo1 --eval 'db.getCollection("sth_/_turtlesim_demo1").find()'
-MongoDB shell version v3.6.5
-connecting to: mongodb://127.0.0.1:27017/sth_demo1
-MongoDB server version: 3.6.5
-{ "_id" : ObjectId("5b174d815ff6fa000a96b6dc"), "recvTime" : ISODate("2018-06-06T02:57:04.721Z"), "attrName" : "temperature", "attrType" : "float32", "attrValue" : "25.2999992371" }
-```
-
-## register cmd-proxy as subscriber
-
-```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.example.com/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: button_sensor" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.cloudconductor.jp/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
 {
   "subject": {
     "entities": [{
-      "idPattern": "gamepad.*",
-      "type": "demo1"
+      "idPattern": "button_sensor.*",
+      "type": "button_sensor"
     }]
   },
   "notification": {
     "http": {
-      "url": "http://cmd-proxy:8888/gamepad/"
+      "url": "http://reception:8888/notify/start-reception/"
     },
-    "attrs": ["button"]
+    "attrs": ["state"]
   }
 }
 __EOS__
 ```
-
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-ServicePath: /" https://api.example.com/orion/v2/subscriptions/ | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: button_sensor" -H "Fiware-ServicePath: /" https://api.cloudconductor.jp/orion/v2/subscriptions/ | jq .
 [
   {
-    "id": "5b174d6e7526578caaebd4ab",
+    "id": "5b2c7ad4c682df4861905ac7",
     "status": "active",
     "subject": {
       "entities": [
         {
-          "idPattern": "gamepad.*",
-          "type": "demo1"
+          "idPattern": "button_sensor.*",
+          "type": "button_sensor"
         }
       ],
       "condition": {
@@ -910,26 +767,26 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       }
     },
     "notification": {
-      "timesSent": 1,
-      "lastNotification": "2018-06-06T02:56:46.00Z",
+      "timesSent": 2,
+      "lastNotification": "2018-06-22T04:32:21.00Z",
       "attrs": [
-        "button"
+        "state"
       ],
       "attrsFormat": "legacy",
       "http": {
         "url": "http://cygnus:5050/notify"
       },
-      "lastSuccess": "2018-06-06T02:56:46.00Z"
+      "lastSuccess": "2018-06-22T04:32:21.00Z"
     }
   },
   {
-    "id": "5b174d80d142dab9c1a8db92",
+    "id": "5b2c814dc682df4861905ac8",
     "status": "active",
     "subject": {
       "entities": [
         {
-          "idPattern": "turtlesim.*",
-          "type": "demo1"
+          "idPattern": "button_sensor.*",
+          "type": "button_sensor"
         }
       ],
       "condition": {
@@ -938,42 +795,15 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     },
     "notification": {
       "timesSent": 1,
-      "lastNotification": "2018-06-06T02:57:04.00Z",
+      "lastNotification": "2018-06-22T04:55:41.00Z",
       "attrs": [
-        "temperature"
-      ],
-      "attrsFormat": "legacy",
-      "http": {
-        "url": "http://cygnus:5050/notify"
-      },
-      "lastSuccess": "2018-06-06T02:57:04.00Z"
-    }
-  },
-  {
-    "id": "5b174ebcd142dab9c1a8db93",
-    "status": "failed",
-    "subject": {
-      "entities": [
-        {
-          "idPattern": "gamepad.*",
-          "type": "demo1"
-        }
-      ],
-      "condition": {
-        "attrs": []
-      }
-    },
-    "notification": {
-      "timesSent": 1,
-      "lastNotification": "2018-06-06T03:02:20.00Z",
-      "attrs": [
-        "button"
+        "state"
       ],
       "attrsFormat": "normalized",
       "http": {
-        "url": "http://cmd-proxy:8888/gamepad/"
+        "url": "http://reception:8888/notify/start-reception/"
       },
-      "lastFailure": "2018-06-06T03:02:20.00Z"
+      "lastSuccess": "2018-06-22T04:55:41.00Z"
     }
   }
 ]
