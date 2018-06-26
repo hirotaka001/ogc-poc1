@@ -36,7 +36,7 @@ mac:$ az login --tenant tenant.onmicrosoft.com
 ```
 
 ```bash
-mac:$ az group create --name fiware-demo --location centralus
+mac:$ az group create --name fiware-demo --location westus
 ```
 
 ```bash

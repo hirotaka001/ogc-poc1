@@ -116,6 +116,9 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 
 ## test BUTTON-SENSOR attribute
 ```bash
+mac:$ mosquitto_sub -h mqtt.cloudconductor.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+```
+```bash
 mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.cloudconductor.jp -p 8883 --cafile ./secrets/ca.crt -d -t /button_sensor/button_sensor_0000000000000001/attrs -u iotagent -P XXXXXXXX -m "$d|state|on"
 Client mosqpub|92108-Nobuyukin sending CONNECT
 Client mosqpub|92108-Nobuyukin received CONNACK
@@ -186,32 +189,6 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "static_attributes": []
     }
   ]
-}
-```
-
-```bash
-mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.cloudconductor.jp -p 8883 --cafile ./secrets/ca.crt -d -t /button_sensor/button_sensor_0000000000000001/attrs -u iotagent -P XXXXXXXX -m "$d|state|on"
-```
-```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: button_sensor" -H "Fiware-Servicepath: /" https://api.cloudconductor.jp/orion/v2/entities/button_sensor_0000000000000001/ | jq .
-{
-  "id": "button_sensor_0000000000000001",
-  "type": "button_sensor",
-  "TimeInstant": {
-    "type": "ISO8601",
-    "value": "2018-06-22T13:32:20.1529641940+0900",
-    "metadata": {}
-  },
-  "state": {
-    "type": "string",
-    "value": "on",
-    "metadata": {
-      "TimeInstant": {
-        "type": "ISO8601",
-        "value": "2018-06-22T13:32:20.1529641940+0900"
-      }
-    }
-  }
 }
 ```
 
@@ -388,6 +365,9 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 ```
 
 ## test PEPPER command
+```bash
+mac:$ mosquitto_sub -h mqtt.cloudconductor.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+```
 ```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-Servicepath: /" -H "Content-Type: application/json" https://api.cloudconductor.jp/orion/v1/updateContext -d @-<<__EOS__ | jq .
 {

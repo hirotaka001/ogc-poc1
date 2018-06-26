@@ -295,28 +295,15 @@ mac:$ cat /dev/urandom | LC_CTYPE=C tr -dc 'a-zA-Z0-9' | head -c 32
 ```
 
 * create `secrets/auth-tokens.json` like below:
-```json:secrets/auth-tokens.json
+```json
 {
   "bearer_tokens": [
       {
           "token": "iRGTsKKHwgjf4rR2XMSN3oE9Dhm6ym3O",
-          "allowed_paths": ["^/orion/.*$", "^/idas/.*$"]
-      }, {
-          "token": "4Xc1GFa2D8zkZRbkdygm902oGYeUAJno",
-          "allowed_paths": ["^/idas/.*$"]
+          "allowed_paths": ["^/orion/.*$", "^/idas/.*$", "^/destinations(/)?$"]
       }
   ],
-  "basic_auths": [
-      {
-          "username": "user1",
-          "password": "P@ssw0rd",
-          "allowed_paths": ["/controller/web/"]
-      }, {
-          "username": "user2",
-          "password": "P@ssw0rd",
-          "allowed_paths": ["/controller/web/"]
-      }
-  ]
+  "basic_auths": []
 }
 ```
 
@@ -570,6 +557,10 @@ NAME                           READY     STATUS    RESTARTS   AGE
 destination-84b86b54f6-7wkl9   1/1       Running   0          19s
 destination-84b86b54f6-rqjjc   1/1       Running   0          19s
 destination-84b86b54f6-sjqhb   1/1       Running   0          19s
+```
+mac:$ kubectl get services -l service=destination
+NAME          TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)    AGE
+destination   ClusterIP   10.0.81.101   <none>        8888/TCP   1m
 ```
 ```bash
 $ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" https://api.cloudconductor.jp/destinations/ | jq .
