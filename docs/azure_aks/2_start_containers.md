@@ -300,7 +300,7 @@ mac:$ cat /dev/urandom | LC_CTYPE=C tr -dc 'a-zA-Z0-9' | head -c 32
   "bearer_tokens": [
       {
           "token": "iRGTsKKHwgjf4rR2XMSN3oE9Dhm6ym3O",
-          "allowed_paths": ["^/orion/.*$", "^/idas/.*$", "^/destinations(/)?$"]
+          "allowed_paths": ["^/orion/.*$", "^/idas/.*$", "^/destinations(/)?$", "^/storage/faces(/)?$"]
       }
   ],
   "basic_auths": []
@@ -563,7 +563,7 @@ NAME          TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)    AGE
 destination   ClusterIP   10.0.81.101   <none>        8888/TCP   1m
 ```
 ```bash
-$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" https://api.cloudconductor.jp/destinations/ | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" https://api.cloudconductor.jp/destinations/ | jq .
 [
   {
     "dest_human_sensor_id": "DEST-HUMAN-SENSOR-n8aL7MJuNQk0iJpY",
@@ -603,4 +603,44 @@ $ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -
     "slack_webhook": "https://hooks.slack.com/services/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
   }
 ]
+```
+
+## start storage service on AKS
+```bash
+mac:$ export MANAGED_CLUSTER=$(az resource show --resource-group fiware-demo --name fiwareaks --resource-type Microsoft.ContainerService/managedClusters --query properties.nodeResourceGroup -o tsv);echo ${MANAGED_CLUSTER}
+MC_fiware-demo_fiwareaks_westus
+mac:$ az storage account create --resource-group ${MANAGED_CLUSTER} --name fiwareaksstorageaccount --location westus --sku Standard_LRS
+```
+```bash
+mac:$ kubectl apply -f controller/shared-storage-azure.yaml
+```
+```bash
+mac:$ kubectl get storageclasses
+NAME                PROVISIONER                AGE
+azurefile           kubernetes.io/azure-file   1m
+default (default)   kubernetes.io/azure-disk   6h
+managed-premium     kubernetes.io/azure-disk   6h
+```
+```bash
+mac:$ kubectl get persistentvolumeclaims
+NAME                              STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS      AGE
+face-upload-shared-storage        Bound     pvc-76d0dcd2-790e-11e8-9053-563fd79e0d5d   10Gi       RWX            azurefile         1m
+mongodb-storage-claim-mongodb-0   Bound     pvc-01706875-78ed-11e8-9053-563fd79e0d5d   30Gi       RWO            managed-premium   4h
+mongodb-storage-claim-mongodb-1   Bound     pvc-65adcba8-78ed-11e8-9053-563fd79e0d5d   30Gi       RWO            managed-premium   3h
+mongodb-storage-claim-mongodb-2   Bound     pvc-c3e47e57-78ed-11e8-9053-563fd79e0d5d   30Gi       RWO            managed-premium   3h
+```
+```bash
+mac:$ az acr login --name fiwareacr
+mac:$ docker build -t ${REPOSITORY}/tech-sketch/storage:0.1.0 ./controller/storage/
+mac:$ docker push ${REPOSITORY}/tech-sketch/storage:0.1.0
+```
+```bash
+mac:$ envsubst < controller/storage.yaml | kubectl apply -f -
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Content-Type: multipart/form-data" https://api.cloudconductor.jp/storage/faces/ -X POST -F file=face.jpg | jq .
+{
+  "path": "/shared/faces/xBlzQGubIM5YYr1S.JPEG",
+  "url": ""
+}
 ```

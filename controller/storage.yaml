@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: storage
+  labels:
+    service: storage
+  annotations:
+    getambassador.io/config: |
+      ---
+      apiVersion: ambassador/v0
+      kind:  Mapping
+      name:  storage-mapping
+      prefix: /storage/
+      service: http://storage:8888
+spec:
+  type: ClusterIP
+  selector:
+    pod: storage
+  ports:
+  - name: storage
+    port: 8888
+    targetPort: 8888
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: storage
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        pod: storage
+    spec:
+      containers:
+      - name: storage
+        image: ${REPOSITORY}/tech-sketch/storage:0.1.0
+        imagePullPolicy: Always
+        env:
+        - name: LISTEN_PORT
+          value: "8888"
+        - name: LOG_LEVEL
+          value: "DEBUG"
+        - name: FACE_UPLOAD_DIR_FULLPATH
+          value: "/shared/faces"
+        ports:
+        - name: storage
+          containerPort: 8888
+        volumeMounts:
+        - mountPath: "/shared/faces"
+          name: shared-storage-claim
+      volumes:
+        - name: shared-storage-claim
+          persistentVolumeClaim:
+            claimName: face-upload-shared-storage
