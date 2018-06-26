@@ -638,7 +638,7 @@ mac:$ docker push ${REPOSITORY}/tech-sketch/storage:0.1.0
 mac:$ envsubst < controller/storage.yaml | kubectl apply -f -
 ```
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Content-Type: multipart/form-data" https://api.cloudconductor.jp/storage/faces/ -X POST -F file=face.jpg | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Content-Type: multipart/form-data" https://api.cloudconductor.jp/storage/faces/ -X POST -F face=face.jpg | jq .
 {
   "path": "/shared/faces/xBlzQGubIM5YYr1S.JPEG",
   "url": ""

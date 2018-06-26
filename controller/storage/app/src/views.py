@@ -28,11 +28,11 @@ class FaceListAPI(MethodView):
     NAME = 'face-list'
 
     def post(self):
-        if 'file' not in request.files or not request.files['file']:
+        if 'face' not in request.files or not request.files['face']:
             msg = 'face image not found'
             logger.warning(msg)
             raise BadRequest(msg)
-        imagefile = request.files['file']
+        imagefile = request.files['face']
         try:
             fmt = Image.open(imagefile.stream).format
 
