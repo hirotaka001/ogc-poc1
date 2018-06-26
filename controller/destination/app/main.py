@@ -7,7 +7,7 @@ from logging import getLogger
 
 from flask import Flask
 
-from src.views import DestinationListAPI
+from src.views import DestinationListAPI, DestinationDetailAPI
 from src import error_handler
 from src import const
 
@@ -26,6 +26,7 @@ except FileNotFoundError:
 app = Flask(__name__)
 app.config.from_pyfile(const.CONFIG_CFG)
 app.add_url_rule('/', view_func=DestinationListAPI.as_view(DestinationListAPI.NAME))
+app.add_url_rule('/<id>/', view_func=DestinationDetailAPI.as_view(DestinationDetailAPI.NAME))
 app.register_blueprint(error_handler.blueprint)
 
 
