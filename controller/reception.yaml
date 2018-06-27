@@ -33,6 +33,8 @@ spec:
           value: "8888"
         - name: ORION_ENDPOINT
           value: "http://orion:1026"
+        - name: DESTINATION_ENDPOINT
+          value: "http://destination:8888"
         - name: LOG_LEVEL
           value: "DEBUG"
         - name: PEPPER_SERVICE
@@ -41,6 +43,8 @@ spec:
           value: "${PEPPER_SERVICEPATH}"
         - name: PEPPER_TYPE
           value: "${PEPPER_TYPE}"
+        - name: PEPPER_IDPATTERN
+          value: "${PEPPER_IDPATTERN}"
         - name: PEPPER_1_ID
           value: "${PEPPER_1_ID}"
         ports:

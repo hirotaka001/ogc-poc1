@@ -1,33 +1,28 @@
 # -*- coding: utf-8 -*-
 import os
 from logging import getLogger
-from urllib.parse import urljoin
 
-from flask import request, jsonify, current_app
+from flask import request, jsonify
 from flask.views import MethodView
 from werkzeug.exceptions import BadRequest
 
-from src import orion
-from src import const
+from src import slack, const
+from src.orion import Orion, OrionError
+from src.destination import Destination, DestinationDoesNotExist
 
 logger = getLogger(__name__)
 
 
-class OrionEndpointMixin:
-    ORION_ENDPOINT = None
-
-    @classmethod
-    def get_orion_endpoint(cls):
-        if cls.ORION_ENDPOINT is None:
-            if const.ORION_ENDPOINT in os.environ:
-                cls.ORION_ENDPOINT = urljoin(os.environ[const.ORION_ENDPOINT], const.ORION_PATH)
-            else:
-                cls.ORION_ENDPOINT = urljoin(current_app.config[const.DEFAULT_ORION_ENDPOINT], const.ORION_PATH)
-        return cls.ORION_ENDPOINT
-
-
-class StartReceptionAPI(OrionEndpointMixin, MethodView):
+class StartReceptionAPI(MethodView):
     NAME = 'start-reception'
+
+    def __init__(self):
+        service = os.environ.get(const.PEPPER_SERVICE, '')
+        service_path = os.environ.get(const.PEPPER_SERVICEPATH, '')
+        t = os.environ.get(const.PEPPER_TYPE, '')
+
+        self.orion = Orion(service, service_path, t)
+        self.pepper_1_id = os.environ.get(const.PEPPER_1_ID, '')
 
     def post(self):
         data = request.data.decode('utf-8')
@@ -35,17 +30,53 @@ class StartReceptionAPI(OrionEndpointMixin, MethodView):
 
         result = {'result': 'failure'}
         try:
-            value = orion.get_attr_value(data, 'state')
+            value = self.orion.get_attr_value(data, 'state')
             if value is not None and value == 'on':
-                endpoint = StartReceptionAPI.get_orion_endpoint()
-                service = os.environ.get(const.PEPPER_SERVICE, '')
-                service_path = os.environ.get(const.PEPPER_SERVICE_PATH, '')
-                id = os.environ.get(const.PEPPER_1_ID, '')
-                type = os.environ.get(const.PEPPER_TYPE, '')
-                message = orion.send_message(endpoint, service, service_path, id, type, 'welcome', 'start')
+                message = self.orion.send_message(self.pepper_1_id, 'welcome', 'start')
                 result['result'] = 'success'
                 result['message'] = message
-        except orion.OrionError as e:
+        except OrionError as e:
+            logger.error(f'OrionError: {str(e)}')
+            raise BadRequest(str(e))
+        except Exception as e:
+            logger.exception(e)
+            raise e
+
+        return jsonify(result)
+
+
+class FinishReceptionAPI(MethodView):
+    NAME = 'finish-reception'
+
+    def __init__(self):
+        service = os.environ.get(const.PEPPER_SERVICE, '')
+        service_path = os.environ.get(const.PEPPER_SERVICEPATH, '')
+        t = os.environ.get(const.PEPPER_TYPE, '')
+
+        self.orion = Orion(service, service_path, t)
+        self.pepper_1_id = os.environ.get(const.PEPPER_1_ID, '')
+
+    def post(self):
+        data = request.data.decode('utf-8')
+        logger.info(f'request data={data}')
+
+        result = {'result': 'failure'}
+        try:
+            value = self.orion.get_attr_value(data, 'dest')
+            if value is not None:
+                dest = Destination().get_destinations(value)
+
+                if const.SLACK_WEBHOOK in dest:
+                    slack.send_message_to_slack(dest[const.SLACK_WEBHOOK], dest.get(const.DEST_NAME))
+
+                message = self.orion.send_message(self.pepper_1_id, 'handover', dest.get(const.DEST_FLOOR))
+                result['result'] = 'success'
+                result['message'] = message
+
+        except DestinationDoesNotExist as e:
+            logger.error(f'DestinationDoesNotFound: {str(e)}')
+            raise BadRequest(str(e))
+        except OrionError as e:
             logger.error(f'OrionError: {str(e)}')
             raise BadRequest(str(e))
         except Exception as e:

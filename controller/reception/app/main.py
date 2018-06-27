@@ -7,7 +7,7 @@ from logging import getLogger
 
 from flask import Flask
 
-from src.views import StartReceptionAPI
+from src.views import StartReceptionAPI, FinishReceptionAPI
 from src import error_handler
 from src import const
 
@@ -26,6 +26,7 @@ except FileNotFoundError:
 app = Flask(__name__)
 app.config.from_pyfile(const.CONFIG_CFG)
 app.add_url_rule('/notify/start-reception/', view_func=StartReceptionAPI.as_view(StartReceptionAPI.NAME))
+app.add_url_rule('/notify/finish-reception/', view_func=FinishReceptionAPI.as_view(FinishReceptionAPI.NAME))
 app.register_blueprint(error_handler.blueprint)
 
 
