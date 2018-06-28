@@ -9,6 +9,7 @@ ARG SERVICE_PATH
 ENV LOGGING_JSON /opt/logging.json
 
 COPY ${SERVICE_PATH} /opt/app
+COPY ./controller/controllerlibs/dist/ /opt/wheel
 
 WORKDIR /opt/app
 
@@ -17,6 +18,7 @@ RUN apk update && \
     apk add --no-cache --virtual .build python3-dev build-base linux-headers pcre-dev && \
     pip install -r requirements/common.txt && \
     pip install -r requirements/production.txt && \
+    pip install --no-index --find-links=/opt/wheel -r requirements/wheel.txt && \
     rm /etc/nginx/nginx.conf && \
     apk del --purge .build && \
     rm -r /root/.cache

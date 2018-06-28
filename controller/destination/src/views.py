@@ -1,15 +1,10 @@
 # -*- coding: utf-8 -*-
-import os
 import re
-import json
 from logging import getLogger
 
-from flask import request, jsonify, current_app
+from flask import request, jsonify
 from flask.views import MethodView
-from werkzeug.exceptions import BadRequest, NotFound
-
-from src import const
-from src.utils import get_random_str
+from werkzeug.exceptions import NotFound
 
 logger = getLogger(__name__)
 

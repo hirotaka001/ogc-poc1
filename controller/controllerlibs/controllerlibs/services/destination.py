@@ -8,7 +8,7 @@ from flask import current_app
 
 import requests
 
-from src import const
+from controllerlibs import DESTINATION_ENDPOINT, DESTINATION_LIST_PATH, DEFAULT_DESTINATION_ENDPOINT, DEST_NAME
 
 logger = getLogger(__name__)
 
@@ -27,11 +27,11 @@ class Destination:
     @classmethod
     def get_destination_list_url(cls):
         if cls.DESTINATION_LIST_URL is None:
-            if const.DESTINATION_ENDPOINT in os.environ:
-                cls.DESTINATION_LIST_URL = urljoin(os.environ[const.DESTINATION_ENDPOINT], const.DESTINATION_LIST_PATH)
+            if DESTINATION_ENDPOINT in os.environ:
+                cls.DESTINATION_LIST_URL = urljoin(os.environ[DESTINATION_ENDPOINT], DESTINATION_LIST_PATH)
             else:
-                cls.DESTINATION_LIST_URL = urljoin(current_app.config[const.DEFAULT_DESTINATION_ENDPOINT],
-                                                   const.DESTINATION_LIST_PATH)
+                cls.DESTINATION_LIST_URL = urljoin(current_app.config[DEFAULT_DESTINATION_ENDPOINT],
+                                                   DESTINATION_LIST_PATH)
         return cls.DESTINATION_LIST_URL
 
     def get_destinations(self, name):
@@ -39,7 +39,7 @@ class Destination:
             'Content-Type': 'application/json'
         }
         params = {
-            'filter': f'{const.DEST_NAME}|{name}'
+            'filter': f'{DEST_NAME}|{name}'
         }
         try:
             destinations = requests.get(Destination.get_destination_list_url(), headers=headers, params=params).json()

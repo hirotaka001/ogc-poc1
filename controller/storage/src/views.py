@@ -8,11 +8,13 @@ from werkzeug.exceptions import BadRequest
 
 from PIL import Image
 
+from controllerlibs.utils import get_random_str
+
 from src import const
-from src.utils import get_random_str
 
 
 logger = getLogger(__name__)
+
 
 if const.FACE_UPLOAD_DIR_FULLPATH not in os.environ or \
         not os.environ[const.FACE_UPLOAD_DIR_FULLPATH].startswith('/') or \

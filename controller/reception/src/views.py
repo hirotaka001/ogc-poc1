@@ -7,8 +7,10 @@ from flask.views import MethodView
 from werkzeug.exceptions import BadRequest
 
 from src import slack, const
-from src.orion import Orion, get_attr_value, NGSIPayloadError, AttrDoesNotExist
-from src.destination import Destination, DestinationDoesNotExist
+
+from controllerlibs import DEST_NAME
+from controllerlibs.services.orion import Orion, get_attr_value, NGSIPayloadError, AttrDoesNotExist
+from controllerlibs.services.destination import Destination, DestinationDoesNotExist
 
 logger = getLogger(__name__)
 
@@ -69,7 +71,7 @@ class FinishReceptionAPI(MethodView):
             dest = Destination().get_destinations(value)
 
             if const.SLACK_WEBHOOK in dest:
-                slack.send_message_to_slack(dest[const.SLACK_WEBHOOK], dest.get(const.DEST_NAME))
+                slack.send_message_to_slack(dest[const.SLACK_WEBHOOK], dest.get(DEST_NAME))
 
             message = self.orion.send_message(self.pepper_1_id, 'handover', dest.get(const.DEST_FLOOR))
             result['result'] = 'success'

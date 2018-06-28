@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
-import os
 from logging import getLogger
 
 from flask import request, jsonify
 from flask.views import MethodView
 from werkzeug.exceptions import BadRequest
 
-from src import const
-from src.orion import get_attr_value, get_attr_timestamp, NGSIPayloadError, AttrDoesNotExist
+from controllerlibs.services.orion import get_attr_value, get_attr_timestamp, NGSIPayloadError, AttrDoesNotExist
 
 logger = getLogger(__name__)
 

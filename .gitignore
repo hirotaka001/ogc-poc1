@@ -4,3 +4,6 @@ idas/iotagent-ul/config.js
 .python-version
 *.py[oc]
 .pytest_cache
+dist/
+*.egg-info
+build/

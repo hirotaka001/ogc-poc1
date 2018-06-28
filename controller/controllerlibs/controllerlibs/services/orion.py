@@ -9,7 +9,7 @@ from flask import current_app
 
 import requests
 
-from src import const
+from controllerlibs import ORION_ENDPOINT, ORION_GET_PATH, ORION_POST_PATH, ORION_PAYLOAD_TEMPLATE, DEFAULT_ORION_ENDPOINT
 
 logger = getLogger(__name__)
 
@@ -33,19 +33,19 @@ class Orion:
     @classmethod
     def get_orion_get_url(cls):
         if cls.ORION_GET_URL is None:
-            if const.ORION_ENDPOINT in os.environ:
-                cls.ORION_GET_URL = urljoin(os.environ[const.ORION_ENDPOINT], const.ORION_GET_PATH)
+            if ORION_ENDPOINT in os.environ:
+                cls.ORION_GET_URL = urljoin(os.environ[ORION_ENDPOINT], ORION_GET_PATH)
             else:
-                cls.ORION_GET_URL = urljoin(current_app.config[const.DEFAULT_ORION_ENDPOINT], const.ORION_GET_PATH)
+                cls.ORION_GET_URL = urljoin(current_app.config[DEFAULT_ORION_ENDPOINT], ORION_GET_PATH)
         return cls.ORION_GET_URL
 
     @classmethod
     def get_orion_post_url(cls):
         if cls.ORION_POST_URL is None:
-            if const.ORION_ENDPOINT in os.environ:
-                cls.ORION_POST_URL = urljoin(os.environ[const.ORION_ENDPOINT], const.ORION_POST_PATH)
+            if ORION_ENDPOINT in os.environ:
+                cls.ORION_POST_URL = urljoin(os.environ[ORION_ENDPOINT], ORION_POST_PATH)
             else:
-                cls.ORION_POST_URL = urljoin(current_app.config[const.DEFAULT_ORION_ENDPOINT], const.ORION_POST_PATH)
+                cls.ORION_POST_URL = urljoin(current_app.config[DEFAULT_ORION_ENDPOINT], ORION_POST_PATH)
         return cls.ORION_POST_URL
 
     def __init__(self, service, service_path, t):
@@ -59,7 +59,7 @@ class Orion:
         headers['Fiware-Servicepath'] = self.service_path
 
         params = {
-            'idPattern': os.environ.get(const.PEPPER_IDPATTERN, ''),
+            'idPattern': idpattern,
             'attrs': 'id',
         }
 
@@ -75,7 +75,7 @@ class Orion:
         headers['Fiware-Servicepath'] = self.service_path
         headers['Content-Type'] = 'application/json'
 
-        data = copy.deepcopy(const.ORION_PAYLOAD_TEMPLATE)
+        data = copy.deepcopy(ORION_PAYLOAD_TEMPLATE)
         data['contextElements'][0]['id'] = str(id)
         data['contextElements'][0]['isPattern'] = False
         data['contextElements'][0]['type'] = self.type
