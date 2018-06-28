@@ -69,4 +69,29 @@
       }
     ]
     ```
+1. simulate to be called `/storage/faces/` REST API by `pepper`
 
+    ```bash
+    mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Content-Type: multipart/form-data" https://api.cloudconductor.jp/storage/faces/ -X POST -F face=@face.jpg | jq .
+    {
+      "path": "/shared/faces/xBlzQGubIM5YYr1S.JPEG",
+      "url": ""
+    }
+    ```
+1. simulate to finish reception
+
+    ```bash
+    $ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.cloudconductor.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000001/attrs -u iotagent -P iotagent0GC -m "$d|face|/shared/faces/IoYu2c4sggdVLi49.JPEG|dest|ProjectRoom 1"
+    Client mosqpub|22418-Nobuyukin sending CONNECT
+    Client mosqpub|22418-Nobuyukin received CONNACK
+    Client mosqpub|22418-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/attrs', ... (100 bytes))
+    Client mosqpub|22418-Nobuyukin sending DISCONNECT
+    ```
+1. send 'handover' command to `pepper` automatically
+
+    ```bash
+    Client mosqsub|99494-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/attrs', ... (95 bytes))
+    2018-06-28T10:44:07.1530150247+0900|face|/shared/faces/IoYu2c4sggdVLi49.JPEG|dest|ProjectRoom 1
+    Client mosqsub|99494-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/cmd', ... (34 bytes))
+    pepper_0000000000000001@handover|3<Paste>
+    ```

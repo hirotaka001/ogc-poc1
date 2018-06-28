@@ -527,7 +527,7 @@ mac:$ docker build -t ${REPOSITORY}/tech-sketch/reception:0.1.0 ./controller/rec
 mac:$ docker push ${REPOSITORY}/tech-sketch/reception:0.1.0
 ```
 ```bash
-mac:$ env PEPPER_SERVICE=pepper PEPPER_SERVICEPATH=/ PEPPER_TYPE=pepper PEPPER_1_ID=pepper_0000000000000001 envsubst < controller/reception.yaml | kubectl apply -f -
+mac:$ env PEPPER_SERVICE="pepper" PEPPER_SERVICEPATH="/" PEPPER_TYPE="pepper" PEPPER_1_ID="pepper_0000000000000001" PEPPER_IDPATTERN="pepper.*" envsubst < controller/reception.yaml | kubectl apply -f -
 ```
 ```bash
 mac:$ kubectl get pods -l pod=reception
@@ -558,6 +558,7 @@ destination-84b86b54f6-7wkl9   1/1       Running   0          19s
 destination-84b86b54f6-rqjjc   1/1       Running   0          19s
 destination-84b86b54f6-sjqhb   1/1       Running   0          19s
 ```
+```bash
 mac:$ kubectl get services -l service=destination
 NAME          TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)    AGE
 destination   ClusterIP   10.0.81.101   <none>        8888/TCP   1m
@@ -638,9 +639,31 @@ mac:$ docker push ${REPOSITORY}/tech-sketch/storage:0.1.0
 mac:$ envsubst < controller/storage.yaml | kubectl apply -f -
 ```
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Content-Type: multipart/form-data" https://api.cloudconductor.jp/storage/faces/ -X POST -F face=face.jpg | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Content-Type: multipart/form-data" https://api.cloudconductor.jp/storage/faces/ -X POST -F face=@face.jpg | jq .
 {
   "path": "/shared/faces/xBlzQGubIM5YYr1S.JPEG",
   "url": ""
 }
+```
+
+## start ledger service on AKS
+```bash
+mac:$ az acr login --name fiwareacr
+mac:$ docker build -t ${REPOSITORY}/tech-sketch/ledger:0.1.0 ./controller/ledger/
+mac:$ docker push ${REPOSITORY}/tech-sketch/ledger:0.1.0
+```
+```bash
+mac:$ envsubst < controller/ledger.yaml | kubectl apply -f -
+```
+```bash
+mac:$ kubectl get pods -l pod=ledger
+NAME                     READY     STATUS    RESTARTS   AGE
+ledger-df7789d46-mtx8j   1/1       Running   0          27s
+ledger-df7789d46-nsws8   1/1       Running   0          27s
+ledger-df7789d46-x5mxk   1/1       Running   0          27s
+```
+```bash
+mac:$ kubectl get services -l service=ledger
+NAME      TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)    AGE
+ledger    ClusterIP   10.0.229.79   <none>        8888/TCP   50s
 ```

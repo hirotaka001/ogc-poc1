@@ -234,6 +234,46 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 __EOS__
 ```
 ```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.cloudconductor.jp/idas/ul20/manage/iot/devices/ -X POST -d @- <<__EOS__
+{
+  "devices": [
+    {
+      "device_id": "pepper_0000000000000002",
+      "entity_name": "pepper_0000000000000002",
+      "entity_type": "pepper",
+      "timezone": "Asia/Tokyo",
+      "protocol": "UL20",
+      "attributes": [
+        {
+          "name": "face",
+          "type": "string"
+        }, {
+          "name": "dest",
+          "type": "string"
+        }
+      ],
+      "commands": [
+        {
+          "name": "welcome",
+          "type": "string"
+        }, {
+          "name": "handover",
+          "type": "string"
+        }, {
+          "name": "facedetect",
+          "type": "string"
+        }, {
+          "name": "retry",
+          "type": "string"
+        }
+      ],
+      "transport": "MQTT"
+    }
+  ]
+}
+__EOS__
+```
+```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-Servicepath: /" https://api.cloudconductor.jp/idas/ul20/manage/iot/devices/pepper_0000000000000001/ | jq .
 {
   "device_id": "pepper_0000000000000001",
@@ -789,6 +829,218 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
         "url": "http://reception:8888/notify/start-reception/"
       },
       "lastSuccess": "2018-06-22T04:55:41.00Z"
+    }
+  }
+]
+```
+
+## register reception as a subscriber of PEPPER
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.cloudconductor.jp/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
+{
+  "subject": {
+    "entities": [{
+      "idPattern": "pepper.*",
+      "type": "pepper"
+    }],
+    "condition": {
+      "attrs": ["face", "dest"]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://reception:8888/notify/finish-reception/"
+    },
+    "attrs": ["face", "dest"]
+  }
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" https://api.cloudconductor.jp/orion/v2/subscriptions/ | jq .
+[
+  {
+    "id": "5b31c29b27b17a9c32812b35",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "pepper.*",
+          "type": "pepper"
+        }
+      ],
+      "condition": {
+        "attrs": []
+      }
+    },
+    "notification": {
+      "timesSent": 6,
+      "lastNotification": "2018-06-26T08:58:53.00Z",
+      "attrs": [
+        "dest",
+        "face",
+        "welcome_status",
+        "handover_status",
+        "facedetect_status",
+        "retry_status"
+      ],
+      "attrsFormat": "legacy",
+      "http": {
+        "url": "http://cygnus:5050/notify"
+      },
+      "lastSuccess": "2018-06-26T08:58:53.00Z"
+    }
+  },
+  {
+    "id": "5b3200c4ba29c9f2c7cc1922",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "pepper.*",
+          "type": "pepper"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "face",
+          "dest"
+        ]
+      }
+    },
+    "notification": {
+      "timesSent": 1,
+      "lastNotification": "2018-06-26T09:00:52.00Z",
+      "attrs": [
+        "face",
+        "dest"
+      ],
+      "attrsFormat": "normalized",
+      "http": {
+        "url": "http://reception:8888/notify/finish-reception/"
+      },
+      "lastSuccess": "2018-06-26T09:00:52.00Z"
+    }
+  }
+]
+```
+## register ledger as a subscriber of PEPPER
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.cloudconductor.jp/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
+{
+  "subject": {
+    "entities": [{
+      "idPattern": "pepper.*",
+      "type": "pepper"
+    }],
+    "condition": {
+      "attrs": ["face", "dest"]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://ledger:8888/notify/record-reception/"
+    },
+    "attrs": ["face", "dest"]
+  }
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" https://api.cloudconductor.jp/orion/v2/subscriptions/ | jq .
+[
+  {
+    "id": "5b31c29b27b17a9c32812b35",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "pepper.*",
+          "type": "pepper"
+        }
+      ],
+      "condition": {
+        "attrs": []
+      }
+    },
+    "notification": {
+      "timesSent": 41,
+      "lastNotification": "2018-06-28T00:47:24.00Z",
+      "attrs": [
+        "dest",
+        "face",
+        "welcome_status",
+        "handover_status",
+        "facedetect_status",
+        "retry_status"
+      ],
+      "attrsFormat": "legacy",
+      "http": {
+        "url": "http://cygnus:5050/notify"
+      },
+      "lastSuccess": "2018-06-28T00:47:24.00Z"
+    }
+  },
+  {
+    "id": "5b3200c4ba29c9f2c7cc1922",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "pepper.*",
+          "type": "pepper"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "face",
+          "dest"
+        ]
+      }
+    },
+    "notification": {
+      "timesSent": 17,
+      "lastNotification": "2018-06-28T00:46:55.00Z",
+      "attrs": [
+        "face",
+        "dest"
+      ],
+      "attrsFormat": "normalized",
+      "http": {
+        "url": "http://reception:8888/notify/finish-reception/"
+      },
+      "lastSuccess": "2018-06-28T00:46:55.00Z"
+    }
+  },
+  {
+    "id": "5b34324a50a63601fc455002",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "pepper.*",
+          "type": "pepper"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "face",
+          "dest"
+        ]
+      }
+    },
+    "notification": {
+      "timesSent": 1,
+      "lastNotification": "2018-06-28T00:56:42.00Z",
+      "attrs": [
+        "face",
+        "dest"
+      ],
+      "attrsFormat": "normalized",
+      "http": {
+        "url": "http://ledger:8888/notify/record-reception/"
+      },
+      "lastSuccess": "2018-06-28T00:56:42.00Z"
     }
   }
 ]
