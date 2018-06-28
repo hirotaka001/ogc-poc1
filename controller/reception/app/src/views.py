@@ -7,7 +7,7 @@ from flask.views import MethodView
 from werkzeug.exceptions import BadRequest
 
 from src import slack, const
-from src.orion import Orion, OrionError
+from src.orion import Orion, get_attr_value, NGSIPayloadError, AttrDoesNotExist
 from src.destination import Destination, DestinationDoesNotExist
 
 logger = getLogger(__name__)
@@ -25,18 +25,21 @@ class StartReceptionAPI(MethodView):
         self.pepper_1_id = os.environ.get(const.PEPPER_1_ID, '')
 
     def post(self):
-        data = request.data.decode('utf-8')
-        logger.info(f'request data={data}')
+        content = request.data.decode('utf-8')
+        logger.info(f'request content={content}')
 
         result = {'result': 'failure'}
         try:
-            value = self.orion.get_attr_value(data, 'state')
-            if value is not None and value == 'on':
+            value = get_attr_value(content, 'state')
+            if value == 'on':
                 message = self.orion.send_message(self.pepper_1_id, 'welcome', 'start')
                 result['result'] = 'success'
                 result['message'] = message
-        except OrionError as e:
-            logger.error(f'OrionError: {str(e)}')
+        except AttrDoesNotExist as e:
+            logger.error(f'AttrDoesNotExist: {str(e)}')
+            raise BadRequest(str(e))
+        except NGSIPayloadError as e:
+            logger.error(f'NGSIPayloadError: {str(e)}')
             raise BadRequest(str(e))
         except Exception as e:
             logger.exception(e)
@@ -57,27 +60,28 @@ class FinishReceptionAPI(MethodView):
         self.pepper_1_id = os.environ.get(const.PEPPER_1_ID, '')
 
     def post(self):
-        data = request.data.decode('utf-8')
-        logger.info(f'request data={data}')
+        content = request.data.decode('utf-8')
+        logger.info(f'request content={content}')
 
         result = {'result': 'failure'}
         try:
-            value = self.orion.get_attr_value(data, 'dest')
-            if value is not None:
-                dest = Destination().get_destinations(value)
+            value = get_attr_value(content, 'dest')
+            dest = Destination().get_destinations(value)
 
-                if const.SLACK_WEBHOOK in dest:
-                    slack.send_message_to_slack(dest[const.SLACK_WEBHOOK], dest.get(const.DEST_NAME))
+            if const.SLACK_WEBHOOK in dest:
+                slack.send_message_to_slack(dest[const.SLACK_WEBHOOK], dest.get(const.DEST_NAME))
 
-                message = self.orion.send_message(self.pepper_1_id, 'handover', dest.get(const.DEST_FLOOR))
-                result['result'] = 'success'
-                result['message'] = message
-
+            message = self.orion.send_message(self.pepper_1_id, 'handover', dest.get(const.DEST_FLOOR))
+            result['result'] = 'success'
+            result['message'] = message
+        except AttrDoesNotExist as e:
+            logger.error(f'AttrDoesNotExist: {str(e)}')
+            raise BadRequest(str(e))
+        except NGSIPayloadError as e:
+            logger.error(f'NGSIPayloadError: {str(e)}')
+            raise BadRequest(str(e))
         except DestinationDoesNotExist as e:
             logger.error(f'DestinationDoesNotFound: {str(e)}')
-            raise BadRequest(str(e))
-        except OrionError as e:
-            logger.error(f'OrionError: {str(e)}')
             raise BadRequest(str(e))
         except Exception as e:
             logger.exception(e)

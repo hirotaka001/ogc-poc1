@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ledger
+  labels:
+    service: ledger
+spec:
+  type: ClusterIP
+  selector:
+    pod: ledger
+  ports:
+  - name: ledger
+    port: 8888
+    targetPort: 8888
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: ledger
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        pod: ledger
+    spec:
+      containers:
+      - name: ledger
+        image: ${REPOSITORY}/tech-sketch/ledger:0.1.0
+        imagePullPolicy: Always
+        env:
+        - name: LISTEN_PORT
+          value: "8888"
+        - name: ORION_ENDPOINT
+          value: "http://orion:1026"
+        - name: LOG_LEVEL
+          value: "DEBUG"
+        ports:
+          - name: reception
+            containerPort: 8888
