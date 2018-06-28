@@ -4,9 +4,13 @@ MAINTAINER Nobuyuki Matsui <nobuyuki.matsui@gmail.com>
 ARG LISTEN_PORT
 ENV LISTEN_PORT ${LISTEN_PORT:-3000}
 
-COPY ./app /opt/destination
+ARG SERVICE_PATH
 
-WORKDIR /opt/destination
+ENV LOGGING_JSON /opt/logging.json
+
+COPY ${SERVICE_PATH} /opt/app
+
+WORKDIR /opt/app
 
 RUN apk update && \
     apk add --no-cache nginx supervisor && \
@@ -17,11 +21,12 @@ RUN apk update && \
     apk del --purge .build && \
     rm -r /root/.cache
 
-COPY nginx.conf /etc/nginx/nginx.conf
-COPY flask-nginx.conf /etc/nginx/conf.d/flask-nginx.conf
-COPY uwsgi.ini /etc/uwsgi/uwsgi.ini
-COPY supervisord.conf /etc/supervisord.conf
-COPY entrypoint.sh /opt
+COPY ./controller/docker/nginx.conf /etc/nginx/nginx.conf
+COPY ./controller/docker/flask-nginx.conf /etc/nginx/conf.d/flask-nginx.conf
+COPY ./controller/docker/uwsgi.ini /etc/uwsgi/uwsgi.ini
+COPY ./controller/docker/supervisord.conf /etc/supervisord.conf
+COPY ./controller/docker/entrypoint.sh /opt/entrypoint.sh
+COPY ./controller/docker/logging.json /opt/logging.json
 
 RUN chmod a+x /opt/entrypoint.sh
 

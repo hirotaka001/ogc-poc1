@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+import os
 
 # logging
-LOGGING_JSON = 'logging.json'
+LOGGING_JSON = os.environ.get('LOGGING_JSON', '../docker/logging.json')
 TARGET_HANDLERS = ['console', ]
 
 # flask config

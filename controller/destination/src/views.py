@@ -74,7 +74,6 @@ class DestinationListAPI(MethodView):
             attrs = [a.strip() for a in request.args['attr'].split(',')]
             result = [{k: d[k] for k in attrs if k in d} for d in result]
 
-
         return jsonify(result)
 
 

@@ -523,7 +523,7 @@ cygnus    ClusterIP   10.103.255.240   <none>        5050/TCP,8081/TCP   1m
 ## start reception service on AKS
 ```bash
 mac:$ az acr login --name fiwareacr
-mac:$ docker build -t ${REPOSITORY}/tech-sketch/reception:0.1.0 ./controller/reception/
+mac:$ docker build --build-arg SERVICE_PATH="./controller/reception" -t ${REPOSITORY}/tech-sketch/reception:0.1.0 -f ./controller/docker/Dockerfile .
 mac:$ docker push ${REPOSITORY}/tech-sketch/reception:0.1.0
 ```
 ```bash
@@ -545,7 +545,7 @@ reception   ClusterIP   10.0.163.98   <none>        8888/TCP   1m
 ## start destination service on AKS
 ```bash
 mac:$ az acr login --name fiwareacr
-mac:$ docker build -t ${REPOSITORY}/tech-sketch/destination:0.1.0 ./controller/destination/
+mac:$ docker build --build-arg SERVICE_PATH="./controller/destination" -t ${REPOSITORY}/tech-sketch/destination:0.1.0 -f ./controller/docker/Dockerfile .
 mac:$ docker push ${REPOSITORY}/tech-sketch/destination:0.1.0
 ```
 ```bash
@@ -632,7 +632,7 @@ mongodb-storage-claim-mongodb-2   Bound     pvc-c3e47e57-78ed-11e8-9053-563fd79e
 ```
 ```bash
 mac:$ az acr login --name fiwareacr
-mac:$ docker build -t ${REPOSITORY}/tech-sketch/storage:0.1.0 ./controller/storage/
+mac:$ docker build --build-arg SERVICE_PATH="./controller/storage" -t ${REPOSITORY}/tech-sketch/storage:0.1.0 -f ./controller/docker/Dockerfile_pillow .
 mac:$ docker push ${REPOSITORY}/tech-sketch/storage:0.1.0
 ```
 ```bash
@@ -649,7 +649,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 ## start ledger service on AKS
 ```bash
 mac:$ az acr login --name fiwareacr
-mac:$ docker build -t ${REPOSITORY}/tech-sketch/ledger:0.1.0 ./controller/ledger/
+mac:$ docker build --build-arg SERVICE_PATH="./controller/ledger" -t ${REPOSITORY}/tech-sketch/ledger:0.1.0 -f ./controller/docker/Dockerfile .
 mac:$ docker push ${REPOSITORY}/tech-sketch/ledger:0.1.0
 ```
 ```bash
