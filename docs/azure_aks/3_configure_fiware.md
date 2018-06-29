@@ -29,7 +29,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 __EOS__
 ```
 ```bash
-mac:$ $ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: button_sensor" -H "Fiware-Servicepath: /*" https://api.cloudconductor.jp/idas/ul20/manage/iot/services/ | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: button_sensor" -H "Fiware-Servicepath: /*" https://api.cloudconductor.jp/idas/ul20/manage/iot/services/ | jq .
 {
   "count": 1,
   "services": [
@@ -128,8 +128,8 @@ Client mosqpub|92108-Nobuyukin sending DISCONNECT
 ```bash
 mac:$ mosquitto_sub -h mqtt.cloudconductor.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
 ...
-Client mosqsub|32291-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/button_sensor/button_sensor_0000000000000001/attrs', ... (44 bytes))
-2018-06-22T15:15:53.1529648153+0900|state|on
+Client mosqsub|18252-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/button_sensor/button_sensor_0000000000000001/attrs', ... (44 bytes))
+2018-06-29T10:34:30.1530236070+0900|state|on
 ```
 ```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: button_sensor" -H "Fiware-Servicepath: /" https://api.cloudconductor.jp/orion/v2/entities/button_sensor_0000000000000001/ | jq .
@@ -138,7 +138,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
   "type": "button_sensor",
   "TimeInstant": {
     "type": "ISO8601",
-    "value": "2018-06-22T15:15:53.1529648153+0900",
+    "value": "2018-06-29T10:34:30.1530236070+0900",
     "metadata": {}
   },
   "state": {
@@ -147,7 +147,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-06-22T15:15:53.1529648153+0900"
+        "value": "2018-06-29T10:34:30.1530236070+0900"
       }
     }
   }
@@ -274,134 +274,265 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 __EOS__
 ```
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-Servicepath: /" https://api.cloudconductor.jp/idas/ul20/manage/iot/devices/pepper_0000000000000001/ | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-Servicepath: /" https://api.cloudconductor.jp/idas/ul20/manage/iot/devices/ | jq .
 {
-  "device_id": "pepper_0000000000000001",
-  "service": "pepper",
-  "service_path": "/",
-  "entity_name": "pepper_0000000000000001",
-  "entity_type": "pepper",
-  "transport": "MQTT",
-  "attributes": [
+  "count": 2,
+  "devices": [
     {
-      "object_id": "face",
-      "name": "face",
-      "type": "string"
+      "device_id": "pepper_0000000000000001",
+      "service": "pepper",
+      "service_path": "/",
+      "entity_name": "pepper_0000000000000001",
+      "entity_type": "pepper",
+      "transport": "MQTT",
+      "attributes": [
+        {
+          "object_id": "face",
+          "name": "face",
+          "type": "string"
+        },
+        {
+          "object_id": "dest",
+          "name": "dest",
+          "type": "string"
+        }
+      ],
+      "lazy": [],
+      "commands": [
+        {
+          "object_id": "welcome",
+          "name": "welcome",
+          "type": "string"
+        },
+        {
+          "object_id": "handover",
+          "name": "handover",
+          "type": "string"
+        },
+        {
+          "object_id": "facedetect",
+          "name": "facedetect",
+          "type": "string"
+        },
+        {
+          "object_id": "retry",
+          "name": "retry",
+          "type": "string"
+        }
+      ],
+      "static_attributes": [],
+      "protocol": "UL20"
     },
     {
-      "object_id": "dest",
-      "name": "dest",
-      "type": "string"
+      "device_id": "pepper_0000000000000002",
+      "service": "pepper",
+      "service_path": "/",
+      "entity_name": "pepper_0000000000000002",
+      "entity_type": "pepper",
+      "transport": "MQTT",
+      "attributes": [
+        {
+          "object_id": "face",
+          "name": "face",
+          "type": "string"
+        },
+        {
+          "object_id": "dest",
+          "name": "dest",
+          "type": "string"
+        }
+      ],
+      "lazy": [],
+      "commands": [
+        {
+          "object_id": "welcome",
+          "name": "welcome",
+          "type": "string"
+        },
+        {
+          "object_id": "handover",
+          "name": "handover",
+          "type": "string"
+        },
+        {
+          "object_id": "facedetect",
+          "name": "facedetect",
+          "type": "string"
+        },
+        {
+          "object_id": "retry",
+          "name": "retry",
+          "type": "string"
+        }
+      ],
+      "static_attributes": [],
+      "protocol": "UL20"
     }
-  ],
-  "lazy": [],
-  "commands": [
-    {
-      "object_id": "welcome",
-      "name": "welcome",
-      "type": "string"
-    },
-    {
-      "object_id": "handover",
-      "name": "handover",
-      "type": "string"
-    },
-    {
-      "object_id": "facedetect",
-      "name": "facedetect",
-      "type": "string"
-    },
-    {
-      "object_id": "retry",
-      "name": "retry",
-      "type": "string"
-    }
-  ],
-  "static_attributes": [],
-  "protocol": "UL20"
+  ]
 }
 ```
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-Servicepath: /" https://api.cloudconductor.jp/orion/v2/entities/pepper_0000000000000001/ | jq .
-{
-  "id": "pepper_0000000000000001",
-  "type": "pepper",
-  "TimeInstant": {
-    "type": "ISO8601",
-    "value": " ",
-    "metadata": {}
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-Servicepath: /" https://api.cloudconductor.jp/orion/v2/entities/ | jq .
+[
+  {
+    "id": "pepper_0000000000000001",
+    "type": "pepper",
+    "TimeInstant": {
+      "type": "ISO8601",
+      "value": " ",
+      "metadata": {}
+    },
+    "dest": {
+      "type": "string",
+      "value": " ",
+      "metadata": {}
+    },
+    "face": {
+      "type": "string",
+      "value": " ",
+      "metadata": {}
+    },
+    "facedetect_info": {
+      "type": "commandResult",
+      "value": " ",
+      "metadata": {}
+    },
+    "facedetect_status": {
+      "type": "commandStatus",
+      "value": "UNKNOWN",
+      "metadata": {}
+    },
+    "handover_info": {
+      "type": "commandResult",
+      "value": " ",
+      "metadata": {}
+    },
+    "handover_status": {
+      "type": "commandStatus",
+      "value": "UNKNOWN",
+      "metadata": {}
+    },
+    "retry_info": {
+      "type": "commandResult",
+      "value": " ",
+      "metadata": {}
+    },
+    "retry_status": {
+      "type": "commandStatus",
+      "value": "UNKNOWN",
+      "metadata": {}
+    },
+    "welcome_info": {
+      "type": "commandResult",
+      "value": " ",
+      "metadata": {}
+    },
+    "welcome_status": {
+      "type": "commandStatus",
+      "value": "UNKNOWN",
+      "metadata": {}
+    },
+    "welcome": {
+      "type": "string",
+      "value": "",
+      "metadata": {}
+    },
+    "handover": {
+      "type": "string",
+      "value": "",
+      "metadata": {}
+    },
+    "facedetect": {
+      "type": "string",
+      "value": "",
+      "metadata": {}
+    },
+    "retry": {
+      "type": "string",
+      "value": "",
+      "metadata": {}
+    }
   },
-  "dest": {
-    "type": "string",
-    "value": " ",
-    "metadata": {}
-  },
-  "face": {
-    "type": "string",
-    "value": " ",
-    "metadata": {}
-  },
-  "facedetect_info": {
-    "type": "commandResult",
-    "value": " ",
-    "metadata": {}
-  },
-  "facedetect_status": {
-    "type": "commandStatus",
-    "value": "UNKNOWN",
-    "metadata": {}
-  },
-  "handover_info": {
-    "type": "commandResult",
-    "value": " ",
-    "metadata": {}
-  },
-  "handover_status": {
-    "type": "commandStatus",
-    "value": "UNKNOWN",
-    "metadata": {}
-  },
-  "retry_info": {
-    "type": "commandResult",
-    "value": " ",
-    "metadata": {}
-  },
-  "retry_status": {
-    "type": "commandStatus",
-    "value": "UNKNOWN",
-    "metadata": {}
-  },
-  "welcome_info": {
-    "type": "commandResult",
-    "value": " ",
-    "metadata": {}
-  },
-  "welcome_status": {
-    "type": "commandStatus",
-    "value": "UNKNOWN",
-    "metadata": {}
-  },
-  "welcome": {
-    "type": "string",
-    "value": "",
-    "metadata": {}
-  },
-  "handover": {
-    "type": "string",
-    "value": "",
-    "metadata": {}
-  },
-  "facedetect": {
-    "type": "string",
-    "value": "",
-    "metadata": {}
-  },
-  "retry": {
-    "type": "string",
-    "value": "",
-    "metadata": {}
+  {
+    "id": "pepper_0000000000000002",
+    "type": "pepper",
+    "TimeInstant": {
+      "type": "ISO8601",
+      "value": " ",
+      "metadata": {}
+    },
+    "dest": {
+      "type": "string",
+      "value": " ",
+      "metadata": {}
+    },
+    "face": {
+      "type": "string",
+      "value": " ",
+      "metadata": {}
+    },
+    "facedetect_info": {
+      "type": "commandResult",
+      "value": " ",
+      "metadata": {}
+    },
+    "facedetect_status": {
+      "type": "commandStatus",
+      "value": "UNKNOWN",
+      "metadata": {}
+    },
+    "handover_info": {
+      "type": "commandResult",
+      "value": " ",
+      "metadata": {}
+    },
+    "handover_status": {
+      "type": "commandStatus",
+      "value": "UNKNOWN",
+      "metadata": {}
+    },
+    "retry_info": {
+      "type": "commandResult",
+      "value": " ",
+      "metadata": {}
+    },
+    "retry_status": {
+      "type": "commandStatus",
+      "value": "UNKNOWN",
+      "metadata": {}
+    },
+    "welcome_info": {
+      "type": "commandResult",
+      "value": " ",
+      "metadata": {}
+    },
+    "welcome_status": {
+      "type": "commandStatus",
+      "value": "UNKNOWN",
+      "metadata": {}
+    },
+    "welcome": {
+      "type": "string",
+      "value": "",
+      "metadata": {}
+    },
+    "handover": {
+      "type": "string",
+      "value": "",
+      "metadata": {}
+    },
+    "facedetect": {
+      "type": "string",
+      "value": "",
+      "metadata": {}
+    },
+    "retry": {
+      "type": "string",
+      "value": "",
+      "metadata": {}
+    }
   }
-}
+]
 ```
 
 ## test PEPPER command
@@ -431,17 +562,17 @@ __EOS__
 ```bash
 mac:$ mosquitto_sub -h mqtt.cloudconductor.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
 ...
-Client mosqsub|32291-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/cmd', ... (37 bytes))
+Client mosqsub|18252-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/cmd', ... (37 bytes))
 pepper_0000000000000001@welcome|start
 ```
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-Servicepath: /" https://api.cloudconductor.jp/orion/v2/entities/pepper_0000000000000001/ | jq .
+$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-Servicepath: /" https://api.cloudconductor.jp/orion/v2/entities/pepper_0000000000000001/ | jq .
 {
   "id": "pepper_0000000000000001",
   "type": "pepper",
   "TimeInstant": {
     "type": "ISO8601",
-    "value": "2018-06-22T04:21:44.00Z",
+    "value": "2018-06-29T01:38:36.00Z",
     "metadata": {}
   },
   "dest": {
@@ -495,7 +626,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-06-22T04:21:44.067Z"
+        "value": "2018-06-29T01:57:29.219Z"
       }
     }
   },
@@ -521,7 +652,6 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
   }
 }
 ```
-
 ```bash
 mac:$ mosquitto_pub -h mqtt.cloudconductor.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000001/cmdexe -u iotagent -P XXXXXXXX -m "pepper_0000000000000001@welcome|start exec"
 Client mosqpub|92385-Nobuyukin sending CONNECT
@@ -530,13 +660,19 @@ Client mosqpub|92385-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_
 Client mosqpub|92385-Nobuyukin sending DISCONNECT
 ```
 ```bash
+mac:$ mosquitto_sub -h mqtt.cloudconductor.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+...
+Client mosqsub|18252-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/cmdexe', ... (42 bytes))
+pepper_0000000000000001@welcome|start exec
+```
+```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-Servicepath: /" https://api.cloudconductor.jp/orion/v2/entities/pepper_0000000000000001/ | jq .
 {
   "id": "pepper_0000000000000001",
   "type": "pepper",
   "TimeInstant": {
     "type": "ISO8601",
-    "value": "2018-06-22T04:22:41.00Z",
+    "value": "2018-06-29T01:58:40.00Z",
     "metadata": {}
   },
   "dest": {
@@ -585,7 +721,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-06-22T04:22:41.606Z"
+        "value": "2018-06-29T01:58:40.946Z"
       }
     }
   },
@@ -595,7 +731,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-06-22T04:22:41.606Z"
+        "value": "2018-06-29T01:58:40.946Z"
       }
     }
   },
@@ -646,7 +782,7 @@ __EOS__
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: button_sensor" -H "Fiware-ServicePath: /" https://api.cloudconductor.jp/orion/v2/subscriptions/ | jq .
 [
   {
-    "id": "5b2c7ad4c682df4861905ac7",
+    "id": "5b358ed7cabb3e96b43251ba",
     "status": "active",
     "subject": {
       "entities": [
@@ -661,7 +797,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     },
     "notification": {
       "timesSent": 1,
-      "lastNotification": "2018-06-22T04:28:04.00Z",
+      "lastNotification": "2018-06-29T01:43:51.00Z",
       "attrs": [
         "state"
       ],
@@ -669,7 +805,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "http": {
         "url": "http://cygnus:5050/notify"
       },
-      "lastSuccess": "2018-06-22T04:28:04.00Z"
+      "lastSuccess": "2018-06-29T01:43:51.00Z"
     }
   }
 ]
@@ -679,7 +815,7 @@ mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_button_sensor --eval 'db.ge
 MongoDB shell version v3.6.5
 connecting to: mongodb://127.0.0.1:27017/sth_button_sensor
 MongoDB server version: 3.6.5
-{ "_id" : ObjectId("5b2c7bd579828d000af5ae1b"), "recvTime" : ISODate("2018-06-22T04:32:21.299Z"), "attrName" : "state", "attrType" : "string", "attrValue" : "on" }
+{ "_id" : ObjectId("5b358ed7f13180000ab627fc"), "recvTime" : ISODate("2018-06-29T01:43:51.699Z"), "attrName" : "state", "attrType" : "string", "attrValue" : "on" }
 ```
 
 ```bash
@@ -705,7 +841,7 @@ __EOS__
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" https://api.cloudconductor.jp/orion/v2/subscriptions/ | jq .
 [
   {
-    "id": "5b2c7f073f343a30cd7b65df",
+    "id": "5b3590a707f08f3a3ac62b58",
     "status": "active",
     "subject": {
       "entities": [
@@ -720,7 +856,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     },
     "notification": {
       "timesSent": 5,
-      "lastNotification": "2018-06-22T04:49:16.00Z",
+      "lastNotification": "2018-06-29T01:58:40.00Z",
       "attrs": [
         "dest",
         "face",
@@ -733,24 +869,21 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "http": {
         "url": "http://cygnus:5050/notify"
       },
-      "lastSuccess": "2018-06-22T04:49:17.00Z"
+      "lastSuccess": "2018-06-29T01:58:40.00Z"
     }
   }
 ]
 ```
 ```bash
-mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_pepper --eval 'db.getCollection("sth_/_pepper_0000000000000001_pepper").find()'
-{ "_id" : ObjectId("5b2c7fb669d383000a97c3a6"), "recvTime" : ISODate("2018-06-22T04:48:54.951Z"), "attrName" : "facedetect_status", "attrType" : "commandStatus", "attrValue" : "UNKNOWN" }
-{ "_id" : ObjectId("5b2c7fb669d383000a97c3a7"), "recvTime" : ISODate("2018-06-22T04:48:54.951Z"), "attrName" : "handover_status", "attrType" : "commandStatus", "attrValue" : "UNKNOWN" }
-{ "_id" : ObjectId("5b2c7fb669d383000a97c3a8"), "recvTime" : ISODate("2018-06-22T04:48:54.951Z"), "attrName" : "retry_status", "attrType" : "commandStatus", "attrValue" : "UNKNOWN" }
-{ "_id" : ObjectId("5b2c7fb669d383000a97c3a9"), "recvTime" : ISODate("2018-06-22T04:48:54.922Z"), "attrName" : "welcome_status", "attrType" : "commandStatus", "attrValue" : "PENDING" }
-{ "_id" : ObjectId("5b2c7fcd79828d000af5ae20"), "recvTime" : ISODate("2018-06-22T04:49:16.996Z"), "attrName" : "facedetect_status", "attrType" : "commandStatus", "attrValue" : "UNKNOWN" }
-{ "_id" : ObjectId("5b2c7fcd79828d000af5ae21"), "recvTime" : ISODate("2018-06-22T04:49:16.996Z"), "attrName" : "handover_status", "attrType" : "commandStatus", "attrValue" : "UNKNOWN" }
-{ "_id" : ObjectId("5b2c7fcd79828d000af5ae22"), "recvTime" : ISODate("2018-06-22T04:49:16.996Z"), "attrName" : "retry_status", "attrType" : "commandStatus", "attrValue" : "UNKNOWN" }
-{ "_id" : ObjectId("5b2c7fcd79828d000af5ae23"), "recvTime" : ISODate("2018-06-22T04:49:16.973Z"), "attrName" : "welcome_status", "attrType" : "commandStatus", "attrValue" : "OK" }
+$ kubectl exec mongodb-0 -c mongodb -- mongo sth_pepper --eval 'db.getCollection("sth_/_pepper_0000000000000001_pepper").find({"attrName": "welcome_status"})'
+MongoDB shell version v3.6.5
+connecting to: mongodb://127.0.0.1:27017/sth_pepper
+MongoDB server version: 3.6.5
+{ "_id" : ObjectId("5b359209169675000a7aebcd"), "recvTime" : ISODate("2018-06-29T01:57:29.219Z"), "attrName" : "welcome_status", "attrType" : "commandStatus", "attrValue" : "PENDING" }
+{ "_id" : ObjectId("5b359250169675000a7aebd1"), "recvTime" : ISODate("2018-06-29T01:58:40.946Z"), "attrName" : "welcome_status", "attrType" : "commandStatus", "attrValue" : "OK" }
 ```
 
-## register reception as a subscriber of BUTTON-SENSOR
+## register `start-reception` of reception as a subscriber of BUTTON-SENSOR
 ```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: button_sensor" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.cloudconductor.jp/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
 {
@@ -776,7 +909,7 @@ __EOS__
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: button_sensor" -H "Fiware-ServicePath: /" https://api.cloudconductor.jp/orion/v2/subscriptions/ | jq .
 [
   {
-    "id": "5b2c7ad4c682df4861905ac7",
+    "id": "5b358ed7cabb3e96b43251ba",
     "status": "active",
     "subject": {
       "entities": [
@@ -790,8 +923,8 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       }
     },
     "notification": {
-      "timesSent": 2,
-      "lastNotification": "2018-06-22T04:32:21.00Z",
+      "timesSent": 1,
+      "lastNotification": "2018-06-29T01:43:51.00Z",
       "attrs": [
         "state"
       ],
@@ -799,11 +932,11 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "http": {
         "url": "http://cygnus:5050/notify"
       },
-      "lastSuccess": "2018-06-22T04:32:21.00Z"
+      "lastSuccess": "2018-06-29T01:43:51.00Z"
     }
   },
   {
-    "id": "5b2c814dc682df4861905ac8",
+    "id": "5b35932607f08f3a3ac62b59",
     "status": "active",
     "subject": {
       "entities": [
@@ -820,7 +953,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     },
     "notification": {
       "timesSent": 1,
-      "lastNotification": "2018-06-22T04:55:41.00Z",
+      "lastNotification": "2018-06-29T02:02:14.00Z",
       "attrs": [
         "state"
       ],
@@ -828,13 +961,13 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "http": {
         "url": "http://reception:8888/notify/start-reception/"
       },
-      "lastSuccess": "2018-06-22T04:55:41.00Z"
+      "lastSuccess": "2018-06-29T02:02:14.00Z"
     }
   }
 ]
 ```
 
-## register reception as a subscriber of PEPPER
+## register `finish-reception` of reception as a subscriber of PEPPER
 ```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.cloudconductor.jp/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
 {
@@ -860,7 +993,7 @@ __EOS__
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" https://api.cloudconductor.jp/orion/v2/subscriptions/ | jq .
 [
   {
-    "id": "5b31c29b27b17a9c32812b35",
+    "id": "5b3590a707f08f3a3ac62b58",
     "status": "active",
     "subject": {
       "entities": [
@@ -875,7 +1008,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     },
     "notification": {
       "timesSent": 6,
-      "lastNotification": "2018-06-26T08:58:53.00Z",
+      "lastNotification": "2018-06-29T02:02:14.00Z",
       "attrs": [
         "dest",
         "face",
@@ -888,11 +1021,11 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "http": {
         "url": "http://cygnus:5050/notify"
       },
-      "lastSuccess": "2018-06-26T08:58:53.00Z"
+      "lastSuccess": "2018-06-29T02:02:14.00Z"
     }
   },
   {
-    "id": "5b3200c4ba29c9f2c7cc1922",
+    "id": "5b35935fcabb3e96b43251bb",
     "status": "active",
     "subject": {
       "entities": [
@@ -910,7 +1043,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     },
     "notification": {
       "timesSent": 1,
-      "lastNotification": "2018-06-26T09:00:52.00Z",
+      "lastNotification": "2018-06-29T02:03:11.00Z",
       "attrs": [
         "face",
         "dest"
@@ -919,12 +1052,13 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "http": {
         "url": "http://reception:8888/notify/finish-reception/"
       },
-      "lastSuccess": "2018-06-26T09:00:52.00Z"
+      "lastSuccess": "2018-06-29T02:03:11.00Z"
     }
   }
 ]
 ```
-## register ledger as a subscriber of PEPPER
+
+## register `record-reception` of ledger as a subscriber of PEPPER
 ```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.cloudconductor.jp/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
 {
@@ -950,7 +1084,7 @@ __EOS__
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" https://api.cloudconductor.jp/orion/v2/subscriptions/ | jq .
 [
   {
-    "id": "5b31c29b27b17a9c32812b35",
+    "id": "5b3590a707f08f3a3ac62b58",
     "status": "active",
     "subject": {
       "entities": [
@@ -964,8 +1098,8 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       }
     },
     "notification": {
-      "timesSent": 41,
-      "lastNotification": "2018-06-28T00:47:24.00Z",
+      "timesSent": 6,
+      "lastNotification": "2018-06-29T02:02:14.00Z",
       "attrs": [
         "dest",
         "face",
@@ -978,42 +1112,11 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "http": {
         "url": "http://cygnus:5050/notify"
       },
-      "lastSuccess": "2018-06-28T00:47:24.00Z"
+      "lastSuccess": "2018-06-29T02:02:14.00Z"
     }
   },
   {
-    "id": "5b3200c4ba29c9f2c7cc1922",
-    "status": "active",
-    "subject": {
-      "entities": [
-        {
-          "idPattern": "pepper.*",
-          "type": "pepper"
-        }
-      ],
-      "condition": {
-        "attrs": [
-          "face",
-          "dest"
-        ]
-      }
-    },
-    "notification": {
-      "timesSent": 17,
-      "lastNotification": "2018-06-28T00:46:55.00Z",
-      "attrs": [
-        "face",
-        "dest"
-      ],
-      "attrsFormat": "normalized",
-      "http": {
-        "url": "http://reception:8888/notify/finish-reception/"
-      },
-      "lastSuccess": "2018-06-28T00:46:55.00Z"
-    }
-  },
-  {
-    "id": "5b34324a50a63601fc455002",
+    "id": "5b35935fcabb3e96b43251bb",
     "status": "active",
     "subject": {
       "entities": [
@@ -1031,7 +1134,38 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     },
     "notification": {
       "timesSent": 1,
-      "lastNotification": "2018-06-28T00:56:42.00Z",
+      "lastNotification": "2018-06-29T02:03:11.00Z",
+      "attrs": [
+        "face",
+        "dest"
+      ],
+      "attrsFormat": "normalized",
+      "http": {
+        "url": "http://reception:8888/notify/finish-reception/"
+      },
+      "lastSuccess": "2018-06-29T02:03:11.00Z"
+    }
+  },
+  {
+    "id": "5b35944007f08f3a3ac62b5a",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "pepper.*",
+          "type": "pepper"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "face",
+          "dest"
+        ]
+      }
+    },
+    "notification": {
+      "timesSent": 1,
+      "lastNotification": "2018-06-29T02:06:56.00Z",
       "attrs": [
         "face",
         "dest"
@@ -1039,8 +1173,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "attrsFormat": "normalized",
       "http": {
         "url": "http://ledger:8888/notify/record-reception/"
-      },
-      "lastSuccess": "2018-06-28T00:56:42.00Z"
+      }
     }
   }
 ]

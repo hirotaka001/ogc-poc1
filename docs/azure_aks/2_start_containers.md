@@ -422,13 +422,13 @@ mac:$ env IOTAGENT_PASSWORD=XXXXXXXXXXXX envsubst < idas/iotagent-ul/config.js.t
 ```
 
 ```bash
-mac:$ az acr login --name fiwareacr
+mac:$ az acr login --name ogcacr
 mac:$ docker build -t ${REPOSITORY}/tech-sketch/iotagent-ul:1.6.0 idas/iotagent-ul/
 mac:$ docker push ${REPOSITORY}/tech-sketch/iotagent-ul:1.6.0
 ```
 
 ```bash
-mac:$ az acr repository list --name fiwareacr --output table
+mac:$ az acr repository list --name ogcacr --output table
 Result
 ---------------------------------
 tech-sketch/iotagent-ul
@@ -489,13 +489,13 @@ server: envoy
 **In this demonstration, we use re-configured cygnus in order to revoke unnecessary sinks.**
 
 ```bash
-mac:$ az acr login --name fiwareacr
+mac:$ az acr login --name ogcacr
 mac:$ docker build -t ${REPOSITORY}/tech-sketch/cygnus-ngsi:1.8.0 ./cygnus/fiware-cygnus/
 mac:$ docker push ${REPOSITORY}/tech-sketch/cygnus-ngsi:1.8.0
 ```
 
 ```bash
-mac:$ az acr repository list --name fiwareacr --output table
+mac:$ az acr repository list --name ogcacr --output table
 Result
 ---------------------------------
 tech-sketch/cygnus-ngsi
@@ -520,9 +520,16 @@ NAME      TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
 cygnus    ClusterIP   10.103.255.240   <none>        5050/TCP,8081/TCP   1m
 ```
 
+## build libraries for controller services
+```bash
+mac:$ sh ./controller/controllerlibs/build.sh
+mac:$ ls controller/controllerlibs/dist/controllerlibs-0.1.0-py3-none-any.whl
+controller/controllerlibs/dist/controllerlibs-0.1.0-py3-none-any.whl
+```
+
 ## start reception service on AKS
 ```bash
-mac:$ az acr login --name fiwareacr
+mac:$ az acr login --name ogcacr
 mac:$ docker build --build-arg SERVICE_PATH="./controller/reception" -t ${REPOSITORY}/tech-sketch/reception:0.1.0 -f ./controller/docker/Dockerfile .
 mac:$ docker push ${REPOSITORY}/tech-sketch/reception:0.1.0
 ```
@@ -544,7 +551,7 @@ reception   ClusterIP   10.0.163.98   <none>        8888/TCP   1m
 
 ## start destination service on AKS
 ```bash
-mac:$ az acr login --name fiwareacr
+mac:$ az acr login --name ogcacr
 mac:$ docker build --build-arg SERVICE_PATH="./controller/destination" -t ${REPOSITORY}/tech-sketch/destination:0.1.0 -f ./controller/docker/Dockerfile .
 mac:$ docker push ${REPOSITORY}/tech-sketch/destination:0.1.0
 ```
@@ -608,9 +615,8 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 
 ## start storage service on AKS
 ```bash
-mac:$ export MANAGED_CLUSTER=$(az resource show --resource-group fiware-demo --name fiwareaks --resource-type Microsoft.ContainerService/managedClusters --query properties.nodeResourceGroup -o tsv);echo ${MANAGED_CLUSTER}
-MC_fiware-demo_fiwareaks_westus
-mac:$ az storage account create --resource-group ${MANAGED_CLUSTER} --name fiwareaksstorageaccount --location westus --sku Standard_LRS
+mac:$ export MANAGED_CLUSTER=$(az resource show --resource-group ogc-poc1 --name ogc-poc1-aks --resource-type Microsoft.ContainerService/managedClusters --query properties.nodeResourceGroup -o tsv);echo ${MANAGED_CLUSTER}
+mac:$ az storage account create --resource-group ${MANAGED_CLUSTER} --name fiwareaksstorageaccount --location japaneast --sku Standard_LRS
 ```
 ```bash
 mac:$ kubectl apply -f controller/shared-storage-azure.yaml
@@ -631,7 +637,7 @@ mongodb-storage-claim-mongodb-1   Bound     pvc-65adcba8-78ed-11e8-9053-563fd79e
 mongodb-storage-claim-mongodb-2   Bound     pvc-c3e47e57-78ed-11e8-9053-563fd79e0d5d   30Gi       RWO            managed-premium   3h
 ```
 ```bash
-mac:$ az acr login --name fiwareacr
+mac:$ az acr login --name ogcacr
 mac:$ docker build --build-arg SERVICE_PATH="./controller/storage" -t ${REPOSITORY}/tech-sketch/storage:0.1.0 -f ./controller/docker/Dockerfile_pillow .
 mac:$ docker push ${REPOSITORY}/tech-sketch/storage:0.1.0
 ```
@@ -648,7 +654,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 
 ## start ledger service on AKS
 ```bash
-mac:$ az acr login --name fiwareacr
+mac:$ az acr login --name ogcacr
 mac:$ docker build --build-arg SERVICE_PATH="./controller/ledger" -t ${REPOSITORY}/tech-sketch/ledger:0.1.0 -f ./controller/docker/Dockerfile .
 mac:$ docker push ${REPOSITORY}/tech-sketch/ledger:0.1.0
 ```
