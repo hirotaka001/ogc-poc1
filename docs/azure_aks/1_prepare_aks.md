@@ -7,9 +7,7 @@ Prepare [Microsoft Azure AKS](https://azure.microsoft.com/en-us/services/contain
 1. [start kubernetes](#start-kubernetes-on-azure-aks)
 1. [install helm](#install-helm)
 
-**In the following document, replace "tenant.onmicrosoft.com" with your account's tentant.**
-
-## create DNS zone of "example.com"
+## create DNS zone of "tech-sketch.jp"
 
 ```bash
 mac:$ az group create --name dns-zone --location japaneast

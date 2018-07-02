@@ -14,8 +14,6 @@ Start pods & services on AKS by following steps:
 1. [start reception service](#start-reception-service-on-aks)
 1. [start destination service](#start-destination-service-on-aks)
 
-**In the following document, replace "example.com" with your domain.**
-
 ## start etcd cluster on AKS
 
 [etcd](https://github.com/coreos/etcd)
@@ -71,44 +69,46 @@ d7c603bd213157b2: name=etcd-cluster-0002 peerURLs=http://etcd-cluster-0002.etcd-
 mac:$ mkdir -p secrets
 mac:$ touch secrets/vmq.passwd
 mac:$ docker run --rm -v $(pwd)/secrets:/mnt -it erlio/docker-vernemq vmq-passwd /mnt/vmq.passwd iotagent
-mac:$ docker run --rm -v $(pwd)/secrets:/mnt -it erlio/docker-vernemq vmq-passwd /mnt/vmq.passwd raspberrypi
-mac:$ docker run --rm -v $(pwd)/secrets:/mnt -it erlio/docker-vernemq vmq-passwd /mnt/vmq.passwd turtlesim
-mac:$ docker run --rm -v $(pwd)/secrets:/mnt -it erlio/docker-vernemq vmq-passwd /mnt/vmq.passwd gopigo
+mac:$ docker run --rm -v $(pwd)/secrets:/mnt -it erlio/docker-vernemq vmq-passwd /mnt/vmq.passwd button_sensor
+mac:$ docker run --rm -v $(pwd)/secrets:/mnt -it erlio/docker-vernemq vmq-passwd /mnt/vmq.passwd pepper
+mac:$ docker run --rm -v $(pwd)/secrets:/mnt -it erlio/docker-vernemq vmq-passwd /mnt/vmq.passwd dest_led
+mac:$ docker run --rm -v $(pwd)/secrets:/mnt -it erlio/docker-vernemq vmq-passwd /mnt/vmq.passwd dest_human_sensor
+mac:$ docker run --rm -v $(pwd)/secrets:/mnt -it erlio/docker-vernemq vmq-passwd /mnt/vmq.passwd ros
 ```
 
 ```bash
-mac:$ docker run -it -v $(pwd)/secrets:/etc/letsencrypt certbot/certbot certonly --manual --domain mqtt.example.com --email nobuyuki.matsui@gmail.com --agree-tos --manual-public-ip-logging-ok --preferred-challenges dns
+mac:$ docker run -it -v $(pwd)/secrets:/etc/letsencrypt certbot/certbot certonly --manual --domain mqtt.tech-sketch.jp --email nobuyuki.matsui@gmail.com --agree-tos --manual-public-ip-logging-ok --preferred-challenges dns
 ```
 
 * Another terminal
 ```bash
-mac-another:$ az network dns record-set txt add-record --resource-group dns-zone --zone-name "example.com" --record-set-name "_acme-challenge.mqtt" --value "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-mac-another:$ az network dns record-set list --resource-group dns-zone --zone-name "example.com" | jq '.[] | {"fqdn": .fqdn, "type": .type}'
+mac-another:$ az network dns record-set txt add-record --resource-group dns-zone --zone-name "tech-sketch.jp" --record-set-name "_acme-challenge.mqtt" --value "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+mac-another:$ az network dns record-set list --resource-group dns-zone --zone-name "tech-sketch.jp" | jq '.[] | {"fqdn": .fqdn, "type": .type}'
 {
-  "fqdn": "example.com.",
+  "fqdn": "tech-sketch.jp.",
   "type": "Microsoft.Network/dnszones/NS"
 }
 {
-  "fqdn": "example.com.",
+  "fqdn": "tech-sketch.jp.",
   "type": "Microsoft.Network/dnszones/SOA"
 }
 {
-  "fqdn": "_acme-challenge.mqtt.example.com.",
+  "fqdn": "_acme-challenge.mqtt.tech-sketch.jp.",
   "type": "Microsoft.Network/dnszones/TXT"
 }
 ```
 
-* Press 'ENTER' at original terminal when `_acme-challenge.mqtt.example.com.` txt record is created.
+* Press 'ENTER' at original terminal when `_acme-challenge.mqtt.tech-sketch.jp.` txt record is created.
 
 * After completion of certbot
 ```bash
-mac-another:$ az network dns record-set txt remove-record --resource-group dns-zone --zone-name "example.com" --record-set-name "_acme-challenge.mqtt" --value "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+mac-another:$ az network dns record-set txt remove-record --resource-group dns-zone --zone-name "tech-sketch.jp" --record-set-name "_acme-challenge.mqtt" --value "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 ```
 
 ```bash
-mac:$ cat secrets/DST_Root_CA_X3.pem secrets/archive/mqtt.example.com/chain1.pem > secrets/ca.crt
-mac:$ cp secrets/archive/mqtt.example.com/fullchain1.pem secrets/server.crt
-mac:$ cp secrets/archive/mqtt.example.com/privkey1.pem secrets/server.key
+mac:$ cat secrets/DST_Root_CA_X3.pem secrets/archive/mqtt.tech-sketch.jp/chain1.pem > secrets/ca.crt
+mac:$ cp secrets/archive/mqtt.tech-sketch.jp/fullchain1.pem secrets/server.crt
+mac:$ cp secrets/archive/mqtt.tech-sketch.jp/privkey1.pem secrets/server.key
 ```
 
 ```bash
@@ -157,12 +157,12 @@ mac:$ kubectl exec vernemq-0 -- vmq-admin cluster show
 ```
 
 ```bash
-mac:$ az network dns record-set a add-record --resource-group dns-zone --zone-name "example.com" --record-set-name "mqtt" --ipv4-address "WWW.XXX.YYY.ZZZ"
+mac:$ az network dns record-set a add-record --resource-group dns-zone --zone-name "tech-sketch.jp" --record-set-name "mqtt" --ipv4-address "WWW.XXX.YYY.ZZZ"
 ```
 
 * XXXXXXXXXXXX is the password of "iotagent"
 ```text
-mac:$ mosquitto_sub -h mqtt.example.com -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXXXXXX
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXXXXXX
 ...
 ```
 
@@ -222,40 +222,52 @@ MongoDB server version: 3.6.5
 [ambassador](https://www.getambassador.io/)
 
 ```bash
-mac:$ docker run -it -v $(pwd)/secrets:/etc/letsencrypt certbot/certbot certonly --manual --domain api.example.com --email nobuyuki.matsui@gmail.com --agree-tos --manual-public-ip-logging-ok --preferred-challenges dns
+mac:$ docker run -it -v $(pwd)/secrets:/etc/letsencrypt certbot/certbot certonly --manual --domain api.tech-sketch.jp --email nobuyuki.matsui@gmail.com --agree-tos --manual-public-ip-logging-ok --preferred-challenges dns
 ```
 
 * Another terminal
 ```bash
-mac-another:$ az network dns record-set txt add-record --resource-group dns-zone --zone-name "example.com" --record-set-name "_acme-challenge.api" --value "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"
-mac-another:$ az network dns record-set list --resource-group dns-zone --zone-name "example.com" | jq '.[] | {"fqdn": .fqdn, "type": .type}'
+mac-another:$ az network dns record-set txt add-record --resource-group dns-zone --zone-name "tech-sketch.jp" --record-set-name "_acme-challenge.api" --value "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"
+mac-another:$ az network dns record-set list --resource-group dns-zone --zone-name "tech-sketch.jp" | jq '.[] | {"fqdn": .fqdn, "type": .type}'
 {
-  "fqdn": "example.com.",
+  "fqdn": "tech-sketch.jp.",
   "type": "Microsoft.Network/dnszones/NS"
 }
 {
-  "fqdn": "example.com.",
+  "fqdn": "tech-sketch.jp.",
   "type": "Microsoft.Network/dnszones/SOA"
 }
 {
-  "fqdn": "_acme-challenge.api.example.com.",
+  "fqdn": "_acme-challenge.api.tech-sketch.jp.",
   "type": "Microsoft.Network/dnszones/TXT"
 }
 {
-  "fqdn": "mqtt.example.com.",
+  "fqdn": "mqtt.tech-sketch.jp.",
   "type": "Microsoft.Network/dnszones/A"
 }
 ```
 
-* Press 'ENTER' at original terminal when `_acme-challenge.api.example.com.` txt record is created.
+* Press 'ENTER' at original terminal when `_acme-challenge.api.tech-sketch.jp.` txt record is created.
 
 * After completion of certbot
 ```bash
-mac-another:$ az network dns record-set txt remove-record --resource-group dns-zone --zone-name "example.com" --record-set-name "_acme-challenge.api" --value "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"
+mac-another:$ az network dns record-set txt remove-record --resource-group dns-zone --zone-name "tech-sketch.jp" --record-set-name "_acme-challenge.api" --value "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"
 ```
 
 ```bash
-mac:$ kubectl create secret tls ambassador-certs --cert=$(pwd)/secrets/live/api.example.com/fullchain.pem --key=$(pwd)/secrets/live/api.example.com/privkey.pem
+mac:$ kubectl create secret tls ambassador-certs --cert=$(pwd)/secrets/live/api.tech-sketch.jp/fullchain.pem --key=$(pwd)/secrets/live/api.tech-sketch.jp/privkey.pem
+```
+
+```bash
+mac:$ kubectl get secrets
+NAME                                                          TYPE                                  DATA      AGE
+ambassador-certs                                              kubernetes.io/tls                     2         29s
+default-token-rkrts                                           kubernetes.io/service-account-token   3         1h
+fiware-etcd-etcd-operator-etcd-backup-operator-token-42pgm    kubernetes.io/service-account-token   3         1h
+fiware-etcd-etcd-operator-etcd-operator-token-7v4dq           kubernetes.io/service-account-token   3         1h
+fiware-etcd-etcd-operator-etcd-restore-operator-token-wb6pg   kubernetes.io/service-account-token   3         1h
+vernemq-certifications                                        Opaque                                3         19m
+vernemq-passwd                                                Opaque                                1         19m
 ```
 
 ```bash
@@ -277,11 +289,11 @@ ambassador   LoadBalancer   10.0.191.59   www.xxx.yyy.zzz   443:30357/TCP,80:327
 ```
 
 ```bash
-mac:$ az network dns record-set a add-record --resource-group dns-zone --zone-name "example.com" --record-set-name "api" --ipv4-address "www.xxx.yyy.zzz"
+mac:$ az network dns record-set a add-record --resource-group dns-zone --zone-name "tech-sketch.jp" --record-set-name "api" --ipv4-address "www.xxx.yyy.zzz"
 ```
 
 ```bash
-mac:$ curl -i https://api.example.com
+mac:$ curl -i https://api.tech-sketch.jp
 HTTP/1.1 404 Not Found
 date: Fri, 25 May 2018 00:47:41 GMT
 server: envoy
@@ -291,17 +303,23 @@ content-length: 0
 ## start authorization & authentication service on AKS
 * create random string
 ```bash
-mac:$ cat /dev/urandom | LC_CTYPE=C tr -dc 'a-zA-Z0-9' | head -c 32
+mac:$ cat /dev/urandom | LC_CTYPE=C tr -dc 'a-zA-Z0-9' | head -c 32; echo ""
 ```
 
 * create `secrets/auth-tokens.json` like below:
 ```json
 {
   "bearer_tokens": [
-      {
-          "token": "iRGTsKKHwgjf4rR2XMSN3oE9Dhm6ym3O",
-          "allowed_paths": ["^/orion/.*$", "^/idas/.*$", "^/destinations(/)?$", "^/storage/faces(/)?$"]
-      }
+    {
+      "token": "7aiplWERkMJdS11q79Nwtvy848CU7peT",
+      "allowed_paths": ["^/orion/.*$", "^/idas/.*$", "^/destinations(/)?$", "^/storage/faces(/)?$"]
+    }, {
+      "token": "wSTjNyVqUsH27oIttz3qSl2fDqcpTCur",
+      "allowed_paths": ["^/destinations(/)?$", "^/storage/faces(/)?$"]
+    }, {
+      "token": "age9ZQ9pk9WsWV79D8jN4MFEN1WqXnI7",
+      "allowed_paths": ["^/destinations(/)?$"]
+    }
   ],
   "basic_auths": []
 }
@@ -365,7 +383,7 @@ orion     ClusterIP   10.0.44.126   <none>        1026/TCP   1m
 ```
 
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -i -H "Authorization: bearer ${TOKEN}" https://api.example.com/orion/v2/entities/
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -i -H "Authorization: bearer ${TOKEN}" https://api.tech-sketch.jp/orion/v2/entities/
 HTTP/1.1 200 OK
 content-length: 2
 content-type: application/json
@@ -378,7 +396,7 @@ server: envoy
 ```
 
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -i -H "Authorization: bearer ${TOKEN}" https://api.example.com/orion/v2/subscriptions/
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -i -H "Authorization: bearer ${TOKEN}" https://api.tech-sketch.jp/orion/v2/subscriptions/
 HTTP/1.1 200 OK
 content-length: 2
 content-type: application/json
@@ -453,7 +471,7 @@ iotagent-ul   ClusterIP   10.0.180.155   <none>        4041/TCP,7896/TCP   43s
 ```
 
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -i -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-Servicepath: /*" https://api.example.com/idas/ul20/manage/iot/services/
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -i -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-Servicepath: /*" https://api.tech-sketch.jp/idas/ul20/manage/iot/services/
 HTTP/1.1 200 OK
 x-powered-by: Express
 fiware-correlator: c114fc5e-b4a2-40f6-b7fe-1d68369784e5
@@ -468,7 +486,7 @@ server: envoy
 ```
 
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -i -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-Servicepath: /" https://api.example.com/idas/ul20/manage/iot/devices/
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -i -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: demo1" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/
 HTTP/1.1 200 OK
 x-powered-by: Express
 fiware-correlator: 1d1ee2f1-83e4-454e-8ef5-a10fd49630ab
@@ -522,6 +540,7 @@ cygnus    ClusterIP   10.103.255.240   <none>        5050/TCP,8081/TCP   1m
 
 ## build libraries for controller services
 ```bash
+mac:$ pip install wheel
 mac:$ sh ./controller/controllerlibs/build.sh
 mac:$ ls controller/controllerlibs/dist/controllerlibs-0.1.0-py3-none-any.whl
 controller/controllerlibs/dist/controllerlibs-0.1.0-py3-none-any.whl
@@ -571,7 +590,7 @@ NAME          TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)    AGE
 destination   ClusterIP   10.0.81.101   <none>        8888/TCP   1m
 ```
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" https://api.cloudconductor.jp/destinations/ | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" https://api.tech-sketch.jp/destinations/ | jq .
 [
   {
     "dest_human_sensor_id": "DEST-HUMAN-SENSOR-n8aL7MJuNQk0iJpY",
@@ -645,7 +664,7 @@ mac:$ docker push ${REPOSITORY}/tech-sketch/storage:0.1.0
 mac:$ envsubst < controller/storage.yaml | kubectl apply -f -
 ```
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Content-Type: multipart/form-data" https://api.cloudconductor.jp/storage/faces/ -X POST -F face=@face.jpg | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Content-Type: multipart/form-data" https://api.tech-sketch.jp/storage/faces/ -X POST -F face=@face.jpg | jq .
 {
   "path": "/shared/faces/xBlzQGubIM5YYr1S.JPEG",
   "url": ""
