@@ -692,3 +692,25 @@ mac:$ kubectl get services -l service=ledger
 NAME      TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)    AGE
 ledger    ClusterIP   10.0.229.79   <none>        8888/TCP   50s
 ```
+
+## start guidance service on AKS
+```bash
+mac:$ az acr login --name ogcacr
+mac:$ docker build --build-arg SERVICE_PATH="./controller/guidance" -t ${REPOSITORY}/tech-sketch/guidance:0.1.0 -f ./controller/docker/Dockerfile .
+mac:$ docker push ${REPOSITORY}/tech-sketch/guidance:0.1.0
+```
+```bash
+mac:$ env ROBOT_SERVICE="robot" ROBOT_SERVICEPATH="/" ROBOT_TYPE="guide_robot" ROBOT_ID="guide_robot" TURTLEBOT_1_ID="1" envsubst < controller/guidance.yaml | kubectl apply -f -
+```
+```bash
+mac:$ kubectl get pods -l pod=guidance
+NAME                        READY     STATUS    RESTARTS   AGE
+guidance-644f7f6755-2s4bq   1/1       Running   0          21s
+guidance-644f7f6755-7ttpm   1/1       Running   0          21s
+guidance-644f7f6755-sc5m8   1/1       Running   0          21s
+```
+```bash
+mac:$ kubectl get services -l service=guidance
+NAME       TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
+guidance   ClusterIP   10.0.222.146   <none>        8888/TCP   58s
+```

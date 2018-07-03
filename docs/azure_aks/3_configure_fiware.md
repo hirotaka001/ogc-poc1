@@ -756,6 +756,230 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 ```
 
+## register ROBOT service
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/idas/ul20/manage/iot/services/ -X POST -d @- <<__EOS__
+{
+  "services": [
+    {
+      "apikey": "guide_robot",
+      "cbroker": "http://orion:1026",
+      "resource": "/iot/d",
+      "entity_type": "guide_robot"
+    }
+  ]
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /*" https://api.tech-sketch.jp/idas/ul20/manage/iot/services/ | jq .
+{
+  "count": 1,
+  "services": [
+    {
+      "_id": "5b3b140f714ee900015538f0",
+      "subservice": "/",
+      "service": "robot",
+      "apikey": "guide_robot",
+      "resource": "/iot/d",
+      "__v": 0,
+      "attributes": [],
+      "lazy": [],
+      "commands": [],
+      "entity_type": "guide_robot",
+      "internal_attributes": [],
+      "static_attributes": []
+    }
+  ]
+}
+```
+
+## register ROBOT device
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/ -X POST -d @- <<__EOS__
+{
+  "devices": [
+    {
+      "device_id": "guide_robot",
+      "entity_name": "guide_robot",
+      "entity_type": "guide_robot",
+      "timezone": "Asia/Tokyo",
+      "protocol": "UL20",
+      "attributes": [
+        {
+          "name": "time",
+          "type": "string"
+        }, {
+          "name": "robot_id",
+          "type": "int"
+        }, {
+          "name": "r_mode",
+          "type": "string"
+        }, {
+          "name": "pos.x",
+          "type": "float"
+        }, {
+          "name": "pos.y",
+          "type": "float"
+        }, {
+          "name": "pos.z",
+          "type": "float"
+        }
+      ],
+      "commands": [
+        {
+          "name": "robot_request",
+          "type": "string"
+        }
+      ],
+      "transport": "MQTT"
+    }
+  ]
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/guide_robot/ | jq .
+{
+  "device_id": "guide_robot",
+  "service": "robot",
+  "service_path": "/",
+  "entity_name": "guide_robot",
+  "entity_type": "guide_robot",
+  "transport": "MQTT",
+  "attributes": [
+    {
+      "object_id": "time",
+      "name": "time",
+      "type": "string"
+    },
+    {
+      "object_id": "robot_id",
+      "name": "robot_id",
+      "type": "int"
+    },
+    {
+      "object_id": "r_mode",
+      "name": "r_mode",
+      "type": "string"
+    },
+    {
+      "object_id": "pos.x",
+      "name": "pos.x",
+      "type": "float"
+    },
+    {
+      "object_id": "pos.y",
+      "name": "pos.y",
+      "type": "float"
+    },
+    {
+      "object_id": "pos.z",
+      "name": "pos.z",
+      "type": "float"
+    }
+  ],
+  "lazy": [],
+  "commands": [
+    {
+      "object_id": "robot_request",
+      "name": "robot_request",
+      "type": "string"
+    }
+  ],
+  "static_attributes": [],
+  "protocol": "UL20"
+}
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot/ | jq .
+{
+  "id": "guide_robot",
+  "type": "guide_robot",
+  "TimeInstant": {
+    "type": "ISO8601",
+    "value": " ",
+    "metadata": {}
+  },
+  "pos.x": {
+    "type": "float",
+    "value": " ",
+    "metadata": {}
+  },
+  "pos.y": {
+    "type": "float",
+    "value": " ",
+    "metadata": {}
+  },
+  "pos.z": {
+    "type": "float",
+    "value": " ",
+    "metadata": {}
+  },
+  "r_mode": {
+    "type": "string",
+    "value": " ",
+    "metadata": {}
+  },
+  "robot_id": {
+    "type": "int",
+    "value": " ",
+    "metadata": {}
+  },
+  "robot_request_info": {
+    "type": "commandResult",
+    "value": " ",
+    "metadata": {}
+  },
+  "robot_request_status": {
+    "type": "commandStatus",
+    "value": "UNKNOWN",
+    "metadata": {}
+  },
+  "time": {
+    "type": "string",
+    "value": " ",
+    "metadata": {}
+  },
+  "robot_request": {
+    "type": "string",
+    "value": "",
+    "metadata": {}
+  }
+}
+```
+
+## test ROBOT command
+```bash
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v1/updateContext -d @-<<__EOS__ | jq .
+{
+  "contextElements": [
+    {
+      "id": "guide_robot",
+      "isPattern": "false",
+      "type": "guide_robot",
+      "attributes": [
+        {
+          "name": "robot_request",
+          "value": "robot_id|1|r_cmd|Navi|pos.x|123.4|pos.y|-987.6|pos.z|3"
+        }
+      ]
+    }
+  ],
+  "updateAction": "UPDATE"
+}
+__EOS__
+```
+```bash
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+...
+Client mosqsub|80205-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot/cmd', ... (74 bytes))
+guide_robot@robot_request|robot_id|1|r_cmd|Navi|pos.x|123.4|pos.y|-987.6|pos.z|3
+```
+
 ## register cygnus
 ```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: button_sensor" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
@@ -879,6 +1103,35 @@ connecting to: mongodb://127.0.0.1:27017/sth_pepper
 MongoDB server version: 3.6.5
 { "_id" : ObjectId("5b359209169675000a7aebcd"), "recvTime" : ISODate("2018-06-29T01:57:29.219Z"), "attrName" : "welcome_status", "attrType" : "commandStatus", "attrValue" : "PENDING" }
 { "_id" : ObjectId("5b359250169675000a7aebd1"), "recvTime" : ISODate("2018-06-29T01:58:40.946Z"), "attrName" : "welcome_status", "attrType" : "commandStatus", "attrValue" : "OK" }
+```
+
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
+{
+  "subject": {
+    "entities": [{
+      "idPattern": "guide_robot.*",
+      "type": "guide_robot"
+    }]
+  },
+  "notification": {
+    "http": {
+      "url": "http://cygnus:5050/notify"
+    },
+    "attrs": [
+      "time",
+      "robot_id",
+      "r_mode",
+      "pos.x",
+      "pos.y",
+      "pos.z",
+      "robot_request_status",
+      "robot_request_info"
+    ],
+    "attrsFormat": "legacy"
+  }
+}
+__EOS__
 ```
 
 ## register `start-reception` of reception as a subscriber of BUTTON-SENSOR
@@ -1172,6 +1425,280 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "http": {
         "url": "http://ledger:8888/notify/record-reception/"
       }
+    }
+  }
+]
+```
+
+## register `start_movement` entity
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v2/entities/ -X POST -d @- <<__EOS__
+{
+  "id": "start_movement",
+  "type": "start_movement",
+  "destx": {
+    "type": "float",
+    "value": "",
+    "metadata": {}
+  },
+  "desty": {
+    "type": "float",
+    "value": "",
+    "metadata": {}
+  },
+  "floor": {
+    "type": "int",
+    "value": "",
+    "metadata": {}
+  },
+  "timestamp": {
+    "type": "string",
+    "value": "",
+    "metadata": {}
+  }
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" https://api.tech-sketch.jp/orion/v2/entities/start_movement/ | jq .
+{
+  "id": "start_movement",
+  "type": "start_movement",
+  "destx": {
+    "type": "float",
+    "value": "",
+    "metadata": {}
+  },
+  "desty": {
+    "type": "float",
+    "value": "",
+    "metadata": {}
+  },
+  "floor": {
+    "type": "int",
+    "value": "",
+    "metadata": {}
+  },
+  "timestamp": {
+    "type": "string",
+    "value": "",
+    "metadata": {}
+  }
+}
+```
+
+## register `start-movement` of guidance as a subscriber of `start_movement`
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
+{
+  "subject": {
+    "entities": [{
+      "id": "start_movement",
+      "type": "start_movement"
+    }],
+    "condition": {
+      "attrs": ["destx", "desty", "floor", "timestamp"]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://guidance:8888/notify/start-movement/"
+    },
+    "attrs": ["destx", "desty", "floor", "timestamp"]
+  }
+}
+__EOS__
+```
+## register cygnus as as subscriber of `start_movement`
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
+{
+  "subject": {
+    "entities": [{
+      "id": "start_movement",
+      "type": "start_movement"
+    }]
+  },
+  "notification": {
+    "http": {
+      "url": "http://cygnus:5050/notify"
+    },
+    "attrs": ["destx", "desty", "floor", "timestamp"],
+    "attrsFormat": "legacy"
+  }
+}
+__EOS__
+```
+```bash
+mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_pepper --eval 'db.getCollection("sth_/_start_movement_start_movement").find()'
+MongoDB shell version v3.6.5
+connecting to: mongodb://127.0.0.1:27017/sth_pepper
+MongoDB server version: 3.6.5
+{ "_id" : ObjectId("5b3b0ae6cf8d0c000ab1cb8e"), "recvTime" : ISODate("2018-07-03T05:34:29.350Z"), "attrName" : "destx", "attrType" : "float", "attrValue" : "125.12345" }
+{ "_id" : ObjectId("5b3b0ae6cf8d0c000ab1cb8f"), "recvTime" : ISODate("2018-07-03T05:34:29.350Z"), "attrName" : "desty", "attrType" : "float", "attrValue" : "92.12345" }
+{ "_id" : ObjectId("5b3b0ae6cf8d0c000ab1cb90"), "recvTime" : ISODate("2018-07-03T05:34:29.350Z"), "attrName" : "floor", "attrType" : "int", "attrValue" : "3" }
+{ "_id" : ObjectId("5b3b0ae6cf8d0c000ab1cb91"), "recvTime" : ISODate("2018-07-03T05:34:29.350Z"), "attrName" : "timestamp", "attrType" : "string", "attrValue" : "2018-07-03T14:34:29.311962+0900" }
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" https://api.tech-sketch.jp/orion/v2/subscriptions/ | jq .
+[
+  {
+    "id": "5b397c2c01ed8ed56809d2c8",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "pepper.*",
+          "type": "pepper"
+        }
+      ],
+      "condition": {
+        "attrs": []
+      }
+    },
+    "notification": {
+      "timesSent": 36,
+      "lastNotification": "2018-07-03T05:34:29.00Z",
+      "attrs": [
+        "dest",
+        "face",
+        "welcome_status",
+        "handover_status",
+        "facedetect_status",
+        "retry_status"
+      ],
+      "attrsFormat": "legacy",
+      "http": {
+        "url": "http://cygnus:5050/notify"
+      },
+      "lastSuccess": "2018-07-03T05:34:29.00Z"
+    }
+  },
+  {
+    "id": "5b397c967da87a300178826f",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "pepper.*",
+          "type": "pepper"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "face",
+          "dest"
+        ]
+      }
+    },
+    "notification": {
+      "timesSent": 14,
+      "lastNotification": "2018-07-03T05:34:29.00Z",
+      "attrs": [
+        "face",
+        "dest"
+      ],
+      "attrsFormat": "normalized",
+      "http": {
+        "url": "http://reception:8888/notify/finish-reception/"
+      },
+      "lastSuccess": "2018-07-03T05:34:29.00Z"
+    }
+  },
+  {
+    "id": "5b397cac7da87a3001788270",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "pepper.*",
+          "type": "pepper"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "face",
+          "dest"
+        ]
+      }
+    },
+    "notification": {
+      "timesSent": 14,
+      "lastNotification": "2018-07-03T05:34:29.00Z",
+      "attrs": [
+        "face",
+        "dest"
+      ],
+      "attrsFormat": "normalized",
+      "http": {
+        "url": "http://ledger:8888/notify/record-reception/"
+      },
+      "lastSuccess": "2018-07-03T05:34:29.00Z"
+    }
+  },
+  {
+    "id": "5b3afd6eb103566fe628830d",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "id": "start_movement",
+          "type": "start_movement"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "destx",
+          "desty",
+          "floor",
+          "timestamp"
+        ]
+      }
+    },
+    "notification": {
+      "timesSent": 9,
+      "lastNotification": "2018-07-03T05:34:29.00Z",
+      "attrs": [
+        "destx",
+        "desty",
+        "floor",
+        "timestamp"
+      ],
+      "attrsFormat": "normalized",
+      "http": {
+        "url": "http://guidance:8888/notify/start-movement/"
+      },
+      "lastSuccess": "2018-07-03T05:34:29.00Z"
+    }
+  },
+  {
+    "id": "5b3b0a6cb103566fe628830e",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "id": "start_movement",
+          "type": "start_movement"
+        }
+      ],
+      "condition": {
+        "attrs": []
+      }
+    },
+    "notification": {
+      "timesSent": 3,
+      "lastNotification": "2018-07-03T05:34:29.00Z",
+      "attrs": [
+        "destx",
+        "desty",
+        "floor",
+        "timestamp"
+      ],
+      "attrsFormat": "legacy",
+      "http": {
+        "url": "http://cygnus:5050/notify"
+      },
+      "lastSuccess": "2018-07-03T05:34:29.00Z"
     }
   }
 ]
