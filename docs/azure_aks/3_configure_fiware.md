@@ -980,6 +980,186 @@ Client mosqsub|80205-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/g
 guide_robot@robot_request|robot_id|1|r_cmd|Navi|pos.x|123.4|pos.y|-987.6|pos.z|3
 ```
 
+## register CAMERA service
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: camera" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/idas/ul20/manage/iot/services/ -X POST -d @- <<__EOS__
+{
+  "services": [
+    {
+      "apikey": "external_camera",
+      "cbroker": "http://orion:1026",
+      "resource": "/iot/d",
+      "entity_type": "external_camera"
+    }
+  ]
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: camera" -H "Fiware-Servicepath: /*" https://api.tech-sketch.jp/idas/ul20/manage/iot/services/ | jq .
+{
+  "count": 1,
+  "services": [
+    {
+      "_id": "5b3b3152fd223d000164ee62",
+      "subservice": "/",
+      "service": "camera",
+      "apikey": "external_camera",
+      "resource": "/iot/d",
+      "__v": 0,
+      "attributes": [],
+      "lazy": [],
+      "commands": [],
+      "entity_type": "external_camera",
+      "internal_attributes": [],
+      "static_attributes": []
+    }
+  ]
+}
+```
+
+## register CAMERA device
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: camera" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/ -X POST -d @- <<__EOS__
+{
+  "devices": [
+    {
+      "device_id": "external_camera",
+      "entity_name": "external_camera",
+      "entity_type": "external_camera",
+      "timezone": "Asia/Tokyo",
+      "protocol": "UL20",
+      "attributes": [
+        {
+          "name": "time",
+          "type": "string"
+        }, {
+          "name": "camera_id",
+          "type": "int"
+        }, {
+          "name": "c_mode",
+          "type": "string"
+        }, {
+          "name": "num_p",
+          "type": "int"
+        }, {
+          "name": "p_state",
+          "type": "string"
+        }
+      ],
+      "commands": [
+        {
+          "name": "external_camera_request",
+          "type": "string"
+        }
+      ],
+      "transport": "MQTT"
+    }
+  ]
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: camera" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/external_camera/ | jq .
+{
+  "device_id": "external_camera",
+  "service": "camera",
+  "service_path": "/",
+  "entity_name": "external_camera",
+  "entity_type": "external_camera",
+  "transport": "MQTT",
+  "attributes": [
+    {
+      "object_id": "time",
+      "name": "time",
+      "type": "string"
+    },
+    {
+      "object_id": "camera_id",
+      "name": "camera_id",
+      "type": "int"
+    },
+    {
+      "object_id": "c_mode",
+      "name": "c_mode",
+      "type": "string"
+    },
+    {
+      "object_id": "num_p",
+      "name": "num_p",
+      "type": "int"
+    },
+    {
+      "object_id": "p_state",
+      "name": "p_state",
+      "type": "string"
+    }
+  ],
+  "lazy": [],
+  "commands": [
+    {
+      "object_id": "external_camera_request",
+      "name": "external_camera_request",
+      "type": "string"
+    }
+  ],
+  "static_attributes": [],
+  "protocol": "UL20"
+}
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: camera" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/external_camera/ | jq .
+{
+  "id": "external_camera",
+  "type": "external_camera",
+  "TimeInstant": {
+    "type": "ISO8601",
+    "value": " ",
+    "metadata": {}
+  },
+  "c_mode": {
+    "type": "string",
+    "value": " ",
+    "metadata": {}
+  },
+  "camera_id": {
+    "type": "int",
+    "value": " ",
+    "metadata": {}
+  },
+  "external_camera_request_info": {
+    "type": "commandResult",
+    "value": " ",
+    "metadata": {}
+  },
+  "external_camera_request_status": {
+    "type": "commandStatus",
+    "value": "UNKNOWN",
+    "metadata": {}
+  },
+  "num_p": {
+    "type": "int",
+    "value": " ",
+    "metadata": {}
+  },
+  "p_state": {
+    "type": "string",
+    "value": " ",
+    "metadata": {}
+  },
+  "time": {
+    "type": "string",
+    "value": " ",
+    "metadata": {}
+  },
+  "external_camera_request": {
+    "type": "string",
+    "value": "",
+    "metadata": {}
+  }
+}
+```
+
 ## register cygnus
 ```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: button_sensor" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
@@ -1127,6 +1307,33 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "pos.z",
       "robot_request_status",
       "robot_request_info"
+    ],
+    "attrsFormat": "legacy"
+  }
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: camera" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
+{
+  "subject": {
+    "entities": [{
+      "idPattern": "external_camera.*",
+      "type": "external_camera"
+    }]
+  },
+  "notification": {
+    "http": {
+      "url": "http://cygnus:5050/notify"
+    },
+    "attrs": [
+      "time",
+      "camera_id",
+      "c_mode",
+      "num_p",
+      "p_state",
+      "external_camera_request_status",
+      "external_camera_request_info"
     ],
     "attrsFormat": "legacy"
   }
