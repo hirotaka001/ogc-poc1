@@ -48,10 +48,9 @@ class Orion:
                 cls.ORION_POST_URL = urljoin(current_app.config[DEFAULT_ORION_ENDPOINT], ORION_POST_PATH)
         return cls.ORION_POST_URL
 
-    def __init__(self, service, service_path, t):
+    def __init__(self, service, service_path):
         self.service = str(service)
         self.service_path = str(service_path)
-        self.type = str(t)
 
     def get_entity_ids(self, idpattern):
         headers = dict()
@@ -69,7 +68,25 @@ class Orion:
         except json.JSONDecodeError:
             raise NGSIPayloadError()
 
-    def send_message(self, id, cmd, value):
+    def send_cmd(self, id, type, cmd, value):
+        attributes = [
+            {
+                'name': str(cmd),
+                'value': str(value),
+            }
+        ]
+        return self.__update_context(id, type, attributes)
+
+    def update_attributes(self, id, type, attributes):
+        if not isinstance(attributes, list):
+            raise NGSIPayloadError()
+        for attr in attributes:
+            if not isinstance(attr, dict) or 'name' not in attr or 'value' not in attr:
+                raise NGSIPayloadError()
+
+        return self.__update_context(id, type, attributes)
+
+    def __update_context(self, id, type, attributes):
         headers = dict()
         headers['Fiware-Service'] = self.service
         headers['Fiware-Servicepath'] = self.service_path
@@ -78,9 +95,8 @@ class Orion:
         data = copy.deepcopy(ORION_PAYLOAD_TEMPLATE)
         data['contextElements'][0]['id'] = str(id)
         data['contextElements'][0]['isPattern'] = False
-        data['contextElements'][0]['type'] = self.type
-        data['contextElements'][0]['attributes'][0]['name'] = str(cmd)
-        data['contextElements'][0]['attributes'][0]['value'] = str(value)
+        data['contextElements'][0]['type'] = str(type)
+        data['contextElements'][0]['attributes'] = attributes
 
         requests.post(Orion.get_orion_post_url(), headers=headers, data=json.dumps(data))
         logger.debug(f'sent data to orion, headers={headers}, data={data}')

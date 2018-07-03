@@ -21,6 +21,9 @@ class DestinationDoesNotExist(DestinationError):
     pass
 
 
+class DestinationFormatError(DestinationError):
+    pass
+
 class Destination:
     DESTINATION_LIST_URL = None
 

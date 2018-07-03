@@ -26,12 +26,7 @@ ORION_PAYLOAD_TEMPLATE = {
             'id': '',
             'isPattern': False,
             'type': '',
-            'attributes': [
-                {
-                    'name': '',
-                    'value': '',
-                },
-            ],
+            'attributes': [],
         },
     ],
     'updateAction': 'UPDATE',

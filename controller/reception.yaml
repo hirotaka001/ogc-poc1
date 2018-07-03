@@ -47,6 +47,10 @@ spec:
           value: "${PEPPER_IDPATTERN}"
         - name: PEPPER_1_ID
           value: "${PEPPER_1_ID}"
+        - name: START_MOVEMENT_ID
+          value: "start_movement"
+        - name: START_MOVEMENT_TYPE
+          value: "start_movement"
         ports:
           - name: reception
             containerPort: 8888
