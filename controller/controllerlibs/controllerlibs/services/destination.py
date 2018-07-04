@@ -51,4 +51,22 @@ class Destination:
                 raise DestinationDoesNotExist(f'destination({name}) does not found')
             return destinations[0]
         except json.JSONDecodeError as e:
-            raise DestinationError(str(e))
+            raise DestinationFormatError(str(e))
+
+    def get_dest_led_by_pos(self, posx, posy, posz):
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        params = {
+            'pos.x': str(posx),
+            'pos.y': str(posy),
+            'pos.z': str(posz),
+        }
+        try:
+            dest_leds = requests.get(Destination.get_destination_list_url(), headers=headers, params=params).json()
+            if len(dest_leds) == 0:
+                return None
+            else:
+                return dest_leds[0]
+        except json.JSONDecodeError as e:
+            raise DestinationFormatError(str(e))

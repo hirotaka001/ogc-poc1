@@ -16,36 +16,36 @@ DESTINATIONS = {
         "name": "管理センター",
         "floor": 1,
         "dest_pos": "0.001151,0.000134",
-        "dest_led_id": "DEST-LED-CK2s264PqyndhUZ7",
+        "dest_led_id": "dest_led_0000000000000001",
         "dest_led_pos": "0.000000,0.000000",
-        "dest_human_sensor_id": "DEST-HUMAN-SENSOR-n8aL7MJuNQk0iJpY"
+        "dest_human_sensor_id": "dest_human_sensor_0000000000000001",
     },
     "dest-vLBTZbPXc3Al0hMT": {
         "id": "dest-vLBTZbPXc3Al0hMT",
         "name": "203号室",
         "floor": 2,
         "dest_pos": "125.12345,92.12345",
-        "dest_led_id": "DEST-LED-12Mz9QcPjoemgU39",
+        "dest_led_id": "dest_led_0000000000000001",
         "dest_led_pos": "122.001122,91.991122",
-        "dest_human_sensor_id": "DEST-HUMAN-SENSOR-oyVYENgHKHmQ6VJE"
+        "dest_human_sensor_id": "dest_human_sensor_0000000000000001",
     },
     "dest-9QgohxohSmb3AECD": {
         "id": "dest-9QgohxohSmb3AECD",
         "name": "204号室",
         "floor": 2,
         "dest_pos": "110.120101,0.993313",
-        "dest_led_id": "DEST-LED-MV4isvEfDsLZ75R6",
+        "dest_led_id": "dest_led_0000000000000001",
         "dest_led_pos": "98.980808,0.881122",
-        "dest_human_sensor_id": "DEST-HUMAN-SENSOR-9WfJoTmxczWrM4WZ"
+        "dest_human_sensor_id": "dest_human_sensor_0000000000000001",
     },
     "dest-Ymq1aoftEIViZjry": {
         "id": "dest-Ymq1aoftEIViZjry",
         "name": "ProjectRoom 1",
         "floor": 3,
         "dest_pos": "125.12345,92.12345",
-        "dest_led_id": "DEST-LED-sDAyKhjhXKqJsbr9",
+        "dest_led_id": "dest_led_0000000000000001",
         "dest_led_pos": "122.001122,91.991122",
-        "dest_human_sensor_id": "DEST-HUMAN-SENSOR-6d8JoY1hR0wS8rqO",
+        "dest_human_sensor_id": "dest_human_sensor_0000000000000001",
         "slack_webhook": "https://hooks.slack.com/services/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     },
 }
@@ -56,6 +56,9 @@ class DestinationListAPI(MethodView):
 
     def get(self):
         result = list(DESTINATIONS.values())
+
+        if 'pos.x' in request.args and 'pos.y' in request.args and 'pos.z' in request.args:
+            return jsonify(result[:1])
 
         if 'filter' in request.args:
             for f in [f.strip() for f in request.args['filter'].split(',')]:
