@@ -99,3 +99,19 @@ class CheckDestinationAPI(MethodView):
             raise e
 
         return jsonify(result)
+
+
+class StopMovementAPI(MethodView):
+    NAME = 'stop-movement'
+
+    def __init__(self):
+        pass
+
+    def post(self):
+        content = request.data.decode('utf-8')
+        logger.info(f'request content={content}')
+
+        logger.info('nothing to do when called stop-movement')
+        result = {'result': 'nothing to do'}
+
+        return jsonify(result)

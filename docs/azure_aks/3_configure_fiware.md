@@ -2954,14 +2954,17 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "type": "guide_robot"
     }],
     "condition": {
-      "attrs": ["pos.x", "pos.y", "pos.z"]
+      "attrs": ["r_mode", "pos.x", "pos.y", "pos.z"],
+      "expression": {
+        "q": "r_mode==Navi"
+      }
     }
   },
   "notification": {
     "http": {
       "url": "http://guidance:8888/notify/check-destination/"
     },
-    "attrs": ["pos.x", "pos.y", "pos.z"]
+    "attrs": ["r_mode", "pos.x", "pos.y", "pos.z"]
   }
 }
 __EOS__
@@ -2984,8 +2987,8 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       }
     },
     "notification": {
-      "timesSent": 4,
-      "lastNotification": "2018-07-04T04:24:23.00Z",
+      "timesSent": 20,
+      "lastNotification": "2018-07-04T23:14:31.00Z",
       "attrs": [
         "time",
         "robot_id",
@@ -3000,11 +3003,11 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "http": {
         "url": "http://cygnus:5050/notify"
       },
-      "lastSuccess": "2018-07-04T04:24:23.00Z"
+      "lastSuccess": "2018-07-04T23:14:31.00Z"
     }
   },
   {
-    "id": "5b3c5e12f1bdbe368d81d4c8",
+    "id": "5b3d55e0d31a6404acc0ae30",
     "status": "active",
     "subject": {
       "entities": [
@@ -3015,16 +3018,121 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       ],
       "condition": {
         "attrs": [
+          "r_mode",
           "pos.x",
           "pos.y",
           "pos.z"
-        ]
+        ],
+        "expression": {
+          "q": "r_mode==Navi"
+        }
       }
     },
     "notification": {
-      "timesSent": 1,
-      "lastNotification": "2018-07-04T05:41:38.00Z",
       "attrs": [
+        "r_mode",
+        "pos.x",
+        "pos.y",
+        "pos.z"
+      ],
+      "attrsFormat": "normalized",
+      "http": {
+        "url": "http://guidance:8888/notify/check-destination/"
+      }
+    }
+  }
+]
+```
+
+## register `stop-movement` of guidance as a subscriber of `guidance_robot`
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
+{
+  "subject": {
+    "entities": [{
+      "idPattern": "guide_robot.*",
+      "type": "guide_robot"
+    }],
+    "condition": {
+      "attrs": ["r_mode", "pos.x", "pos.y", "pos.z"],
+      "expression": {
+        "q": "r_mode==Standby"
+      }
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://guidance:8888/notify/stop-movement/"
+    },
+    "attrs": ["r_mode", "pos.x", "pos.y", "pos.z"]
+  }
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-ServicePath: /" https://api.tech-sketch.jp/orion/v2/subscriptions/ | jq .
+[
+  {
+    "id": "5b3c44f7d31a6404acc0ae2d",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "guide_robot.*",
+          "type": "guide_robot"
+        }
+      ],
+      "condition": {
+        "attrs": []
+      }
+    },
+    "notification": {
+      "timesSent": 24,
+      "lastNotification": "2018-07-04T23:21:21.00Z",
+      "attrs": [
+        "time",
+        "robot_id",
+        "r_mode",
+        "pos.x",
+        "pos.y",
+        "pos.z",
+        "robot_request_status",
+        "robot_request_info"
+      ],
+      "attrsFormat": "legacy",
+      "http": {
+        "url": "http://cygnus:5050/notify"
+      },
+      "lastSuccess": "2018-07-04T23:21:21.00Z"
+    }
+  },
+  {
+    "id": "5b3d55e0d31a6404acc0ae30",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "guide_robot.*",
+          "type": "guide_robot"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "r_mode",
+          "pos.x",
+          "pos.y",
+          "pos.z"
+        ],
+        "expression": {
+          "q": "r_mode==Navi"
+        }
+      }
+    },
+    "notification": {
+      "timesSent": 2,
+      "lastNotification": "2018-07-04T23:20:46.00Z",
+      "attrs": [
+        "r_mode",
         "pos.x",
         "pos.y",
         "pos.z"
@@ -3033,7 +3141,45 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "http": {
         "url": "http://guidance:8888/notify/check-destination/"
       },
-      "lastSuccess": "2018-07-04T05:41:38.00Z"
+      "lastSuccess": "2018-07-04T23:20:46.00Z"
+    }
+  },
+  {
+    "id": "5b3d59e4f1bdbe368d81d4cb",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "guide_robot.*",
+          "type": "guide_robot"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "r_mode",
+          "pos.x",
+          "pos.y",
+          "pos.z"
+        ],
+        "expression": {
+          "q": "r_mode==Standby"
+        }
+      }
+    },
+    "notification": {
+      "timesSent": 1,
+      "lastNotification": "2018-07-04T23:36:04.00Z",
+      "attrs": [
+        "r_mode",
+        "pos.x",
+        "pos.y",
+        "pos.z"
+      ],
+      "attrsFormat": "normalized",
+      "http": {
+        "url": "http://guidance:8888/notify/stop-movement/"
+      },
+      "lastSuccess": "2018-07-04T23:36:04.00Z"
     }
   }
 ]
