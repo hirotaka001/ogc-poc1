@@ -24,6 +24,7 @@ class DestinationDoesNotExist(DestinationError):
 class DestinationFormatError(DestinationError):
     pass
 
+
 class Destination:
     DESTINATION_LIST_URL = None
 
@@ -37,7 +38,7 @@ class Destination:
                                                    DESTINATION_LIST_PATH)
         return cls.DESTINATION_LIST_URL
 
-    def get_destinations(self, name):
+    def get_destination_by_name(self, name):
         headers = {
             'Content-Type': 'application/json'
         }

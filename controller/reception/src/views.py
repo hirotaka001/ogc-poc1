@@ -71,7 +71,7 @@ class FinishReceptionAPI(MethodView):
         result = {'result': 'failure'}
         try:
             value = get_attr_value(content, 'dest')
-            dest = Destination().get_destinations(value)
+            dest = Destination().get_destination_by_name(value)
 
             if const.SLACK_WEBHOOK in dest:
                 slack.send_message_to_slack(dest[const.SLACK_WEBHOOK], dest.get(DEST_NAME))
