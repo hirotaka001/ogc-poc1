@@ -22,7 +22,31 @@ class RecordReceptionAPI(MethodView):
             face = get_attr_value(content, 'face')
             dest = get_attr_value(content, 'dest')
             timestamp = get_attr_timestamp(content, 'dest')
-            logger.info(f'face={face}, dest={dest}, timestamp={timestamp}')
+            logger.info(f'record reception, face={face}, dest={dest}, timestamp={timestamp}')
+        except AttrDoesNotExist as e:
+            logger.error(f'AttrDoesNotExist: {str(e)}')
+            raise BadRequest(str(e))
+        except NGSIPayloadError as e:
+            logger.error(f'NGSIPayloadError: {str(e)}')
+            raise BadRequest(str(e))
+        except Exception as e:
+            logger.exception(e)
+            raise e
+
+        return jsonify(result)
+
+
+class RecordArrivalAPI(MethodView):
+    NAME = 'record-arrival'
+
+    def post(self):
+        content = request.data.decode('utf-8')
+        logger.info(f'request content={content}')
+
+        result = {'result': 'failure'}
+        try:
+            arrival = get_attr_value(content, 'arrival')
+            logger.info(f'record arrival, arrival={arrival}')
         except AttrDoesNotExist as e:
             logger.error(f'AttrDoesNotExist: {str(e)}')
             raise BadRequest(str(e))

@@ -130,7 +130,7 @@
     Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/cmdexe', ... (40 bytes))
     Client mosqpub|22763-Nobuyukin sending DISCONNECT
     ```
-1. simulate to receive robot state
+1. simulate to receive robot state (Navi)
     * publish ros message to `/Robot/state`
 
     ```bash
@@ -144,12 +144,54 @@
       z: 3.0
     "
     ```
-    * receive MQTT message
+    * receive MQTT message and send `action|on` message to `dest_led` authomatically
 
         ```bash
         Client mosqsub|77879-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot/attrs', ... (112 bytes))
         2018-07-04T13:24:20.259204+0900|time|2018-01-02 03:04:05|robot_id|1|r_mode|Navi|pos.x|1.01|pos.y|-2.02|pos.z|3.0
+        Client mosqsub|58138-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/dest_led/dest_led_0000000000000001/cmd', ... (35 bytes))
+        dest_led_0000000000000001@action|on
         ```
+1. simulate to send `action` cmd result
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /dest_led/dest_led_0000000000000001/cmdexe -u iotagent -P XXXXXXXX -m "dest_led_0000000000000001@action|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/dest_led/dest_led_0000000000000001/cmdexe', ... (40 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
+1. simulate to receive robot state (Standby)
+    * publish ros message to `/Robot/state`
+
+    ```bash
+    root@rosbridge:/opt/ros_ws# rostopic pub -1 /Robot/state rosbridge/r_state "
+    time: '2018-01-02 03:04:05'
+    id: 1
+    r_mode: 'Standby'
+    pos:
+      x: 1.01
+      y: -2.02
+      z: 3.0
+    "
+    ```
+    * receive MQTT message, but don't send `action|on` message to `dest_led` authomatically
+
+        ```bash
+        Client mosqsub|49077-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot/attrs', ... (115 bytes))
+        2018-07-05T08:41:12.547917+0900|time|2018-01-02 03:04:05|robot_id|1|r_mode|Standby|pos.x|1.01|pos.y|-2.02|pos.z|3.0
+        ```
+1. simuate visitor arriving at the destination
+
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /dest_human_sensor/dest_human_sensor_0000000000000001/attrs -u iotagent -P XXXXXXXX -m "$d|arrival|$d"
+    Client mosqpub|65572-Nobuyukin sending CONNECT
+    Client mosqpub|65572-Nobuyukin received CONNACK
+    Client mosqpub|65572-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/dest_human_sensor/dest_human_sensor_0000000000000001/attrs', ... (79 bytes))
+    Client mosqpub|65572-Nobuyukin sending DISCONNECT
+    ```
+
+
 1. simulate to receive camera state
     * publish ros message to `/ExternalCamera/state`
 

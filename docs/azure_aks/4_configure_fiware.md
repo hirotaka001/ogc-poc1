@@ -1232,3 +1232,87 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
   }
 ]
 ```
+
+## register `record-arrival` of ledger as a subscriber of DEST-HUMAN-SENSOR
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: dest_human_sensor" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
+{
+  "subject": {
+    "entities": [{
+      "idPattern": "dest_human_sensor.*",
+      "type": "dest_human_sensor"
+    }],
+    "condition": {
+      "attrs": ["arrival"]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://ledger:8888/notify/record-arrival/"
+    },
+    "attrs": ["arrival"]
+  }
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: dest_human_sensor" -H "Fiware-ServicePath: /" https://api.tech-sketch.jp/orion/v2/subscriptions/ | jq .
+[
+  {
+    "id": "5b3d786bd31a6404acc0ae31",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "dest_human_sensor.*",
+          "type": "dest_human_sensor"
+        }
+      ],
+      "condition": {
+        "attrs": []
+      }
+    },
+    "notification": {
+      "timesSent": 3,
+      "lastNotification": "2018-07-05T02:53:34.00Z",
+      "attrs": [
+        "arrival"
+      ],
+      "attrsFormat": "legacy",
+      "http": {
+        "url": "http://cygnus:5050/notify"
+      },
+      "lastSuccess": "2018-07-05T02:53:34.00Z"
+    }
+  },
+  {
+    "id": "5b3d8959d31a6404acc0ae32",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "dest_human_sensor.*",
+          "type": "dest_human_sensor"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "arrival"
+        ]
+      }
+    },
+    "notification": {
+      "timesSent": 1,
+      "lastNotification": "2018-07-05T02:58:33.00Z",
+      "attrs": [
+        "arrival"
+      ],
+      "attrsFormat": "normalized",
+      "http": {
+        "url": "http://ledger:8888/notify/record-arrival/"
+      },
+      "lastSuccess": "2018-07-05T02:58:33.00Z"
+    }
+  }
+]
+```
