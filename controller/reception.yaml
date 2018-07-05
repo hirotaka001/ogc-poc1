@@ -47,6 +47,8 @@ spec:
           value: "${PEPPER_IDPATTERN}"
         - name: PEPPER_1_ID
           value: "${PEPPER_1_ID}"
+        - name: PEPPER_2_ID
+          value: "${PEPPER_2_ID}"
         - name: START_MOVEMENT_ID
           value: "start_movement"
         - name: START_MOVEMENT_TYPE

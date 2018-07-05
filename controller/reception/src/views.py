@@ -63,6 +63,7 @@ class FinishReceptionAPI(MethodView):
 
         self.orion = Orion(service, service_path)
         self.pepper_1_id = os.environ.get(const.PEPPER_1_ID, '')
+        self.pepper_2_id = os.environ.get(const.PEPPER_2_ID, '')
 
     def post(self):
         content = request.data.decode('utf-8')
@@ -72,12 +73,27 @@ class FinishReceptionAPI(MethodView):
         try:
             value = get_attr_value(content, 'dest')
             dest = Destination().get_destination_by_name(value)
+            dest_name = dest.get(DEST_NAME)
+            if not dest_name:
+                raise DestinationFormatError('dest_name is empty')
+            try:
+                dest_floor = int(dest.get(const.DEST_FLOOR))
+            except (TypeError, ValueError):
+                raise DestinationFormatError('dest_floor is invalid')
 
             if const.SLACK_WEBHOOK in dest:
-                slack.send_message_to_slack(dest[const.SLACK_WEBHOOK], dest.get(DEST_NAME))
+                slack.send_message_to_slack(dest[const.SLACK_WEBHOOK], dest_name)
 
-            self.__notify_start_movement(dest)
-            message = self.orion.send_cmd(self.pepper_1_id, self.type, 'handover', dest.get(const.DEST_FLOOR))
+            if dest_floor == 1:
+                logger.info(f'call start-movement to guide_robot, dest_name={dest_name}, floor={dest_floor}')
+                self.__notify_start_movement(dest)
+            elif dest_floor == 2:
+                logger.info(f'call facedetect to pepper({self.pepper_2_id}), dest_name={dest_name}, floor={dest_floor}')
+                self.orion.send_cmd(self.pepper_2_id, self.type, 'facedetect', 'start')
+            else:
+                logger.info(f'nothing to do, dest_name={dest_name}, floor={dest_floor}')
+
+            message = self.orion.send_cmd(self.pepper_1_id, self.type, 'handover', dest_floor)
             result['result'] = 'success'
             result['message'] = message
         except AttrDoesNotExist as e:

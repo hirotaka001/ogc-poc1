@@ -553,7 +553,7 @@ mac:$ docker build --build-arg SERVICE_PATH="./controller/reception" -t ${REPOSI
 mac:$ docker push ${REPOSITORY}/tech-sketch/reception:0.1.0
 ```
 ```bash
-mac:$ env PEPPER_SERVICE="pepper" PEPPER_SERVICEPATH="/" PEPPER_TYPE="pepper" PEPPER_1_ID="pepper_0000000000000001" PEPPER_IDPATTERN="pepper.*" envsubst < controller/reception.yaml | kubectl apply -f -
+mac:$ env PEPPER_SERVICE="pepper" PEPPER_SERVICEPATH="/" PEPPER_TYPE="pepper" PEPPER_1_ID="pepper_0000000000000001" PEPPER_2_ID="pepper_0000000000000002" PEPPER_IDPATTERN="pepper.*" envsubst < controller/reception.yaml | kubectl apply -f -
 ```
 ```bash
 mac:$ kubectl get pods -l pod=reception
