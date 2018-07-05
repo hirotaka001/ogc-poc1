@@ -103,6 +103,14 @@ class Orion:
         return data
 
 
+def get_id(content):
+    for data in __extract_data_from_NGSI(content):
+        if isinstance(data, dict) and 'id' in data:
+            return data['id']
+
+    raise AttrDoesNotExist('id')
+
+
 def get_attr_value(content, attr):
     data = __extract_attr_from_NGSI(content, attr)
     return data['value']
@@ -114,6 +122,15 @@ def get_attr_timestamp(content, attr):
 
 
 def __extract_attr_from_NGSI(content, attr):
+    for data in __extract_data_from_NGSI(content):
+        if (isinstance(data, dict) and attr in data and
+                isinstance(data[attr], dict) and 'value' in data[attr]):
+            return data[attr]
+
+    raise AttrDoesNotExist(attr)
+
+
+def __extract_data_from_NGSI(content):
     if content is None or len(content.strip()) == 0:
         raise NGSIPayloadError()
 
@@ -126,9 +143,4 @@ def __extract_attr_from_NGSI(content, attr):
             'data' not in payload or not isinstance(payload['data'], list)):
         raise NGSIPayloadError()
 
-    for data in payload['data']:
-        if (isinstance(data, dict) and attr in data and
-                isinstance(data[attr], dict) and 'value' in data[attr]):
-            return data[attr]
-
-    raise AttrDoesNotExist(attr)
+    return payload['data']

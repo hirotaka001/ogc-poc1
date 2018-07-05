@@ -60,6 +60,33 @@ class DestinationListAPI(MethodView):
         if 'pos.x' in request.args and 'pos.y' in request.args and 'pos.z' in request.args:
             return jsonify(result[:1])
 
+        if 'dest_human_sensor_id' in request.args:
+            return jsonify(result[:1])
+
+        if 'floor_initial' in request.args:
+            if request.args['floor_initial'] == '1':
+                return jsonify([{
+                    "id": "dest-FtYNG505n7aIOJ0m",
+                    "name": "1階初期位置",
+                    "floor": 1,
+                    "dest_pos": "0.0,0.0",
+                    "dest_led_id": "dest_led_0000000000000001",
+                    "dest_led_pos": "0.0,0.0",
+                    "dest_human_sensor_id": "dest_human_sensor_0000000000000001",
+                }])
+            elif request.args['floor_initial'] == '2':
+                return jsonify([{
+                    "id": "dest-FtYNG505n7aIOJ0m",
+                    "name": "1階初期位置",
+                    "floor": 1,
+                    "dest_pos": "0.0,0.0",
+                    "dest_led_id": "dest_led_0000000000000001",
+                    "dest_led_pos": "0.0,0.0",
+                    "dest_human_sensor_id": "dest_human_sensor_0000000000000001",
+                }])
+            else:
+                return jsonify([])
+
         if 'filter' in request.args:
             for f in [f.strip() for f in request.args['filter'].split(',')]:
                 m = FILTER_RE.match(f)

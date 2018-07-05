@@ -53,7 +53,7 @@ class Destination:
         except json.JSONDecodeError as e:
             raise DestinationFormatError(str(e))
 
-    def get_dest_led_by_pos(self, posx, posy, posz):
+    def get_destination_by_pos(self, posx, posy, posz):
         headers = {
             'Content-Type': 'application/json'
         }
@@ -61,6 +61,38 @@ class Destination:
             'pos.x': str(posx),
             'pos.y': str(posy),
             'pos.z': str(posz),
+        }
+        try:
+            dest_leds = requests.get(Destination.get_destination_list_url(), headers=headers, params=params).json()
+            if len(dest_leds) == 0:
+                return None
+            else:
+                return dest_leds[0]
+        except json.JSONDecodeError as e:
+            raise DestinationFormatError(str(e))
+
+    def get_destination_by_dest_human_sensor_id(self, dest_human_sensor_id):
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        params = {
+            'dest_human_sensor_id': str(dest_human_sensor_id),
+        }
+        try:
+            dest_leds = requests.get(Destination.get_destination_list_url(), headers=headers, params=params).json()
+            if len(dest_leds) == 0:
+                return None
+            else:
+                return dest_leds[0]
+        except json.JSONDecodeError as e:
+            raise DestinationFormatError(str(e))
+
+    def get_initial_of_floor(self, floor):
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        params = {
+            'floor_initial': str(floor),
         }
         try:
             dest_leds = requests.get(Destination.get_destination_list_url(), headers=headers, params=params).json()

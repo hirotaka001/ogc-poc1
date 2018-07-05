@@ -13,3 +13,5 @@ DEST_LED_TYPE = 'DEST_LED_TYPE'
 
 # destination specification
 DEST_LED_ID = 'dest_led_id'
+DEST_FLOOR = 'floor'
+DEST_POS = 'dest_pos'
