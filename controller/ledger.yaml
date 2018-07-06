@@ -33,8 +33,28 @@ spec:
           value: "8888"
         - name: ORION_ENDPOINT
           value: "http://orion:1026"
+        - name: DESTINATION_ENDPOINT
+          value: "http://destination:8888"
         - name: LOG_LEVEL
           value: "DEBUG"
+        - name: PEPPER_SERVICE
+          value: "${PEPPER_SERVICE}"
+        - name: PEPPER_SERVICEPATH
+          value: "${PEPPER_SERVICEPATH}"
+        - name: PEPPER_TYPE
+          value: "${PEPPER_TYPE}"
+        - name: PEPPER_2_ID
+          value: "${PEPPER_2_ID}"
+        - name: START_MOVEMENT_SERVICE
+          value: "start_movement"
+        - name: START_MOVEMENT_SERVICEPATH
+          value: "/"
+        - name: START_MOVEMENT_ID
+          value: "start_movement"
+        - name: START_MOVEMENT_TYPE
+          value: "start_movement"
+        - name: ETCD_HOST
+          value: "etcd-cluster-client"
         ports:
           - name: reception
             containerPort: 8888

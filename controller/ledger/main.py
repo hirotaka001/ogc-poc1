@@ -5,7 +5,7 @@ from flask import Flask
 from controllerlibs import CONFIG_CFG, DEFAULT_PORT
 from controllerlibs.utils import setup_logging, error_handler, get_port
 
-from src.views import RecordReceptionAPI, RecordArrivalAPI
+from src.views import RecordReceptionAPI, RecordArrivalAPI, DetectVisitorAPI, ReaskDestinationAPI
 
 setup_logging()
 
@@ -14,6 +14,8 @@ app.config.from_pyfile(CONFIG_CFG)
 app.register_blueprint(error_handler.blueprint)
 app.add_url_rule('/notify/record-reception/', view_func=RecordReceptionAPI.as_view(RecordReceptionAPI.NAME))
 app.add_url_rule('/notify/record-arrival/', view_func=RecordArrivalAPI.as_view(RecordArrivalAPI.NAME))
+app.add_url_rule('/notify/detect-visitor/', view_func=DetectVisitorAPI.as_view(DetectVisitorAPI.NAME))
+app.add_url_rule('/notify/reask-destination/', view_func=ReaskDestinationAPI.as_view(ReaskDestinationAPI.NAME))
 
 
 if __name__ == '__main__':

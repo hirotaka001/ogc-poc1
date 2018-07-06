@@ -1,2 +1,4 @@
 Flask>=1.0
 requests>=2.18
+pytz==2018.5
+etcd3>=0.8
