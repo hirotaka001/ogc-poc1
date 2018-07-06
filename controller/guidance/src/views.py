@@ -23,6 +23,7 @@ class StartMovementAPI(MethodView):
         self.type = os.environ.get(const.ROBOT_TYPE, '')
         self.id = os.environ.get(const.ROBOT_ID, '')
         self.turtlebot_1_id = os.environ.get(const.TURTLEBOT_1_ID, '')
+        self.turtlebot_2_id = os.environ.get(const.TURTLEBOT_2_ID, '')
 
         self.orion = Orion(service, service_path)
 
@@ -34,9 +35,14 @@ class StartMovementAPI(MethodView):
         try:
             destx = get_attr_value(content, 'destx')
             desty = get_attr_value(content, 'desty')
-            floor = get_attr_value(content, 'floor')
-            if destx is not None and desty is not None and floor is not None:
-                value = f'robot_id|{self.turtlebot_1_id}|r_cmd|Navi|pos.x|{destx}|pos.y|{desty}|pos.z|{floor}'
+            try:
+                floor = int(get_attr_value(content, 'floor'))
+            except (TypeError, ValueError):
+                raise DestinationFormatError('dest_floor is invalid')
+
+            if destx is not None and desty is not None and floor in (1, 2):
+                turtlebot_id = self.turtlebot_1_id if floor == 1 else self.turtlebot_2_id
+                value = f'robot_id|{turtlebot_id}|r_cmd|Navi|pos.x|{destx}|pos.y|{desty}|pos.z|{floor}'
                 message = self.orion.send_cmd(self.id, self.type, 'robot_request', value)
                 result['result'] = 'success'
                 result['message'] = message
@@ -45,6 +51,9 @@ class StartMovementAPI(MethodView):
             raise BadRequest(str(e))
         except NGSIPayloadError as e:
             logger.error(f'NGSIPayloadError: {str(e)}')
+            raise BadRequest(str(e))
+        except DestinationFormatError as e:
+            logger.error(f'DestinationFormatError: {str(e)}')
             raise BadRequest(str(e))
         except Exception as e:
             logger.exception(e)
@@ -128,6 +137,7 @@ class ArrivalAPI(MethodView):
         self.robot_type = os.environ.get(const.ROBOT_TYPE, '')
         self.robot_id = os.environ.get(const.ROBOT_ID, '')
         self.turtlebot_1_id = os.environ.get(const.TURTLEBOT_1_ID, '')
+        self.turtlebot_2_id = os.environ.get(const.TURTLEBOT_2_ID, '')
 
     def post(self):
         content = request.data.decode('utf-8')
@@ -144,13 +154,18 @@ class ArrivalAPI(MethodView):
                     dest_led_id = destination[const.DEST_LED_ID]
                     message = self.dest_led_orion.send_cmd(dest_led_id, self.dest_led_type, 'action', 'off')
                 if destination is not None and const.DEST_FLOOR in destination:
-                    floor = destination[const.DEST_FLOOR]
+                    try:
+                        floor = int(destination[const.DEST_FLOOR])
+                    except (TypeError, ValueError):
+                        raise DestinationFormatError('dest_floor is invalid')
+
+                    turtlebot_id = self.turtlebot_1_id if floor == 1 else self.turtlebot_2_id
                     initial = destService.get_initial_of_floor(floor)
                     initial_pos = initial.get(const.DEST_POS)
                     if not initial_pos:
                         raise DestinationFormatError('initial dest_pos is empty')
                     initx, inity = [float(x.strip()) for x in initial_pos.split(',')]
-                    value = f'robot_id|{self.turtlebot_1_id}|r_cmd|Navi|pos.x|{initx}|pos.y|{inity}|pos.z|{floor}'
+                    value = f'robot_id|{turtlebot_id}|r_cmd|Navi|pos.x|{initx}|pos.y|{inity}|pos.z|{floor}'
                     message = self.robot_orion.send_cmd(self.robot_id, self.robot_type, 'robot_request', value)
                     result['result'] = 'success'
                     result['message'] = message

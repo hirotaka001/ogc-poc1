@@ -47,6 +47,8 @@ spec:
           value: "${ROBOT_ID}"
         - name: TURTLEBOT_1_ID
           value: "${TURTLEBOT_1_ID}"
+        - name: TURTLEBOT_2_ID
+          value: "${TURTLEBOT_2_ID}"
         - name: DEST_LED_SERVICE
           value: "${DEST_LED_SERVICE}"
         - name: DEST_LED_SERVICEPATH
