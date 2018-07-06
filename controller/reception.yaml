@@ -49,6 +49,10 @@ spec:
           value: "${PEPPER_1_ID}"
         - name: PEPPER_2_ID
           value: "${PEPPER_2_ID}"
+        - name: START_MOVEMENT_SERVICE
+          value: "start_movement"
+        - name: START_MOVEMENT_SERVICEPATH
+          value: "/"
         - name: START_MOVEMENT_ID
           value: "start_movement"
         - name: START_MOVEMENT_TYPE
