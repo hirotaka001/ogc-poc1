@@ -11,6 +11,8 @@ Configure fiware on AKS by following steps:
 1. [register `start-reception` of "reception" as a subscriber of "BUTTON-SENSOR"](#register-start-reception-of-reception-as-a-subscriber-of-button-sensor)
 1. [register `finish-reception` of "reception" as a subscriber of "PEPPER"](#register-finish-reception-of-reception-as-a-subscriber-of-pepper)
 1. [register `record-reception` of "ledger" as a subscriber of "PEPPER"](#register-record-reception-of-ledger-as-a-subscriber-of-pepper)
+1. [register `detect-visitor` of "ledger" as a subscriber of "PEPPER"](#register-detect-visitor-of-ledger-as-a-subscriber-of-pepper)
+1. [register `reask-destination` of "ledger" as a subscriber of "PEPPER"](#register-reask-destination-of-ledger-as-a-subscriber-of-pepper)
 1. [register `start_movement` entity](#register-stert_movement-entity)
 1. [register `start-movement` of "guidance" as a subscriber of `start_movement`](#register-start-movement-of-guidance-as-a-subscriber-of-start_movement)
 1. [register cygnus as as subscriber of `start_movement`](#register-cygnus-as-a-subscriber-of-start_movement)
@@ -521,7 +523,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 {
   "subject": {
     "entities": [{
-      "idPattern": "pepper.*",
+      "id": "pepper_0000000000000001",
       "type": "pepper"
     }],
     "condition": {
@@ -578,7 +580,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "subject": {
       "entities": [
         {
-          "idPattern": "pepper.*",
+          "id": "pepper_0000000000000001",
           "type": "pepper"
         }
       ],
@@ -612,7 +614,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 {
   "subject": {
     "entities": [{
-      "idPattern": "pepper.*",
+      "id": "pepper_0000000000000001",
       "type": "pepper"
     }],
     "condition": {
@@ -669,7 +671,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "subject": {
       "entities": [
         {
-          "idPattern": "pepper.*",
+          "id": "pepper_0000000000000001",
           "type": "pepper"
         }
       ],
@@ -700,7 +702,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "subject": {
       "entities": [
         {
-          "idPattern": "pepper.*",
+          "id": "pepper_0000000000000001",
           "type": "pepper"
         }
       ],
@@ -727,102 +729,24 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 ]
 ```
 
-## register `start_movement` entity
-```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v2/entities/ -X POST -d @- <<__EOS__
-{
-  "id": "start_movement",
-  "type": "start_movement",
-  "destx": {
-    "type": "float",
-    "value": "",
-    "metadata": {}
-  },
-  "desty": {
-    "type": "float",
-    "value": "",
-    "metadata": {}
-  },
-  "floor": {
-    "type": "int",
-    "value": "",
-    "metadata": {}
-  },
-  "timestamp": {
-    "type": "string",
-    "value": "",
-    "metadata": {}
-  }
-}
-__EOS__
-```
-```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" https://api.tech-sketch.jp/orion/v2/entities/start_movement/ | jq .
-{
-  "id": "start_movement",
-  "type": "start_movement",
-  "destx": {
-    "type": "float",
-    "value": "",
-    "metadata": {}
-  },
-  "desty": {
-    "type": "float",
-    "value": "",
-    "metadata": {}
-  },
-  "floor": {
-    "type": "int",
-    "value": "",
-    "metadata": {}
-  },
-  "timestamp": {
-    "type": "string",
-    "value": "",
-    "metadata": {}
-  }
-}
-```
-
-## register `start-movement` of guidance as a subscriber of `start_movement`
+## register `detect-visitor` of ledger as a subscriber of PEPPER
 ```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
 {
   "subject": {
     "entities": [{
-      "id": "start_movement",
-      "type": "start_movement"
+      "id": "pepper_0000000000000002",
+      "type": "pepper"
     }],
     "condition": {
-      "attrs": ["destx", "desty", "floor", "timestamp"]
+      "attrs": ["face"]
     }
   },
   "notification": {
     "http": {
-      "url": "http://guidance:8888/notify/start-movement/"
+      "url": "http://ledger:8888/notify/detect-visitor/"
     },
-    "attrs": ["destx", "desty", "floor", "timestamp"]
-  }
-}
-__EOS__
-```
-
-## register cygnus as as subscriber of `start_movement`
-```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
-{
-  "subject": {
-    "entities": [{
-      "id": "start_movement",
-      "type": "start_movement"
-    }]
-  },
-  "notification": {
-    "http": {
-      "url": "http://cygnus:5050/notify"
-    },
-    "attrs": ["destx", "desty", "floor", "timestamp"],
-    "attrsFormat": "legacy"
+    "attrs": ["face"]
   }
 }
 __EOS__
@@ -868,7 +792,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "subject": {
       "entities": [
         {
-          "idPattern": "pepper.*",
+          "id": "pepper_0000000000000001",
           "type": "pepper"
         }
       ],
@@ -899,7 +823,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "subject": {
       "entities": [
         {
-          "idPattern": "pepper.*",
+          "id": "pepper_0000000000000001",
           "type": "pepper"
         }
       ],
@@ -925,7 +849,321 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     }
   },
   {
-    "id": "5b3afd6eb103566fe628830d",
+    "id": "5b3ecfacd31a6404acc0ae36",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "id": "pepper_0000000000000002",
+          "type": "pepper"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "face"
+        ]
+      }
+    },
+    "notification": {
+      "timesSent": 1,
+      "lastNotification": "2018-07-06T02:10:52.00Z",
+      "attrs": [
+        "face"
+      ],
+      "attrsFormat": "normalized",
+      "http": {
+        "url": "http://ledger:8888/notify/detect-visitor/"
+      },
+      "lastSuccess": "2018-07-06T02:10:52.00Z"
+    }
+  }
+]
+```
+
+## register `reask-destination` of ledger as a subscriber of PEPPER
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
+{
+  "subject": {
+    "entities": [{
+      "id": "pepper_0000000000000002",
+      "type": "pepper"
+    }],
+    "condition": {
+      "attrs": ["dest"]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://ledger:8888/notify/reask-destination/"
+    },
+    "attrs": ["dest"]
+  }
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" https://api.tech-sketch.jp/orion/v2/subscriptions/ | jq .
+[
+  {
+    "id": "5b397c2c01ed8ed56809d2c8",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "pepper.*",
+          "type": "pepper"
+        }
+      ],
+      "condition": {
+        "attrs": []
+      }
+    },
+    "notification": {
+      "timesSent": 36,
+      "lastNotification": "2018-07-03T05:34:29.00Z",
+      "attrs": [
+        "dest",
+        "face",
+        "welcome_status",
+        "handover_status",
+        "facedetect_status",
+        "retry_status"
+      ],
+      "attrsFormat": "legacy",
+      "http": {
+        "url": "http://cygnus:5050/notify"
+      },
+      "lastSuccess": "2018-07-03T05:34:29.00Z"
+    }
+  },
+  {
+    "id": "5b397c967da87a300178826f",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "id": "pepper_0000000000000001",
+          "type": "pepper"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "face",
+          "dest"
+        ]
+      }
+    },
+    "notification": {
+      "timesSent": 14,
+      "lastNotification": "2018-07-03T05:34:29.00Z",
+      "attrs": [
+        "face",
+        "dest"
+      ],
+      "attrsFormat": "normalized",
+      "http": {
+        "url": "http://reception:8888/notify/finish-reception/"
+      },
+      "lastSuccess": "2018-07-03T05:34:29.00Z"
+    }
+  },
+  {
+    "id": "5b397cac7da87a3001788270",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "id": "pepper_0000000000000001",
+          "type": "pepper"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "face",
+          "dest"
+        ]
+      }
+    },
+    "notification": {
+      "timesSent": 14,
+      "lastNotification": "2018-07-03T05:34:29.00Z",
+      "attrs": [
+        "face",
+        "dest"
+      ],
+      "attrsFormat": "normalized",
+      "http": {
+        "url": "http://ledger:8888/notify/record-reception/"
+      },
+      "lastSuccess": "2018-07-03T05:34:29.00Z"
+    }
+  },
+  {
+    "id": "5b3ecfacd31a6404acc0ae36",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "id": "pepper_0000000000000002",
+          "type": "pepper"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "face"
+        ]
+      }
+    },
+    "notification": {
+      "timesSent": 1,
+      "lastNotification": "2018-07-06T02:10:52.00Z",
+      "attrs": [
+        "face"
+      ],
+      "attrsFormat": "normalized",
+      "http": {
+        "url": "http://ledger:8888/notify/detect-visitor/"
+      },
+      "lastSuccess": "2018-07-06T02:10:52.00Z"
+    }
+  },
+  {
+    "id": "5b3ed0b0f1bdbe368d81d4ce",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "id": "pepper_0000000000000002",
+          "type": "pepper"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "dest"
+        ]
+      }
+    },
+    "notification": {
+      "timesSent": 1,
+      "lastNotification": "2018-07-06T02:15:12.00Z",
+      "attrs": [
+        "dest"
+      ],
+      "attrsFormat": "normalized",
+      "http": {
+        "url": "http://ledger:8888/notify/reask-destination/"
+      }
+    }
+  }
+]
+```
+
+## register `start_movement` entity
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: start_movement" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v2/entities/ -X POST -d @- <<__EOS__
+{
+  "id": "start_movement",
+  "type": "start_movement",
+  "destx": {
+    "type": "float",
+    "value": "",
+    "metadata": {}
+  },
+  "desty": {
+    "type": "float",
+    "value": "",
+    "metadata": {}
+  },
+  "floor": {
+    "type": "int",
+    "value": "",
+    "metadata": {}
+  },
+  "timestamp": {
+    "type": "string",
+    "value": "",
+    "metadata": {}
+  }
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: start_movement" -H "Fiware-ServicePath: /" https://api.tech-sketch.jp/orion/v2/entities/start_movement/ | jq .
+{
+  "id": "start_movement",
+  "type": "start_movement",
+  "destx": {
+    "type": "float",
+    "value": "",
+    "metadata": {}
+  },
+  "desty": {
+    "type": "float",
+    "value": "",
+    "metadata": {}
+  },
+  "floor": {
+    "type": "int",
+    "value": "",
+    "metadata": {}
+  },
+  "timestamp": {
+    "type": "string",
+    "value": "",
+    "metadata": {}
+  }
+}
+```
+
+## register `start-movement` of guidance as a subscriber of `start_movement`
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: start_movement" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
+{
+  "subject": {
+    "entities": [{
+      "id": "start_movement",
+      "type": "start_movement"
+    }],
+    "condition": {
+      "attrs": ["destx", "desty", "floor", "timestamp"]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://guidance:8888/notify/start-movement/"
+    },
+    "attrs": ["destx", "desty", "floor", "timestamp"]
+  }
+}
+__EOS__
+```
+
+## register cygnus as as subscriber of `start_movement`
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: start_movement" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
+{
+  "subject": {
+    "entities": [{
+      "id": "start_movement",
+      "type": "start_movement"
+    }]
+  },
+  "notification": {
+    "http": {
+      "url": "http://cygnus:5050/notify"
+    },
+    "attrs": ["destx", "desty", "floor", "timestamp"],
+    "attrsFormat": "legacy"
+  }
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: start_movement" -H "Fiware-ServicePath: /" https://api.tech-sketch.jp/orion/v2/subscriptions/ | jq .
+[
+  {
+    "id": "5b3efc85d31a6404acc0ae37",
     "status": "active",
     "subject": {
       "entities": [
@@ -944,8 +1182,6 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       }
     },
     "notification": {
-      "timesSent": 9,
-      "lastNotification": "2018-07-03T05:34:29.00Z",
       "attrs": [
         "destx",
         "desty",
@@ -955,12 +1191,11 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "attrsFormat": "normalized",
       "http": {
         "url": "http://guidance:8888/notify/start-movement/"
-      },
-      "lastSuccess": "2018-07-03T05:34:29.00Z"
+      }
     }
   },
   {
-    "id": "5b3b0a6cb103566fe628830e",
+    "id": "5b3efc8ed31a6404acc0ae38",
     "status": "active",
     "subject": {
       "entities": [
@@ -974,8 +1209,8 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       }
     },
     "notification": {
-      "timesSent": 3,
-      "lastNotification": "2018-07-03T05:34:29.00Z",
+      "timesSent": 1,
+      "lastNotification": "2018-07-06T05:22:22.00Z",
       "attrs": [
         "destx",
         "desty",
@@ -986,7 +1221,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "http": {
         "url": "http://cygnus:5050/notify"
       },
-      "lastSuccess": "2018-07-03T05:34:29.00Z"
+      "lastSuccess": "2018-07-06T05:22:22.00Z"
     }
   }
 ]

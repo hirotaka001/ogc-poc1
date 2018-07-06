@@ -73,7 +73,7 @@
       }
     ]
     ```
-1. simulate to be called `/storage/faces/` REST API by `pepper`
+1. simulate to be called `/storage/faces/` REST API by `pepper(floor 1)`
 
     ```bash
     mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Content-Type: multipart/form-data" https://api.tech-sketch.jp/storage/faces/ -X POST -F face=@face.jpg | jq .
@@ -194,8 +194,40 @@
     Client mosqpub|65572-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/dest_human_sensor/dest_human_sensor_0000000000000001/attrs', ... (79 bytes))
     Client mosqpub|65572-Nobuyukin sending DISCONNECT
     ```
+    * receive MQTT message and send `action|off` message to `dest_led` and `robot_request` command to `guide_robot` automatically
 
+        ```bash
+        Client mosqsub|51716-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/dest_human_sensor/dest_human_sensor_0000000000000001/attrs', ... (79 bytes))
+        2018-07-06T09:44:54.1530837894+0900|arrival|2018-07-06T09:44:54.1530837894+0900
+        Client mosqsub|51716-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/dest_led/dest_led_0000000000000001/cmd', ... (36 bytes))
+        dest_led_0000000000000001@action|off
+        Client mosqsub|51716-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot/cmd', ... (75 bytes))
+        guide_robot@robot_request|robot_id|1|r_cmd|Navi|pos.x|0.0|pos.y|0.0|pos.z|1
+        Client mosqsub|51716-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot/cmdexe', ... (111 bytes))
+        guide_robot@robot_request|result,success/time,2018-07-06 09:45:00/id,1/r_cmd,Navi/pos.x,0.0/pos.y,0.0/pos.z,1.0
+        ```
+    * send ros message to ros topic '/Robot/request
 
+        ```bash
+        root@rosbridge:/opt/ros_ws# rostopic echo /Robot/request
+        time: "2018-07-06 09:45:00"
+        id: 1
+        r_cmd: "Navi"
+        pos:
+          x: 0.0
+          y: 0.0
+          z: 1.0
+        ---
+        ```
+1. simulate to send `action` cmd result
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /dest_led/dest_led_0000000000000001/cmdexe -u iotagent -P XXXXXXXX -m "dest_led_0000000000000001@action|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/dest_led/dest_led_0000000000000001/cmdexe', ... (40 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
 1. simulate to receive camera state
     * publish ros message to `/ExternalCamera/state`
 
@@ -225,7 +257,7 @@
 1. simulate to finish reception (floor 2)
 
     ```bash
-    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000001/attrs -u iotagent -P iotagent_0GC -m "$d|face|/shared/faces/IoYu2c4sggdVLi49.JPEG|dest|203号室"
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000001/attrs -u iotagent -P XXXXXXXX -m "$d|face|/shared/faces/IoYu2c4sggdVLi49.JPEG|dest|203号室"
     Client mosqpub|37447-Nobuyukin sending CONNECT
     Client mosqpub|37447-Nobuyukin received CONNACK
     Client mosqpub|37447-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/attrs', ... (91 bytes))
@@ -259,10 +291,72 @@
     Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/cmdexe', ... (40 bytes))
     Client mosqpub|22763-Nobuyukin sending DISCONNECT
     ```
+1. simulate to be called `/storage/faces/` REST API by `pepper(floor 2)`
+
+    ```bash
+    mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Content-Type: multipart/form-data" https://api.tech-sketch.jp/storage/faces/ -X POST -F face=@face.jpg | jq .
+    {
+      "path": "/shared/faces/6Q72bJkxZ4Ct8wx0.JPEG",
+      "url": ""
+    }
+    ```
+1. simulate to detect visitor
+
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000002/attrs -u iotagent -P XXXXXXXX -m "$d|face|/shared/faces/IoYu2c4sggdVLi49.JPEG"
+    Client mosqpub|97057-Nobuyukin sending CONNECT
+    Client mosqpub|97057-Nobuyukin received CONNACK
+    Client mosqpub|97057-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000002/attrs', ... (76 bytes))
+    Client mosqpub|97057-Nobuyukin sending DISCONNECT
+    ```
+    * send `handover` command to `pepper(floor 2)` and `robot_request` command to `guide_robot` automatically
+
+        ```bash
+        Client mosqsub|51716-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/attrs', ... (76 bytes))
+        2018-07-06T15:13:27.1530857607+0900|face|/shared/faces/IoYu2c4sggdVLi49.JPEG
+        Client mosqsub|51716-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/cmd', ... (41 bytes))
+        pepper_0000000000000002@handover|continue
+        Client mosqsub|51716-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot/cmd', ... (86 bytes))
+        guide_robot@robot_request|robot_id|1|r_cmd|Navi|pos.x|125.12345|pos.y|92.12345|pos.z|2
+        Client mosqsub|51716-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot/cmdexe', ... (122 bytes))
+        guide_robot@robot_request|result,success/time,2018-07-06 15:13:48/id,1/r_cmd,Navi/pos.x,125.12345/pos.y,92.12345/pos.z,2.0
+        ```
+    * send ros message to ros topic '/Robot/request
+
+        ```bash
+        root@rosbridge:/opt/ros_ws# rostopic echo /Robot/request
+        time: "2018-07-06 15:13:48"
+        id: 1
+        r_cmd: "Navi"
+        pos:
+          x: 125.12345
+          y: 92.12345
+          z: 2.0
+        ---
+        ```
+1. simulate to send `facedetect` cmd result from `pepper(floor 2)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000002/cmdexe -u iotagent -P XXXXXXXX -m "pepper_0000000000000002@facedetect|success"
+    Client mosqpub|48535-Nobuyukin sending CONNECT
+    Client mosqpub|48535-Nobuyukin received CONNACK
+    Client mosqpub|48535-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000002/cmdexe', ... (42 bytes))
+    Client mosqpub|48535-Nobuyukin sending DISCONNECT
+    ```
+
+1. simulate to send `handover` cmd result from `pepper(floor 1)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000002/cmdexe -u iotagent -P XXXXXXXX -m "pepper_0000000000000002@handover|success"
+    Client mosqpub|48779-Nobuyukin sending CONNECT
+    Client mosqpub|48779-Nobuyukin received CONNACK
+    Client mosqpub|48779-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000002/cmdexe', ... (40 bytes))
+    Client mosqpub|48779-Nobuyukin sending DISCONNECT
+    ```
 1. simulate to finish reception (floor 3)
 
     ```bash
-    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000001/attrs -u iotagent -P iotagent_0GC -m "$d|face|/shared/faces/IoYu2c4sggdVLi49.JPEG|dest|ProjectRoom 1"
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000001/attrs -u iotagent -P XXXXXXXX -m "$d|face|/shared/faces/IoYu2c4sggdVLi49.JPEG|dest|ProjectRoom 1"
     Client mosqpub|38060-Nobuyukin sending CONNECT
     Client mosqpub|38060-Nobuyukin received CONNACK
     Client mosqpub|38060-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/attrs', ... (95 bytes))

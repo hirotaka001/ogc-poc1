@@ -674,11 +674,11 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 ## start ledger service on AKS
 ```bash
 mac:$ az acr login --name ogcacr
-mac:$ docker build --build-arg SERVICE_PATH="./controller/ledger" -t ${REPOSITORY}/tech-sketch/ledger:0.1.0 -f ./controller/docker/Dockerfile .
+mac:$ docker build --build-arg SERVICE_PATH="./controller/ledger" -t ${REPOSITORY}/tech-sketch/ledger:0.1.0 -f ./controller/docker/Dockerfile_etcd .
 mac:$ docker push ${REPOSITORY}/tech-sketch/ledger:0.1.0
 ```
 ```bash
-mac:$ envsubst < controller/ledger.yaml | kubectl apply -f -
+mac:$ env PEPPER_SERVICE="pepper" PEPPER_SERVICEPATH="/" PEPPER_TYPE="pepper" PEPPER_2_ID="pepper_0000000000000002" envsubst < controller/ledger.yaml | kubectl apply -f -
 ```
 ```bash
 mac:$ kubectl get pods -l pod=ledger
