@@ -13,6 +13,7 @@ setup(
     install_requires=[
         "Flask>=1.0",
         "requests>=2.18",
+        "pytz==2018.5",
     ],
     classifiers=[
         'Programming Language :: Python :: 3.6',
