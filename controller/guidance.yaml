@@ -43,12 +43,8 @@ spec:
           value: "${ROBOT_SERVICEPATH}"
         - name: ROBOT_TYPE
           value: "${ROBOT_TYPE}"
-        - name: ROBOT_ID
-          value: "${ROBOT_ID}"
-        - name: TURTLEBOT_1_ID
-          value: "${TURTLEBOT_1_ID}"
-        - name: TURTLEBOT_2_ID
-          value: "${TURTLEBOT_2_ID}"
+        - name: ROBOT_FLOOR_MAP
+          value: '${ROBOT_FLOOR_MAP}'
         - name: DEST_LED_SERVICE
           value: "${DEST_LED_SERVICE}"
         - name: DEST_LED_SERVICEPATH

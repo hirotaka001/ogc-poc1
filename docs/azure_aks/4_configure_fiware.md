@@ -18,6 +18,9 @@ Configure fiware on AKS by following steps:
 1. [register cygnus as as subscriber of `start_movement`](#register-cygnus-as-a-subscriber-of-start_movement)
 1. [register `check-destination` of "guidance" as a subscriber of "ROBOT"](#register-check-destination-of-guidance-as-a-subscriber-of-robot)
 1. [register `stop-movement` of "guidance" as a subscriber of "ROBOT"](#register-stop-movement-of-guidance-as-a-subscriber-of-robot)
+1. [register `record-arrival` of "ledger" as a subscriber of "DEST-HUMAN-SENSOR"](#register-record-arrival-of-ledger-as-a-subscriber-of-dest-human-sensor)
+1. [register `arrival` of "guidance" as a subscriber of "DEST-HUMAN-SENSOR"](#register-arrival-of-guidance-as-a-subscriber-of-dest-human-sensor)
+
 
 ## register BUTTON-SENSOR to cygnus
 ```bash
@@ -161,11 +164,10 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     },
     "attrs": [
       "time",
-      "robot_id",
       "r_mode",
-      "pos.x",
-      "pos.y",
-      "pos.z",
+      "x",
+      "y",
+      "theta",
       "robot_request_status",
       "robot_request_info"
     ],
@@ -178,7 +180,7 @@ __EOS__
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-ServicePath: /" https://api.tech-sketch.jp/orion/v2/subscriptions/ | jq .
 [
   {
-    "id": "5b3c44f7d31a6404acc0ae2d",
+    "id": "5b611c4cbc0be89f5baac3d3",
     "status": "active",
     "subject": {
       "entities": [
@@ -193,14 +195,13 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     },
     "notification": {
       "timesSent": 1,
-      "lastNotification": "2018-07-04T03:54:31.00Z",
+      "lastNotification": "2018-08-01T02:34:52.00Z",
       "attrs": [
         "time",
-        "robot_id",
         "r_mode",
-        "pos.x",
-        "pos.y",
-        "pos.z",
+        "x",
+        "y",
+        "theta",
         "robot_request_status",
         "robot_request_info"
       ],
@@ -208,24 +209,36 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "http": {
         "url": "http://cygnus:5050/notify"
       },
-      "lastSuccess": "2018-07-04T03:54:31.00Z"
+      "lastSuccess": "2018-08-01T02:34:52.00Z"
     }
   }
 ]
 ```
 ```bash
-mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_robot --eval 'db.getCollection("sth_/_guide_robot_guide_robot").find()'
+mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_robot --eval 'db.getCollection("sth_/_guide_robot_0000000000000001_guide_robot").find()'
 MongoDB shell version v3.6.5
 connecting to: mongodb://127.0.0.1:27017/sth_robot
 MongoDB server version: 3.6.5
-{ "_id" : ObjectId("5b3c44f723b570000ae53ba4"), "recvTime" : ISODate("2018-07-04T03:54:31.464Z"), "attrName" : "pos.x", "attrType" : "float", "attrValue" : "123.4" }
-{ "_id" : ObjectId("5b3c44f723b570000ae53ba5"), "recvTime" : ISODate("2018-07-04T03:54:31.464Z"), "attrName" : "pos.y", "attrType" : "float", "attrValue" : "-987.6" }
-{ "_id" : ObjectId("5b3c44f723b570000ae53ba6"), "recvTime" : ISODate("2018-07-04T03:54:31.464Z"), "attrName" : "pos.z", "attrType" : "float", "attrValue" : "3.0" }
-{ "_id" : ObjectId("5b3c44f723b570000ae53ba7"), "recvTime" : ISODate("2018-07-04T03:54:31.464Z"), "attrName" : "r_mode", "attrType" : "string", "attrValue" : "Navi" }
-{ "_id" : ObjectId("5b3c44f723b570000ae53ba8"), "recvTime" : ISODate("2018-07-04T03:54:31.464Z"), "attrName" : "robot_id", "attrType" : "int", "attrValue" : "1" }
-{ "_id" : ObjectId("5b3c44f723b570000ae53ba9"), "recvTime" : ISODate("2018-07-04T03:22:25.246Z"), "attrName" : "robot_request_info", "attrType" : "commandResult", "attrValue" : "result,success/robot_id,1/r_cmd,Navi/pos.x,123.4/pos.y,-987.6/pos.z,3.0" }
-{ "_id" : ObjectId("5b3c44f723b570000ae53baa"), "recvTime" : ISODate("2018-07-04T03:22:25.246Z"), "attrName" : "robot_request_status", "attrType" : "commandStatus", "attrValue" : "OK" }
-{ "_id" : ObjectId("5b3c44f723b570000ae53bab"), "recvTime" : ISODate("2018-07-04T03:54:31.464Z"), "attrName" : "time", "attrType" : "string", "attrValue" : "2018-01-02 03:04:05" }
+{ "_id" : ObjectId("5b611c88c22929000a69fe9c"), "recvTime" : ISODate("2018-08-01T02:35:52.628Z"), "attrName" : "r_mode", "attrType" : "string", "attrValue" : "Navi" }
+{ "_id" : ObjectId("5b611c88c22929000a69fe9d"), "recvTime" : ISODate("2018-08-01T02:21:08.148Z"), "attrName" : "robot_request_info", "attrType" : "commandResult", "attrValue" : "result,success/time,2018-08-01 11:21:07/r_cmd,Navi/pos.x,123.4/pos.y,-987.6" }
+{ "_id" : ObjectId("5b611c88c22929000a69fe9e"), "recvTime" : ISODate("2018-08-01T02:21:08.148Z"), "attrName" : "robot_request_status", "attrType" : "commandStatus", "attrValue" : "OK" }
+{ "_id" : ObjectId("5b611c88c22929000a69fe9f"), "recvTime" : ISODate("2018-08-01T02:35:52.628Z"), "attrName" : "theta", "attrType" : "float", "attrValue" : "0.3" }
+{ "_id" : ObjectId("5b611c88c22929000a69fea0"), "recvTime" : ISODate("2018-08-01T02:35:52.628Z"), "attrName" : "time", "attrType" : "string", "attrValue" : "2018-09-08 07:06:05" }
+{ "_id" : ObjectId("5b611c88c22929000a69fea1"), "recvTime" : ISODate("2018-08-01T02:35:52.628Z"), "attrName" : "x", "attrType" : "float", "attrValue" : "0.1" }
+{ "_id" : ObjectId("5b611c88c22929000a69fea2"), "recvTime" : ISODate("2018-08-01T02:35:52.628Z"), "attrName" : "y", "attrType" : "float", "attrValue" : "0.2" }
+```
+```bash
+mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_robot --eval 'db.getCollection("sth_/_guide_robot_0000000000000002_guide_robot").find()'
+MongoDB shell version v3.6.5
+connecting to: mongodb://127.0.0.1:27017/sth_robot
+MongoDB server version: 3.6.5
+{ "_id" : ObjectId("5b611c8cc22929000a69fea3"), "recvTime" : ISODate("2018-08-01T02:35:56.153Z"), "attrName" : "r_mode", "attrType" : "string", "attrValue" : "Navi" }
+{ "_id" : ObjectId("5b611d37f8a94e000a6eaeae"), "recvTime" : ISODate("2018-08-01T02:38:47.590Z"), "attrName" : "robot_request_info", "attrType" : "commandResult", "attrValue" : "result,success/time,2018-08-01 11:38:46/r_cmd,Navi/pos.x,-0.1/pos.y,0.2" }
+{ "_id" : ObjectId("5b611d37f8a94e000a6eaeaf"), "recvTime" : ISODate("2018-08-01T02:38:47.590Z"), "attrName" : "robot_request_status", "attrType" : "commandStatus", "attrValue" : "OK" }
+{ "_id" : ObjectId("5b611c8cc22929000a69fea5"), "recvTime" : ISODate("2018-08-01T02:35:56.153Z"), "attrName" : "theta", "attrType" : "float", "attrValue" : "-0.3" }
+{ "_id" : ObjectId("5b611c8cc22929000a69fea6"), "recvTime" : ISODate("2018-08-01T02:35:56.153Z"), "attrName" : "time", "attrType" : "string", "attrValue" : "2018-09-08 17:16:15" }
+{ "_id" : ObjectId("5b611c8cc22929000a69fea7"), "recvTime" : ISODate("2018-08-01T02:35:56.153Z"), "attrName" : "x", "attrType" : "float", "attrValue" : "-0.1" }
+{ "_id" : ObjectId("5b611c8cc22929000a69fea8"), "recvTime" : ISODate("2018-08-01T02:35:56.153Z"), "attrName" : "y", "attrType" : "float", "attrValue" : "-0.2" }
 ```
 
 ## register CAMERA to cygnus
@@ -1258,7 +1271,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "type": "guide_robot"
     }],
     "condition": {
-      "attrs": ["r_mode", "pos.x", "pos.y", "pos.z"],
+      "attrs": ["r_mode", "x", "y", "theta"],
       "expression": {
         "q": "r_mode==Navi"
       }
@@ -1268,7 +1281,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "http": {
       "url": "http://guidance:8888/notify/check-destination/"
     },
-    "attrs": ["r_mode", "pos.x", "pos.y", "pos.z"]
+    "attrs": ["r_mode", "x", "y", "theta"]
   }
 }
 __EOS__
@@ -1277,7 +1290,7 @@ __EOS__
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-ServicePath: /" https://api.tech-sketch.jp/orion/v2/subscriptions/ | jq .
 [
   {
-    "id": "5b3c44f7d31a6404acc0ae2d",
+    "id": "5b611c4cbc0be89f5baac3d3",
     "status": "active",
     "subject": {
       "entities": [
@@ -1291,15 +1304,14 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       }
     },
     "notification": {
-      "timesSent": 20,
-      "lastNotification": "2018-07-04T23:14:31.00Z",
+      "timesSent": 5,
+      "lastNotification": "2018-08-01T02:38:47.00Z",
       "attrs": [
         "time",
-        "robot_id",
         "r_mode",
-        "pos.x",
-        "pos.y",
-        "pos.z",
+        "x",
+        "y",
+        "theta",
         "robot_request_status",
         "robot_request_info"
       ],
@@ -1307,11 +1319,11 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "http": {
         "url": "http://cygnus:5050/notify"
       },
-      "lastSuccess": "2018-07-04T23:14:31.00Z"
+      "lastSuccess": "2018-08-01T02:38:47.00Z"
     }
   },
   {
-    "id": "5b3d55e0d31a6404acc0ae30",
+    "id": "5b611e8bd201a33a709aa74c",
     "status": "active",
     "subject": {
       "entities": [
@@ -1323,9 +1335,9 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "condition": {
         "attrs": [
           "r_mode",
-          "pos.x",
-          "pos.y",
-          "pos.z"
+          "x",
+          "y",
+          "theta"
         ],
         "expression": {
           "q": "r_mode==Navi"
@@ -1333,11 +1345,13 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       }
     },
     "notification": {
+      "timesSent": 1,
+      "lastNotification": "2018-08-01T02:44:27.00Z",
       "attrs": [
         "r_mode",
-        "pos.x",
-        "pos.y",
-        "pos.z"
+        "x",
+        "y",
+        "theta"
       ],
       "attrsFormat": "normalized",
       "http": {
@@ -1358,7 +1372,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "type": "guide_robot"
     }],
     "condition": {
-      "attrs": ["r_mode", "pos.x", "pos.y", "pos.z"],
+      "attrs": ["r_mode", "x", "y", "theta"],
       "expression": {
         "q": "r_mode==Standby"
       }
@@ -1368,7 +1382,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "http": {
       "url": "http://guidance:8888/notify/stop-movement/"
     },
-    "attrs": ["r_mode", "pos.x", "pos.y", "pos.z"]
+    "attrs": ["r_mode", "x", "y", "theta"]
   }
 }
 __EOS__
@@ -1377,7 +1391,7 @@ __EOS__
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-ServicePath: /" https://api.tech-sketch.jp/orion/v2/subscriptions/ | jq .
 [
   {
-    "id": "5b3c44f7d31a6404acc0ae2d",
+    "id": "5b611c4cbc0be89f5baac3d3",
     "status": "active",
     "subject": {
       "entities": [
@@ -1391,15 +1405,14 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       }
     },
     "notification": {
-      "timesSent": 24,
-      "lastNotification": "2018-07-04T23:21:21.00Z",
+      "timesSent": 5,
+      "lastNotification": "2018-08-01T02:38:47.00Z",
       "attrs": [
         "time",
-        "robot_id",
         "r_mode",
-        "pos.x",
-        "pos.y",
-        "pos.z",
+        "x",
+        "y",
+        "theta",
         "robot_request_status",
         "robot_request_info"
       ],
@@ -1407,11 +1420,11 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "http": {
         "url": "http://cygnus:5050/notify"
       },
-      "lastSuccess": "2018-07-04T23:21:21.00Z"
+      "lastSuccess": "2018-08-01T02:38:47.00Z"
     }
   },
   {
-    "id": "5b3d55e0d31a6404acc0ae30",
+    "id": "5b611e8bd201a33a709aa74c",
     "status": "active",
     "subject": {
       "entities": [
@@ -1423,9 +1436,9 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "condition": {
         "attrs": [
           "r_mode",
-          "pos.x",
-          "pos.y",
-          "pos.z"
+          "x",
+          "y",
+          "theta"
         ],
         "expression": {
           "q": "r_mode==Navi"
@@ -1433,23 +1446,23 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       }
     },
     "notification": {
-      "timesSent": 2,
-      "lastNotification": "2018-07-04T23:20:46.00Z",
+      "timesSent": 1,
+      "lastNotification": "2018-08-01T02:44:27.00Z",
       "attrs": [
         "r_mode",
-        "pos.x",
-        "pos.y",
-        "pos.z"
+        "x",
+        "y",
+        "theta"
       ],
       "attrsFormat": "normalized",
       "http": {
         "url": "http://guidance:8888/notify/check-destination/"
       },
-      "lastSuccess": "2018-07-04T23:20:46.00Z"
+      "lastSuccess": "2018-08-01T02:44:27.00Z"
     }
   },
   {
-    "id": "5b3d59e4f1bdbe368d81d4cb",
+    "id": "5b611ecdd201a33a709aa74d",
     "status": "active",
     "subject": {
       "entities": [
@@ -1461,9 +1474,9 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "condition": {
         "attrs": [
           "r_mode",
-          "pos.x",
-          "pos.y",
-          "pos.z"
+          "x",
+          "y",
+          "theta"
         ],
         "expression": {
           "q": "r_mode==Standby"
@@ -1471,19 +1484,16 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       }
     },
     "notification": {
-      "timesSent": 1,
-      "lastNotification": "2018-07-04T23:36:04.00Z",
       "attrs": [
         "r_mode",
-        "pos.x",
-        "pos.y",
-        "pos.z"
+        "x",
+        "y",
+        "theta"
       ],
       "attrsFormat": "normalized",
       "http": {
         "url": "http://guidance:8888/notify/stop-movement/"
-      },
-      "lastSuccess": "2018-07-04T23:36:04.00Z"
+      }
     }
   }
 ]

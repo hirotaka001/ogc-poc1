@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import json
 from logging import getLogger
 
 from flask import request, jsonify
@@ -14,16 +15,26 @@ from controllerlibs.services.destination import Destination, DestinationFormatEr
 logger = getLogger(__name__)
 
 
-class StartMovementAPI(MethodView):
+class RobotFloorMapMixin:
+    def __init__(self):
+        super().__init__()
+        self.robot_floor_map = json.loads(os.environ.get(const.ROBOT_FLOOR_MAP, '{}'))
+
+    def get_floor_by_robot(self, robot_id):
+        return self.robot_floor_map[robot_id]
+
+    def get_available_robot_from_floor(self, floor):
+        return [r_id for r_id, f in self.robot_floor_map.items() if f == floor][0]
+
+
+class StartMovementAPI(RobotFloorMapMixin, MethodView):
     NAME = 'start-movement'
 
     def __init__(self):
+        super().__init__()
         service = os.environ.get(const.ROBOT_SERVICE, '')
         service_path = os.environ.get(const.ROBOT_SERVICEPATH, '')
         self.type = os.environ.get(const.ROBOT_TYPE, '')
-        self.id = os.environ.get(const.ROBOT_ID, '')
-        self.turtlebot_1_id = os.environ.get(const.TURTLEBOT_1_ID, '')
-        self.turtlebot_2_id = os.environ.get(const.TURTLEBOT_2_ID, '')
 
         self.orion = Orion(service, service_path)
 
@@ -41,9 +52,9 @@ class StartMovementAPI(MethodView):
                 raise DestinationFormatError('dest_floor is invalid')
 
             if destx is not None and desty is not None and floor in (1, 2):
-                turtlebot_id = self.turtlebot_1_id if floor == 1 else self.turtlebot_2_id
-                value = f'robot_id|{turtlebot_id}|r_cmd|Navi|pos.x|{destx}|pos.y|{desty}|pos.z|{floor}'
-                message = self.orion.send_cmd(self.id, self.type, 'robot_request', value)
+                robot_id = self.get_available_robot_from_floor(floor)
+                value = f'r_cmd|Navi|pos.x|{destx}|pos.y|{desty}'
+                message = self.orion.send_cmd(robot_id, self.type, 'robot_request', value)
                 result['result'] = 'success'
                 result['message'] = message
         except AttrDoesNotExist as e:
@@ -62,10 +73,11 @@ class StartMovementAPI(MethodView):
         return jsonify(result)
 
 
-class CheckDestinationAPI(MethodView):
+class CheckDestinationAPI(RobotFloorMapMixin, MethodView):
     NAME = 'check-destination'
 
     def __init__(self):
+        super().__init__()
         service = os.environ.get(const.DEST_LED_SERVICE, '')
         service_path = os.environ.get(const.DEST_LED_SERVICEPATH, '')
         self.type = os.environ.get(const.DEST_LED_TYPE, '')
@@ -78,12 +90,14 @@ class CheckDestinationAPI(MethodView):
 
         result = {'result': 'ignore'}
         try:
-            posx = get_attr_value(content, 'pos.x')
-            posy = get_attr_value(content, 'pos.y')
-            posz = get_attr_value(content, 'pos.z')
+            posx = get_attr_value(content, 'x')
+            posy = get_attr_value(content, 'y')
+            deviceid = get_id(content)
+            floor = self.get_floor_by_robot(deviceid)
+            logger.info(f'received position: posx={posx}, posy={posy}, robot_id={deviceid}, floor={floor}')
 
-            if posx is not None and posy is not None and posz is not None:
-                destination = Destination().get_destination_by_pos(posx, posy, posz)
+            if posx is not None and posy is not None and floor is not None:
+                destination = Destination().get_destination_by_pos(posx, posy, floor)
                 if destination is not None and const.DEST_LED_ID in destination:
                     dest_led_id = destination[const.DEST_LED_ID]
                     message = self.orion.send_cmd(dest_led_id, self.type, 'action', 'on')
@@ -109,7 +123,7 @@ class StopMovementAPI(MethodView):
     NAME = 'stop-movement'
 
     def __init__(self):
-        pass
+        super().__init__()
 
     def post(self):
         content = request.data.decode('utf-8')
@@ -121,10 +135,11 @@ class StopMovementAPI(MethodView):
         return jsonify(result)
 
 
-class ArrivalAPI(MethodView):
+class ArrivalAPI(RobotFloorMapMixin, MethodView):
     NAME = 'arrival'
 
     def __init__(self):
+        super().__init__()
         dest_led_service = os.environ.get(const.DEST_LED_SERVICE, '')
         dest_led_service_path = os.environ.get(const.DEST_LED_SERVICEPATH, '')
         self.dest_led_orion = Orion(dest_led_service, dest_led_service_path)
@@ -135,9 +150,6 @@ class ArrivalAPI(MethodView):
 
         self.dest_led_type = os.environ.get(const.DEST_LED_TYPE, '')
         self.robot_type = os.environ.get(const.ROBOT_TYPE, '')
-        self.robot_id = os.environ.get(const.ROBOT_ID, '')
-        self.turtlebot_1_id = os.environ.get(const.TURTLEBOT_1_ID, '')
-        self.turtlebot_2_id = os.environ.get(const.TURTLEBOT_2_ID, '')
 
     def post(self):
         content = request.data.decode('utf-8')
@@ -159,14 +171,14 @@ class ArrivalAPI(MethodView):
                     except (TypeError, ValueError):
                         raise DestinationFormatError('dest_floor is invalid')
 
-                    turtlebot_id = self.turtlebot_1_id if floor == 1 else self.turtlebot_2_id
+                    robot_id = self.get_available_robot_from_floor(floor)
                     initial = destService.get_initial_of_floor(floor)
                     initial_pos = initial.get(const.DEST_POS)
                     if not initial_pos:
                         raise DestinationFormatError('initial dest_pos is empty')
                     initx, inity = [float(x.strip()) for x in initial_pos.split(',')]
-                    value = f'robot_id|{turtlebot_id}|r_cmd|Navi|pos.x|{initx}|pos.y|{inity}|pos.z|{floor}'
-                    message = self.robot_orion.send_cmd(self.robot_id, self.robot_type, 'robot_request', value)
+                    value = f'r_cmd|Navi|pos.x|{initx}|pos.y|{inity}'
+                    message = self.robot_orion.send_cmd(robot_id, self.robot_type, 'robot_request', value)
                     result['result'] = 'success'
                     result['message'] = message
         except AttrDoesNotExist as e:
