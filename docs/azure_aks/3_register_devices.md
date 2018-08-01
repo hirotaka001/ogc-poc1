@@ -20,9 +20,9 @@ Configure fiware on AKS by following steps:
 1. [register "DEST-LED" service](#register-dest-led-service)
 1. [register "DEST-LED" device](#register-dest-led-device)
 1. [test "DEST-LED" command](#test-dest-led-command)
-1. [register "DEST-HUMAN-SENSOR" service](#register-button-sensor-service)
-1. [register "DEST-HUMAN-SENSOR" device](#register-button-sensor-device)
-1. [test "DEST-HUMAN-SENSOR" attribute](#test-button-sensor-attribute)
+1. [register "DEST-HUMAN-SENSOR" service](#register-dest-human-sensor-service)
+1. [register "DEST-HUMAN-SENSOR" device](#register-dest-human-sensor-device)
+1. [test "DEST-HUMAN-SENSOR" attribute](#test-dest-human-sensor-attribute)
 
 ## register BUTTON-SENSOR service
 ```bash
