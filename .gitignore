@@ -7,3 +7,4 @@ idas/iotagent-ul/config.js
 dist/
 *.egg-info
 build/
+.DS_Store
