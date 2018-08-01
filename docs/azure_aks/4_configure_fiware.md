@@ -245,10 +245,9 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     },
     "attrs": [
       "time",
-      "camera_id",
       "c_mode",
       "num_p",
-      "p_state",
+      "position",
       "external_camera_request_status",
       "external_camera_request_info"
     ],
@@ -261,7 +260,7 @@ __EOS__
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: camera" -H "Fiware-ServicePath: /" https://api.tech-sketch.jp/orion/v2/subscriptions/ | jq .
 [
   {
-    "id": "5b3c4591f1bdbe368d81d4c2",
+    "id": "5b60fbaabc0be89f5baac3d2",
     "status": "active",
     "subject": {
       "entities": [
@@ -276,13 +275,12 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     },
     "notification": {
       "timesSent": 1,
-      "lastNotification": "2018-07-04T03:57:05.00Z",
+      "lastNotification": "2018-08-01T00:15:38.00Z",
       "attrs": [
         "time",
-        "camera_id",
         "c_mode",
         "num_p",
-        "p_state",
+        "position",
         "external_camera_request_status",
         "external_camera_request_info"
       ],
@@ -290,23 +288,46 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "http": {
         "url": "http://cygnus:5050/notify"
       },
-      "lastSuccess": "2018-07-04T03:57:05.00Z"
+      "lastSuccess": "2018-08-01T00:15:38.00Z"
     }
   }
 ]
 ```
 ```bash
-mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_camera --eval 'db.getCollection("sth_/_external_camera_external_camera").find()'
+mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_camera --eval 'db.getCollection("sth_/_external_camera_0000000000000011_external_camera").find()'
 MongoDB shell version v3.6.5
 connecting to: mongodb://127.0.0.1:27017/sth_camera
 MongoDB server version: 3.6.5
-{ "_id" : ObjectId("5b3c459123b570000ae53bac"), "recvTime" : ISODate("2018-07-04T03:57:05.088Z"), "attrName" : "c_mode", "attrType" : "string", "attrValue" : "Monitor" }
-{ "_id" : ObjectId("5b3c459123b570000ae53bad"), "recvTime" : ISODate("2018-07-04T03:57:05.088Z"), "attrName" : "camera_id", "attrType" : "int", "attrValue" : "1" }
-{ "_id" : ObjectId("5b3c459123b570000ae53bae"), "recvTime" : ISODate("2018-07-04T03:39:38.731Z"), "attrName" : "external_camera_request_info", "attrType" : "commandResult", "attrValue" : "result,success/camera_id,1/c_cmd,Monitor" }
-{ "_id" : ObjectId("5b3c459123b570000ae53baf"), "recvTime" : ISODate("2018-07-04T03:39:38.731Z"), "attrName" : "external_camera_request_status", "attrType" : "commandStatus", "attrValue" : "OK" }
-{ "_id" : ObjectId("5b3c459123b570000ae53bb0"), "recvTime" : ISODate("2018-07-04T03:57:05.088Z"), "attrName" : "num_p", "attrType" : "int", "attrValue" : "1" }
-{ "_id" : ObjectId("5b3c459123b570000ae53bb1"), "recvTime" : ISODate("2018-07-04T03:57:05.088Z"), "attrName" : "p_state", "attrType" : "string", "attrValue" : "pos[0].x,123.4/pos[0].y,-987.6/pos[0].z,3.0/width[0],10.1/height[0],20.2/feature_hex[0],00ff00" }
-{ "_id" : ObjectId("5b3c459123b570000ae53bb2"), "recvTime" : ISODate("2018-07-04T03:57:05.088Z"), "attrName" : "time", "attrType" : "string", "attrValue" : "2018-01-02 03:04:05" }
+{ "_id" : ObjectId("5b60fbfbf8a94e000a6eae83"), "recvTime" : ISODate("2018-08-01T00:16:58.930Z"), "attrName" : "c_mode", "attrType" : "string", "attrValue" : "Monitor" }
+{ "_id" : ObjectId("5b60fbfbf8a94e000a6eae84"), "recvTime" : ISODate("2018-07-31T23:34:35.231Z"), "attrName" : "external_camera_request_info", "attrType" : "commandResult", "attrValue" : "result,success/time,2018-08-01 08:34:32/c_cmd,Monitor" }
+{ "_id" : ObjectId("5b60fbfbf8a94e000a6eae85"), "recvTime" : ISODate("2018-07-31T23:34:35.231Z"), "attrName" : "external_camera_request_status", "attrType" : "commandStatus", "attrValue" : "OK" }
+{ "_id" : ObjectId("5b60fbfbf8a94e000a6eae86"), "recvTime" : ISODate("2018-08-01T00:16:58.930Z"), "attrName" : "num_p", "attrType" : "int", "attrValue" : "1" }
+{ "_id" : ObjectId("5b60fbfbf8a94e000a6eae87"), "recvTime" : ISODate("2018-08-01T00:16:58.930Z"), "attrName" : "position", "attrType" : "string", "attrValue" : "x[0],1.12/y[0],-95.1" }
+{ "_id" : ObjectId("5b60fbfbf8a94e000a6eae88"), "recvTime" : ISODate("2018-08-01T00:16:58.930Z"), "attrName" : "time", "attrType" : "string", "attrValue" : "2018-01-02 03:04:05" }
+```
+```bash
+mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_camera --eval 'db.getCollection("sth_/_external_camera_0000000000000012_external_camera").find()'
+MongoDB shell version v3.6.5
+connecting to: mongodb://127.0.0.1:27017/sth_camera
+MongoDB server version: 3.6.5
+{ "_id" : ObjectId("5b60fc92c22929000a69fe7e"), "recvTime" : ISODate("2018-08-01T00:19:30.639Z"), "attrName" : "c_mode", "attrType" : "string", "attrValue" : "Monitor" }
+{ "_id" : ObjectId("5b60fc92c22929000a69fe7f"), "recvTime" : ISODate("2018-07-31T23:44:31.386Z"), "attrName" : "external_camera_request_info", "attrType" : "commandResult", "attrValue" : "result,success/time,2018-08-01 08:44:28/c_cmd,Monitor" }
+{ "_id" : ObjectId("5b60fc92c22929000a69fe80"), "recvTime" : ISODate("2018-07-31T23:44:31.386Z"), "attrName" : "external_camera_request_status", "attrType" : "commandStatus", "attrValue" : "OK" }
+{ "_id" : ObjectId("5b60fc92c22929000a69fe81"), "recvTime" : ISODate("2018-08-01T00:19:30.639Z"), "attrName" : "num_p", "attrType" : "int", "attrValue" : "1" }
+{ "_id" : ObjectId("5b60fc92c22929000a69fe82"), "recvTime" : ISODate("2018-08-01T00:19:30.639Z"), "attrName" : "position", "attrType" : "string", "attrValue" : "x[0],-0.1/y[0],-15.1" }
+{ "_id" : ObjectId("5b60fc92c22929000a69fe83"), "recvTime" : ISODate("2018-08-01T00:19:30.639Z"), "attrName" : "time", "attrType" : "string", "attrValue" : "2018-01-02 03:04:05" }
+```
+```bash
+mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_camera --eval 'db.getCollection("sth_/_external_camera_0000000000000021_external_camera").find()'
+MongoDB shell version v3.6.5
+connecting to: mongodb://127.0.0.1:27017/sth_camera
+MongoDB server version: 3.6.5
+{ "_id" : ObjectId("5b60fca2c22929000a69fe84"), "recvTime" : ISODate("2018-08-01T00:19:46.793Z"), "attrName" : "c_mode", "attrType" : "string", "attrValue" : "Monitor" }
+{ "_id" : ObjectId("5b60fca2c22929000a69fe85"), "recvTime" : ISODate("2018-07-31T23:44:55.554Z"), "attrName" : "external_camera_request_info", "attrType" : "commandResult", "attrValue" : "result,success/time,2018-08-01 08:44:53/c_cmd,Monitor" }
+{ "_id" : ObjectId("5b60fca2c22929000a69fe86"), "recvTime" : ISODate("2018-07-31T23:44:55.554Z"), "attrName" : "external_camera_request_status", "attrType" : "commandStatus", "attrValue" : "OK" }
+{ "_id" : ObjectId("5b60fca2c22929000a69fe87"), "recvTime" : ISODate("2018-08-01T00:19:46.793Z"), "attrName" : "num_p", "attrType" : "int", "attrValue" : "1" }
+{ "_id" : ObjectId("5b60fca2c22929000a69fe88"), "recvTime" : ISODate("2018-08-01T00:19:46.793Z"), "attrName" : "position", "attrType" : "string", "attrValue" : "x[0],-0.111111/y[0],105.1" }
+{ "_id" : ObjectId("5b60fca2c22929000a69fe89"), "recvTime" : ISODate("2018-08-01T00:19:46.793Z"), "attrName" : "time", "attrType" : "string", "attrValue" : "2018-01-02 03:04:05" }
 ```
 
 ## register DEST-LED to cygnus
