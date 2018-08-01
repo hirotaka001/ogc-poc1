@@ -53,14 +53,14 @@ class Destination:
         except json.JSONDecodeError as e:
             raise DestinationFormatError(str(e))
 
-    def get_destination_by_pos(self, posx, posy, posz):
+    def get_destination_by_pos(self, posx, posy, floor):
         headers = {
             'Content-Type': 'application/json'
         }
         params = {
             'pos.x': str(posx),
             'pos.y': str(posy),
-            'pos.z': str(posz),
+            'floor': str(floor),
         }
         try:
             dest_leds = requests.get(Destination.get_destination_list_url(), headers=headers, params=params).json()

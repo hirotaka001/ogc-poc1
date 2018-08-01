@@ -25,27 +25,27 @@ DESTINATIONS = {
         "name": "203号室",
         "floor": 2,
         "dest_pos": "125.12345,92.12345",
-        "dest_led_id": "dest_led_0000000000000001",
+        "dest_led_id": "dest_led_0000000000000002",
         "dest_led_pos": "122.001122,91.991122",
-        "dest_human_sensor_id": "dest_human_sensor_0000000000000001",
+        "dest_human_sensor_id": "dest_human_sensor_0000000000000002",
     },
     "dest-9QgohxohSmb3AECD": {
         "id": "dest-9QgohxohSmb3AECD",
         "name": "204号室",
         "floor": 2,
         "dest_pos": "110.120101,0.993313",
-        "dest_led_id": "dest_led_0000000000000001",
+        "dest_led_id": "dest_led_0000000000000002",
         "dest_led_pos": "98.980808,0.881122",
-        "dest_human_sensor_id": "dest_human_sensor_0000000000000001",
+        "dest_human_sensor_id": "dest_human_sensor_0000000000000002",
     },
     "dest-Ymq1aoftEIViZjry": {
         "id": "dest-Ymq1aoftEIViZjry",
         "name": "ProjectRoom 1",
         "floor": 3,
         "dest_pos": "125.12345,92.12345",
-        "dest_led_id": "dest_led_0000000000000001",
+        "dest_led_id": "dest_led_0000000000000003",
         "dest_led_pos": "122.001122,91.991122",
-        "dest_human_sensor_id": "dest_human_sensor_0000000000000001",
+        "dest_human_sensor_id": "dest_human_sensor_0000000000000003",
         "slack_webhook": "https://hooks.slack.com/services/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     },
 }
@@ -57,11 +57,12 @@ class DestinationListAPI(MethodView):
     def get(self):
         result = list(DESTINATIONS.values())
 
-        if 'pos.x' in request.args and 'pos.y' in request.args and 'pos.z' in request.args:
-            return jsonify(result[:1])
+        if 'pos.x' in request.args and 'pos.y' in request.args and 'floor' in request.args:
+            return jsonify([r for r in result if str(r['floor']).strip() == request.args['floor'].strip()][:1])
 
         if 'dest_human_sensor_id' in request.args:
-            return jsonify(result[:1])
+            return jsonify([r for r in result
+                            if str(r['dest_human_sensor_id']).strip() == request.args['dest_human_sensor_id'].strip()][:1])
 
         if 'floor_initial' in request.args:
             if request.args['floor_initial'] == '1':
@@ -76,13 +77,13 @@ class DestinationListAPI(MethodView):
                 }])
             elif request.args['floor_initial'] == '2':
                 return jsonify([{
-                    "id": "dest-FtYNG505n7aIOJ0m",
-                    "name": "1階初期位置",
-                    "floor": 1,
+                    "id": "dest-GtYNG595n7aIOJ15",
+                    "name": "2階初期位置",
+                    "floor": 2,
                     "dest_pos": "0.0,0.0",
-                    "dest_led_id": "dest_led_0000000000000001",
+                    "dest_led_id": "dest_led_0000000000000002",
                     "dest_led_pos": "0.0,0.0",
-                    "dest_human_sensor_id": "dest_human_sensor_0000000000000001",
+                    "dest_human_sensor_id": "dest_human_sensor_0000000000000002",
                 }])
             else:
                 return jsonify([])
