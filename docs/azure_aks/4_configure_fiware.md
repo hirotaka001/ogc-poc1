@@ -1,4 +1,4 @@
-# 3. configure fiware on AKS
+# 4. configure fiware on AKS
 
 Configure fiware on AKS by following steps:
 

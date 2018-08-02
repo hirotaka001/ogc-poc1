@@ -11,8 +11,13 @@ Start pods & services on AKS by following steps:
 1. [start duplicate message filter service for idas](#start-duplicate-message-filter-service-for-idas)
 1. [start fiware IDAS(iotagent-ul)](#start-fiware-idasiotagent-ul-on-aks)
 1. [start fiware cygnus](#start-fiware-cygnus-on-aks)
+1. [build libraries for controller services](#build-libraries-for-controller-services)
 1. [start reception service](#start-reception-service-on-aks)
 1. [start destination service](#start-destination-service-on-aks)
+1. [start storage service](#start-storage-service-on-aks)
+1. [start ledger service](#start-ledger-service-on-aks)
+1. [start guidance service](#start-guidance-service-on-aks)
+
 
 ## start etcd cluster on AKS
 
