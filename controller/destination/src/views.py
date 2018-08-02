@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
+import os
 import re
 from logging import getLogger
 
 from flask import request, jsonify
 from flask.views import MethodView
 from werkzeug.exceptions import NotFound
+
+from pymongo import MongoClient
+
+from src import const, utils
 
 logger = getLogger(__name__)
 
@@ -50,9 +55,56 @@ DESTINATIONS = {
     },
 }
 
+SCHEMA = {
+    'type': 'object',
+    'properties': {
+        'name': {
+            'type': 'string',
+        },
+        'floor': {
+            'type': 'integer',
+            'minimum': 1,
+        },
+        'dest_pos': {
+            'type': 'string',
+            'pattern': '^(-)?[0-9]+(.[0-9]+)?,(-)?[0-9]+(.[0-9]+)?$',
+        },
+        'dest_led_id': {
+            'type': 'string',
+        },
+        'dest_led_pos': {
+            'type': 'string',
+            'pattern': '^(-)?[0-9]+(.[0-9]+)?,(-)?[0-9]+(.[0-9]+)?$',
+        },
+        'dest_human_sensor_id': {
+            'type': 'string',
+        },
+        'slack_webhook': {
+            'type': 'string',
+        },
+    },
+    'required': ['name', 'floor', 'dest_pos', 'dest_led_id', 'dest_led_pos', 'dest_human_sensor_id'],
+}
 
-class DestinationListAPI(MethodView):
+
+class MongoMixin:
+    def __init__(self):
+        super().__init__()
+        url = os.environ.get(const.MONGODB_URL, 'mongodb://localhost:27017')
+        rs = os.environ.get(const.MONGODB_REPLICASET, None)
+
+        if rs:
+            client = MongoClient(url, replicaset=rs)
+        else:
+            client = MongoClient(url)
+        self._collection = client[const.MONGODB_DATABASE][const.MONGODB_COLLECTION]
+
+
+class DestinationListAPI(MongoMixin, MethodView):
     NAME = 'destination-list'
+
+    def __init__(self):
+        super().__init__()
 
     def get(self):
         result = list(DESTINATIONS.values())
@@ -102,9 +154,18 @@ class DestinationListAPI(MethodView):
 
         return jsonify(result)
 
+    def post(self):
+        data = utils.validate_json(SCHEMA)
+        oid = self._collection.insert_one(data).inserted_id
+        result = self._collection.find_one({"_id": oid})
+        return jsonify(utils.convert_bson(result))
 
-class DestinationDetailAPI(MethodView):
+
+class DestinationDetailAPI(MongoMixin, MethodView):
     NAME = 'destination-detail'
+
+    def __init__(self):
+        super().__init__()
 
     def get(self, id):
         if id not in DESTINATIONS:
