@@ -20,9 +20,9 @@ Configure fiware on AKS by following steps:
 1. [register "DEST-LED" service](#register-dest-led-service)
 1. [register "DEST-LED" device](#register-dest-led-device)
 1. [test "DEST-LED" command](#test-dest-led-command)
-1. [register "DEST-HUMAN-SENSOR" service](#register-button-sensor-service)
-1. [register "DEST-HUMAN-SENSOR" device](#register-button-sensor-device)
-1. [test "DEST-HUMAN-SENSOR" attribute](#test-button-sensor-attribute)
+1. [register "DEST-HUMAN-SENSOR" service](#register-dest-human-sensor-service)
+1. [register "DEST-HUMAN-SENSOR" device](#register-dest-human-sensor-device)
+1. [test "DEST-HUMAN-SENSOR" attribute](#test-dest-human-sensor-attribute)
 
 ## register BUTTON-SENSOR service
 ```bash
@@ -933,8 +933,8 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 {
   "devices": [
     {
-      "device_id": "guide_robot",
-      "entity_name": "guide_robot",
+      "device_id": "guide_robot_0000000000000001",
+      "entity_name": "guide_robot_0000000000000001",
       "entity_type": "guide_robot",
       "timezone": "Asia/Tokyo",
       "protocol": "UL20",
@@ -943,19 +943,16 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
           "name": "time",
           "type": "string"
         }, {
-          "name": "robot_id",
-          "type": "int"
-        }, {
           "name": "r_mode",
           "type": "string"
         }, {
-          "name": "pos.x",
+          "name": "x",
           "type": "float"
         }, {
-          "name": "pos.y",
+          "name": "y",
           "type": "float"
         }, {
-          "name": "pos.z",
+          "name": "theta",
           "type": "float"
         }
       ],
@@ -972,12 +969,52 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 __EOS__
 ```
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/guide_robot/ | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/ -X POST -d @- <<__EOS__
 {
-  "device_id": "guide_robot",
+  "devices": [
+    {
+      "device_id": "guide_robot_0000000000000002",
+      "entity_name": "guide_robot_0000000000000002",
+      "entity_type": "guide_robot",
+      "timezone": "Asia/Tokyo",
+      "protocol": "UL20",
+      "attributes": [
+        {
+          "name": "time",
+          "type": "string"
+        }, {
+          "name": "r_mode",
+          "type": "string"
+        }, {
+          "name": "x",
+          "type": "float"
+        }, {
+          "name": "y",
+          "type": "float"
+        }, {
+          "name": "theta",
+          "type": "float"
+        }
+      ],
+      "commands": [
+        {
+          "name": "robot_request",
+          "type": "string"
+        }
+      ],
+      "transport": "MQTT"
+    }
+  ]
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/guide_robot_0000000000000001/ | jq .
+{
+  "device_id": "guide_robot_0000000000000001",
   "service": "robot",
   "service_path": "/",
-  "entity_name": "guide_robot",
+  "entity_name": "guide_robot_0000000000000001",
   "entity_type": "guide_robot",
   "transport": "MQTT",
   "attributes": [
@@ -987,28 +1024,23 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "type": "string"
     },
     {
-      "object_id": "robot_id",
-      "name": "robot_id",
-      "type": "int"
-    },
-    {
       "object_id": "r_mode",
       "name": "r_mode",
       "type": "string"
     },
     {
-      "object_id": "pos.x",
-      "name": "pos.x",
+      "object_id": "x",
+      "name": "x",
       "type": "float"
     },
     {
-      "object_id": "pos.y",
-      "name": "pos.y",
+      "object_id": "y",
+      "name": "y",
       "type": "float"
     },
     {
-      "object_id": "pos.z",
-      "name": "pos.z",
+      "object_id": "theta",
+      "name": "theta",
       "type": "float"
     }
   ],
@@ -1025,37 +1057,17 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 ```
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot/ | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000001/ | jq .
 {
-  "id": "guide_robot",
+  "id": "guide_robot_0000000000000001",
   "type": "guide_robot",
   "TimeInstant": {
     "type": "ISO8601",
     "value": " ",
     "metadata": {}
   },
-  "pos.x": {
-    "type": "float",
-    "value": " ",
-    "metadata": {}
-  },
-  "pos.y": {
-    "type": "float",
-    "value": " ",
-    "metadata": {}
-  },
-  "pos.z": {
-    "type": "float",
-    "value": " ",
-    "metadata": {}
-  },
   "r_mode": {
     "type": "string",
-    "value": " ",
-    "metadata": {}
-  },
-  "robot_id": {
-    "type": "int",
     "value": " ",
     "metadata": {}
   },
@@ -1069,8 +1081,23 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "value": "UNKNOWN",
     "metadata": {}
   },
+  "theta": {
+    "type": "float",
+    "value": " ",
+    "metadata": {}
+  },
   "time": {
     "type": "string",
+    "value": " ",
+    "metadata": {}
+  },
+  "x": {
+    "type": "float",
+    "value": " ",
+    "metadata": {}
+  },
+  "y": {
+    "type": "float",
     "value": " ",
     "metadata": {}
   },
@@ -1082,6 +1109,8 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 ```
 
+* check `guide_robot_0000000000000002` by the same procedure.
+
 ## test ROBOT command
 ```bash
 mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
@@ -1091,13 +1120,13 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 {
   "contextElements": [
     {
-      "id": "guide_robot",
+      "id": "guide_robot_0000000000000001",
       "isPattern": "false",
       "type": "guide_robot",
       "attributes": [
         {
           "name": "robot_request",
-          "value": "robot_id|1|r_cmd|Navi|pos.x|123.4|pos.y|-987.6|pos.z|3"
+          "value": "r_cmd|Navi|pos.x|123.4|pos.y|-987.6"
         }
       ]
     }
@@ -1109,41 +1138,21 @@ __EOS__
 ```bash
 mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
 ...
-Client mosqsub|80205-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot/cmd', ... (74 bytes))
-guide_robot@robot_request|robot_id|1|r_cmd|Navi|pos.x|123.4|pos.y|-987.6|pos.z|3
+Client mosqsub|15957-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/cmd', ... (78 bytes))
+guide_robot_0000000000000001@robot_request|r_cmd|Navi|pos.x|123.4|pos.y|-987.6
 ```
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot/ | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000001/ | jq .
 {
-  "id": "guide_robot",
+  "id": "guide_robot_0000000000000001",
   "type": "guide_robot",
   "TimeInstant": {
     "type": "ISO8601",
-    "value": "2018-07-04T03:18:44.00Z",
-    "metadata": {}
-  },
-  "pos.x": {
-    "type": "float",
-    "value": " ",
-    "metadata": {}
-  },
-  "pos.y": {
-    "type": "float",
-    "value": " ",
-    "metadata": {}
-  },
-  "pos.z": {
-    "type": "float",
-    "value": " ",
+    "value": "2018-08-01T02:21:08.00Z",
     "metadata": {}
   },
   "r_mode": {
     "type": "string",
-    "value": " ",
-    "metadata": {}
-  },
-  "robot_id": {
-    "type": "int",
     "value": " ",
     "metadata": {}
   },
@@ -1158,12 +1167,27 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-07-04T03:18:44.340Z"
+        "value": "2018-08-01T02:21:08.148Z"
       }
     }
   },
+  "theta": {
+    "type": "float",
+    "value": " ",
+    "metadata": {}
+  },
   "time": {
     "type": "string",
+    "value": " ",
+    "metadata": {}
+  },
+  "x": {
+    "type": "float",
+    "value": " ",
+    "metadata": {}
+  },
+  "y": {
+    "type": "float",
     "value": " ",
     "metadata": {}
   },
@@ -1175,41 +1199,26 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 ```
 ```bash
-mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /guide_robot/guide_robot/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot@robot_request|result,success/robot_id,1/r_cmd,Navi/pos.x,123.4/pos.y,-987.6/pos.z,3.0"
+mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /guide_robot/guide_robot_0000000000000001/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000001@robot_request|result,success/time,2018-08-01 11:21:07/r_cmd,Navi/pos.x,123.4/pos.y,-987.6"
 Client mosqpub|80036-Nobuyukin sending CONNECT
 Client mosqpub|80036-Nobuyukin received CONNACK
-Client mosqpub|80036-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot/cmdexe', ... (97 bytes))
+Client mosqpub|80036-Nobuyukin sending PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/cmdexe', ... (118 bytes))
 Client mosqpub|80036-Nobuyukin sending DISCONNECT
 ```
 ```bash
 mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
 ...
-Client mosqsub|77879-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot/cmdexe', ... (97 bytes))
-guide_robot@robot_request|result,success/robot_id,1/r_cmd,Navi/pos.x,123.4/pos.y,-987.6/pos.z,3.0
+Client mosqsub|15957-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/cmdexe', ... (118 bytes))
+guide_robot_0000000000000001@robot_request|result,success/time,2018-08-01 11:21:07/r_cmd,Navi/pos.x,123.4/pos.y,-987.6
 ```
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot/ | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000001/ | jq .
 {
-  "id": "guide_robot",
+  "id": "guide_robot_0000000000000001",
   "type": "guide_robot",
   "TimeInstant": {
     "type": "ISO8601",
-    "value": "2018-07-04T03:22:25.00Z",
-    "metadata": {}
-  },
-  "pos.x": {
-    "type": "float",
-    "value": " ",
-    "metadata": {}
-  },
-  "pos.y": {
-    "type": "float",
-    "value": " ",
-    "metadata": {}
-  },
-  "pos.z": {
-    "type": "float",
-    "value": " ",
+    "value": "2018-08-01T02:21:08.00Z",
     "metadata": {}
   },
   "r_mode": {
@@ -1217,18 +1226,13 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "value": " ",
     "metadata": {}
   },
-  "robot_id": {
-    "type": "int",
-    "value": " ",
-    "metadata": {}
-  },
   "robot_request_info": {
     "type": "commandResult",
-    "value": "result,success/robot_id,1/r_cmd,Navi/pos.x,123.4/pos.y,-987.6/pos.z,3.0",
+    "value": "result,success/time,2018-08-01 11:21:07/r_cmd,Navi/pos.x,123.4/pos.y,-987.6",
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-07-04T03:22:25.246Z"
+        "value": "2018-08-01T02:21:08.148Z"
       }
     }
   },
@@ -1238,12 +1242,27 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-07-04T03:22:25.246Z"
+        "value": "2018-08-01T02:21:08.148Z"
       }
     }
   },
+  "theta": {
+    "type": "float",
+    "value": " ",
+    "metadata": {}
+  },
   "time": {
     "type": "string",
+    "value": " ",
+    "metadata": {}
+  },
+  "x": {
+    "type": "float",
+    "value": " ",
+    "metadata": {}
+  },
+  "y": {
+    "type": "float",
     "value": " ",
     "metadata": {}
   },
@@ -1255,62 +1274,34 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 ```
 
+* test `guide_robot_0000000000000002` by the same procedure.
+
 ## test ROBOT attribute
 ```bash
 mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
 ```
 ```bash
-mac$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /guide_robot/guide_robot/attrs -u iotagent -P XXXXXXXX -m "$d|time|2018-01-02 03:04:05|robot_id|1|r_mode|Navi|pos.x|123.4|pos.y|-987.6|pos.z|3.0"
+mac$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /guide_robot/guide_robot_0000000000000001/attrs -u iotagent -P XXXXXXXX -m "$d|time|2018-09-08 07:06:05|r_mode|Navi|x|0.1|y|0.2|theta|0.3"
 Client mosqpub|80236-Nobuyukin sending CONNECT
 Client mosqpub|80236-Nobuyukin received CONNACK
-Client mosqpub|80236-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot/attrs', ... (118 bytes))
+Client mosqpub|80236-Nobuyukin sending PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/attrs', ... (90 bytes))
 Client mosqpub|80236-Nobuyukin sending DISCONNECT
 ```
 ```bash
 mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
 ...
-Client mosqsub|77879-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot/attrs', ... (118 bytes))
-2018-07-04T12:26:25.1530674785+0900|time|2018-01-02 03:04:05|robot_id|1|r_mode|Navi|pos.x|123.4|pos.y|-987.6|pos.z|3.0
+Client mosqsub|15957-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/attrs', ... (90 bytes))
+2018-08-01T11:28:39.949474+0900|time|2018-09-08 07:06:05|r_mode|Navi|x|0.1|y|0.2|theta|0.3
 ```
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot/ | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000001/ | jq .
 {
-  "id": "guide_robot",
+  "id": "guide_robot_0000000000000001",
   "type": "guide_robot",
   "TimeInstant": {
     "type": "ISO8601",
-    "value": "2018-07-04T12:26:25.1530674785+0900",
+    "value": "2018-08-01T11:28:39.949474+0900",
     "metadata": {}
-  },
-  "pos.x": {
-    "type": "float",
-    "value": "123.4",
-    "metadata": {
-      "TimeInstant": {
-        "type": "ISO8601",
-        "value": "2018-07-04T12:26:25.1530674785+0900"
-      }
-    }
-  },
-  "pos.y": {
-    "type": "float",
-    "value": "-987.6",
-    "metadata": {
-      "TimeInstant": {
-        "type": "ISO8601",
-        "value": "2018-07-04T12:26:25.1530674785+0900"
-      }
-    }
-  },
-  "pos.z": {
-    "type": "float",
-    "value": "3.0",
-    "metadata": {
-      "TimeInstant": {
-        "type": "ISO8601",
-        "value": "2018-07-04T12:26:25.1530674785+0900"
-      }
-    }
   },
   "r_mode": {
     "type": "string",
@@ -1318,27 +1309,17 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-07-04T12:26:25.1530674785+0900"
-      }
-    }
-  },
-  "robot_id": {
-    "type": "int",
-    "value": "1",
-    "metadata": {
-      "TimeInstant": {
-        "type": "ISO8601",
-        "value": "2018-07-04T12:26:25.1530674785+0900"
+        "value": "2018-08-01T11:28:39.949474+0900"
       }
     }
   },
   "robot_request_info": {
     "type": "commandResult",
-    "value": "result,success/robot_id,1/r_cmd,Navi/pos.x,123.4/pos.y,-987.6/pos.z,3.0",
+    "value": "result,success/time,2018-08-01 11:21:07/r_cmd,Navi/pos.x,123.4/pos.y,-987.6",
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-07-04T03:22:25.246Z"
+        "value": "2018-08-01T02:21:08.148Z"
       }
     }
   },
@@ -1348,17 +1329,47 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-07-04T03:22:25.246Z"
+        "value": "2018-08-01T02:21:08.148Z"
+      }
+    }
+  },
+  "theta": {
+    "type": "float",
+    "value": "0.3",
+    "metadata": {
+      "TimeInstant": {
+        "type": "ISO8601",
+        "value": "2018-08-01T11:28:39.949474+0900"
       }
     }
   },
   "time": {
     "type": "string",
-    "value": "2018-01-02 03:04:05",
+    "value": "2018-09-08 07:06:05",
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-07-04T12:26:25.1530674785+0900"
+        "value": "2018-08-01T11:28:39.949474+0900"
+      }
+    }
+  },
+  "x": {
+    "type": "float",
+    "value": "0.1",
+    "metadata": {
+      "TimeInstant": {
+        "type": "ISO8601",
+        "value": "2018-08-01T11:28:39.949474+0900"
+      }
+    }
+  },
+  "y": {
+    "type": "float",
+    "value": "0.2",
+    "metadata": {
+      "TimeInstant": {
+        "type": "ISO8601",
+        "value": "2018-08-01T11:28:39.949474+0900"
       }
     }
   },
@@ -1369,6 +1380,8 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
   }
 }
 ```
+
+* test `guide_robot_0000000000000002` by the same procedure.
 
 ## register CAMERA service
 ```bash
@@ -1414,8 +1427,8 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 {
   "devices": [
     {
-      "device_id": "external_camera",
-      "entity_name": "external_camera",
+      "device_id": "external_camera_0000000000000011",
+      "entity_name": "external_camera_0000000000000011",
       "entity_type": "external_camera",
       "timezone": "Asia/Tokyo",
       "protocol": "UL20",
@@ -1424,16 +1437,13 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
           "name": "time",
           "type": "string"
         }, {
-          "name": "camera_id",
-          "type": "int"
-        }, {
           "name": "c_mode",
           "type": "string"
         }, {
           "name": "num_p",
           "type": "int"
         }, {
-          "name": "p_state",
+          "name": "position",
           "type": "string"
         }
       ],
@@ -1450,12 +1460,86 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 __EOS__
 ```
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: camera" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/external_camera/ | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: camera" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/ -X POST -d @- <<__EOS__
 {
-  "device_id": "external_camera",
+  "devices": [
+    {
+      "device_id": "external_camera_0000000000000012",
+      "entity_name": "external_camera_0000000000000012",
+      "entity_type": "external_camera",
+      "timezone": "Asia/Tokyo",
+      "protocol": "UL20",
+      "attributes": [
+        {
+          "name": "time",
+          "type": "string"
+        }, {
+          "name": "c_mode",
+          "type": "string"
+        }, {
+          "name": "num_p",
+          "type": "int"
+        }, {
+          "name": "position",
+          "type": "string"
+        }
+      ],
+      "commands": [
+        {
+          "name": "external_camera_request",
+          "type": "string"
+        }
+      ],
+      "transport": "MQTT"
+    }
+  ]
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: camera" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/ -X POST -d @- <<__EOS__
+{
+  "devices": [
+    {
+      "device_id": "external_camera_0000000000000021",
+      "entity_name": "external_camera_0000000000000021",
+      "entity_type": "external_camera",
+      "timezone": "Asia/Tokyo",
+      "protocol": "UL20",
+      "attributes": [
+        {
+          "name": "time",
+          "type": "string"
+        }, {
+          "name": "c_mode",
+          "type": "string"
+        }, {
+          "name": "num_p",
+          "type": "int"
+        }, {
+          "name": "position",
+          "type": "string"
+        }
+      ],
+      "commands": [
+        {
+          "name": "external_camera_request",
+          "type": "string"
+        }
+      ],
+      "transport": "MQTT"
+    }
+  ]
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: camera" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/external_camera_0000000000000011/ | jq .
+{
+  "device_id": "external_camera_0000000000000011",
   "service": "camera",
   "service_path": "/",
-  "entity_name": "external_camera",
+  "entity_name": "external_camera_0000000000000011",
   "entity_type": "external_camera",
   "transport": "MQTT",
   "attributes": [
@@ -1463,11 +1547,6 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "object_id": "time",
       "name": "time",
       "type": "string"
-    },
-    {
-      "object_id": "camera_id",
-      "name": "camera_id",
-      "type": "int"
     },
     {
       "object_id": "c_mode",
@@ -1480,8 +1559,8 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "type": "int"
     },
     {
-      "object_id": "p_state",
-      "name": "p_state",
+      "object_id": "position",
+      "name": "position",
       "type": "string"
     }
   ],
@@ -1498,9 +1577,9 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 ```
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: camera" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/external_camera/ | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: camera" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/external_camera_0000000000000011/ | jq .
 {
-  "id": "external_camera",
+  "id": "external_camera_0000000000000011",
   "type": "external_camera",
   "TimeInstant": {
     "type": "ISO8601",
@@ -1509,11 +1588,6 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
   },
   "c_mode": {
     "type": "string",
-    "value": " ",
-    "metadata": {}
-  },
-  "camera_id": {
-    "type": "int",
     "value": " ",
     "metadata": {}
   },
@@ -1532,7 +1606,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "value": " ",
     "metadata": {}
   },
-  "p_state": {
+  "position": {
     "type": "string",
     "value": " ",
     "metadata": {}
@@ -1550,6 +1624,8 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 ```
 
+* check `external_camera_0000000000000012` and `external_camera_0000000000000021` by the same procedure.
+
 ## test CAMERA command
 ```bash
 mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
@@ -1559,13 +1635,13 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 {
   "contextElements": [
     {
-      "id": "external_camera",
+      "id": "external_camera_0000000000000011",
       "isPattern": "false",
       "type": "external_camera",
       "attributes": [
         {
           "name": "external_camera_request",
-          "value": "camera_id|1|c_cmd|Monitor"
+          "value": "c_cmd|Monitor"
         }
       ]
     }
@@ -1578,25 +1654,20 @@ __EOS__
 mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
 ...
 Client mosqsub|77879-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/external_camera/external_camera/cmd', ... (65 bytes))
-external_camera@external_camera_request|camera_id|1|c_cmd|Monitor
+external_camera_0000000000000011@external_camera_request|c_cmd|Monitor
 ```
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: camera" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/external_camera/ | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: camera" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/external_camera_0000000000000011/ | jq .
 {
-  "id": "external_camera",
+  "id": "external_camera_0000000000000011",
   "type": "external_camera",
   "TimeInstant": {
     "type": "ISO8601",
-    "value": "2018-07-04T03:37:05.00Z",
+    "value": "2018-07-31T23:34:35.00Z",
     "metadata": {}
   },
   "c_mode": {
     "type": "string",
-    "value": " ",
-    "metadata": {}
-  },
-  "camera_id": {
-    "type": "int",
     "value": " ",
     "metadata": {}
   },
@@ -1620,7 +1691,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "value": " ",
     "metadata": {}
   },
-  "p_state": {
+  "position": {
     "type": "string",
     "value": " ",
     "metadata": {}
@@ -1638,26 +1709,26 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 ```
 ```bash
-$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /external_camera/external_camera/cmdexe -u iotagent -P XXXXXXXX -m "external_camera@external_camera_request|result,success/camera_id,1/c_cmd,Monitor"
+$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /external_camera/external_camera/cmdexe -u iotagent -P XXXXXXXX -m "external_camera_0000000000000011@external_camera_request|result,success/time,2018-08-01 08:34:32/c_cmd,Monitor"
 Client mosqpub|81501-Nobuyukin sending CONNECT
 Client mosqpub|81501-Nobuyukin received CONNACK
-Client mosqpub|81501-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/external_camera/external_camera/cmdexe', ... (80 bytes))
+Client mosqpub|81501-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/external_camera/external_camera_0000000000000011/cmdexe', ... (110 bytes))
 Client mosqpub|81501-Nobuyukin sending DISCONNECT
 ```
 ```bash
 mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
 ...
-lient mosqsub|77879-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/external_camera/external_camera/cmdexe', ... (80 bytes))
-external_camera@external_camera_request|result,success/camera_id,1/c_cmd,Monitor
+Client mosqsub|6747-Nobuyukino received PUBLISH (d0, q0, r0, m0, '/external_camera/external_camera_0000000000000011/cmdexe', ... (110 bytes))
+external_camera_0000000000000011@external_camera_request|result,success/time,2018-08-01 08:34:32/c_cmd,Monitor
 ```
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: camera" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/external_camera/ | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: camera" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/external_camera_0000000000000011/ | jq .
 {
-  "id": "external_camera",
+  "id": "external_camera_0000000000000011",
   "type": "external_camera",
   "TimeInstant": {
     "type": "ISO8601",
-    "value": "2018-07-04T03:39:38.00Z",
+    "value": "2018-07-31T23:34:35.00Z",
     "metadata": {}
   },
   "c_mode": {
@@ -1665,18 +1736,13 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "value": " ",
     "metadata": {}
   },
-  "camera_id": {
-    "type": "int",
-    "value": " ",
-    "metadata": {}
-  },
   "external_camera_request_info": {
     "type": "commandResult",
-    "value": "result,success/camera_id,1/c_cmd,Monitor",
+    "value": "result,success/time,2018-08-01 08:34:32/c_cmd,Monitor",
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-07-04T03:39:38.731Z"
+        "value": "2018-07-31T23:34:35.231Z"
       }
     }
   },
@@ -1686,7 +1752,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-07-04T03:39:38.731Z"
+        "value": "2018-07-31T23:34:35.231Z"
       }
     }
   },
@@ -1695,7 +1761,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "value": " ",
     "metadata": {}
   },
-  "p_state": {
+  "position": {
     "type": "string",
     "value": " ",
     "metadata": {}
@@ -1713,31 +1779,34 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 ```
 
+* test `external_camera_0000000000000012` and `external_camera_0000000000000021` by the same procedure.
+
+
 ## test CAMERA attribute
 ```bash
 mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
 ```
 ```bash
-$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /external_camera/external_camera/attrs -u iotagent -P XXXXXXXX -m "$d|time|2018-01-02 03:04:05|camera_id|1|c_mode|Monitor|num_p|1|p_state|pos[0].x,123.4/pos[0].y,-987.6/pos[0].z,3.0/width[0],10.1/height[0],20.2/feature_hex[0],00ff00"
+$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /external_camera/external_camera_0000000000000011/attrs -u iotagent -P XXXXXXXX -m "$d|time|2018-01-02 03:04:05|c_mode|Monitor|num_p|1|position|x[0],1.12/y[0],-95.1"
 Client mosqpub|82032-Nobuyukin sending CONNECT
 Client mosqpub|82032-Nobuyukin received CONNACK
-Client mosqpub|82032-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/external_camera/external_camera/attrs', ... (198 bytes))
+Client mosqpub|82032-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/external_camera/external_camera_0000000000000011/attrs', ... (109 bytes))
 Client mosqpub|82032-Nobuyukin sending DISCONNECT
 ```
 ```bash
 mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
 ...
-Client mosqsub|77879-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/external_camera/external_camera/attrs', ... (198 bytes))
-2018-07-04T12:46:39.1530675999+0900|time|2018-01-02 03:04:05|camera_id|1|c_mode|Monitor|num_p|1|p_state|pos[0].x,123.4/pos[0].y,-987.6/pos[0].z,3.0/width[0],10.1/height[0],20.2/feature_hex[0],00ff00
+Client mosqsub|7354-Nobuyukino received PUBLISH (d0, q0, r0, m0, '/external_camera/external_camera_0000000000000011/attrs', ... (109 bytes))
+2018-08-01T09:07:17.010090+0900|time|2018-01-02 03:04:05|c_mode|Monitor|num_p|1|position|x[0],1.12/y[0],-95.1
 ```
 ```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: camera" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/external_camera/ | jq .
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: camera" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/external_camera_0000000000000011/ | jq .
 {
-  "id": "external_camera",
+  "id": "external_camera_0000000000000011",
   "type": "external_camera",
   "TimeInstant": {
     "type": "ISO8601",
-    "value": "2018-07-04T12:46:39.1530675999+0900",
+    "value": "2018-08-01T09:07:17.010090+0900",
     "metadata": {}
   },
   "c_mode": {
@@ -1746,27 +1815,17 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-07-04T12:46:39.1530675999+0900"
-      }
-    }
-  },
-  "camera_id": {
-    "type": "int",
-    "value": "1",
-    "metadata": {
-      "TimeInstant": {
-        "type": "ISO8601",
-        "value": "2018-07-04T12:46:39.1530675999+0900"
+        "value": "2018-08-01T09:07:17.010090+0900"
       }
     }
   },
   "external_camera_request_info": {
     "type": "commandResult",
-    "value": "result,success/camera_id,1/c_cmd,Monitor",
+    "value": "result,success/time,2018-08-01 08:34:32/c_cmd,Monitor",
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-07-04T03:39:38.731Z"
+        "value": "2018-07-31T23:34:35.231Z"
       }
     }
   },
@@ -1776,7 +1835,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-07-04T03:39:38.731Z"
+        "value": "2018-07-31T23:34:35.231Z"
       }
     }
   },
@@ -1786,17 +1845,17 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-07-04T12:46:39.1530675999+0900"
+        "value": "2018-08-01T09:07:17.010090+0900"
       }
     }
   },
-  "p_state": {
+  "position": {
     "type": "string",
-    "value": "pos[0].x,123.4/pos[0].y,-987.6/pos[0].z,3.0/width[0],10.1/height[0],20.2/feature_hex[0],00ff00",
+    "value": "x[0],1.12/y[0],-95.1",
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-07-04T12:46:39.1530675999+0900"
+        "value": "2018-08-01T09:07:17.010090+0900"
       }
     }
   },
@@ -1806,7 +1865,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-07-04T12:46:39.1530675999+0900"
+        "value": "2018-08-01T09:07:17.010090+0900"
       }
     }
   },
@@ -1817,6 +1876,8 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
   }
 }
 ```
+
+* test `external_camera_0000000000000012` and `external_camera_0000000000000021` by the same procedure.
 
 ## register DEST-LED service
 ```bash
@@ -1864,6 +1925,28 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     {
       "device_id": "dest_led_0000000000000001",
       "entity_name": "dest_led_0000000000000001",
+      "entity_type": "dest_led",
+      "timezone": "Asia/Tokyo",
+      "protocol": "UL20",
+      "commands": [
+        {
+          "name": "action",
+          "type": "string"
+        }
+      ],
+      "transport": "MQTT"
+    }
+  ]
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: dest_led" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/ -X POST -d @- <<__EOS__
+{
+  "devices": [
+    {
+      "device_id": "dest_led_0000000000000002",
+      "entity_name": "dest_led_0000000000000002",
       "entity_type": "dest_led",
       "timezone": "Asia/Tokyo",
       "protocol": "UL20",
@@ -1928,6 +2011,8 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
   }
 }
 ```
+
+* check `dest_led_0000000000000002` by the same procedure.
 
 ## test DEST-LED command
 ```bash
@@ -2042,6 +2127,8 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 ```
 
+* test `dest_led_0000000000000002` by the same procedure.
+
 ## register DEST-HUMAN-SENSOR service
 ```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: dest_human_sensor" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/idas/ul20/manage/iot/services/ -X POST -d @- <<__EOS__
@@ -2104,6 +2191,28 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 __EOS__
 ```
 ```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: dest_human_sensor" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/ -X POST -d @- <<__EOS__
+{
+  "devices": [
+    {
+      "device_id": "dest_human_sensor_0000000000000002",
+      "entity_name": "dest_human_sensor_0000000000000002",
+      "entity_type": "dest_human_sensor",
+      "timezone": "Asia/Tokyo",
+      "protocol": "UL20",
+      "attributes": [
+        {
+          "name": "arrival",
+          "type": "string"
+        }
+      ],
+      "transport": "MQTT"
+    }
+  ]
+}
+__EOS__
+```
+```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: dest_human_sensor" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/dest_human_sensor_0000000000000001/ | jq .
 {
   "device_id": "dest_human_sensor_0000000000000001",
@@ -2142,6 +2251,8 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
   }
 }
 ```
+
+* check `dest_human_sensor_0000000000000002` by the same procedure.
 
 ## test DEST-HUMAN-SENSOR attribute
 ```bash
@@ -2182,3 +2293,5 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
   }
 }
 ```
+
+* test `dest_human_sensor_0000000000000002` by the same procedure.

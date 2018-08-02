@@ -35,12 +35,14 @@ spec:
   replicas: 3
   template:
     metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
       labels:
         service: ambassador
     spec:
       containers:
       - name: ambassador
-        image: quay.io/datawire/ambassador:0.32.1
+        image: quay.io/datawire/ambassador:0.37.0
         resources:
           limits:
             cpu: 1
@@ -65,6 +67,6 @@ spec:
             port: 8877
           initialDelaySeconds: 30
           periodSeconds: 3
-      - name: statsd
-        image: quay.io/datawire/statsd:0.32.1
+      # - name: statsd
+      #   image: quay.io/datawire/statsd:0.37.0
       restartPolicy: Always
