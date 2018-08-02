@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import copy
 import os
 import re
 from logging import getLogger
@@ -8,6 +9,9 @@ from flask.views import MethodView
 from werkzeug.exceptions import NotFound
 
 from pymongo import MongoClient
+
+from bson.objectid import ObjectId
+from bson.errors import InvalidId
 
 from src import const, utils
 
@@ -55,7 +59,7 @@ DESTINATIONS = {
     },
 }
 
-SCHEMA = {
+UPDATE_SCHEMA = {
     'type': 'object',
     'properties': {
         'name': {
@@ -83,8 +87,10 @@ SCHEMA = {
             'type': 'string',
         },
     },
-    'required': ['name', 'floor', 'dest_pos', 'dest_led_id', 'dest_led_pos', 'dest_human_sensor_id'],
+    'additionalProperties': False,
 }
+INSERT_SCHEMA = copy.copy(UPDATE_SCHEMA)
+INSERT_SCHEMA['required'] = ['name', 'floor', 'dest_pos', 'dest_led_id', 'dest_led_pos', 'dest_human_sensor_id']
 
 
 class MongoMixin:
@@ -155,10 +161,10 @@ class DestinationListAPI(MongoMixin, MethodView):
         return jsonify(result)
 
     def post(self):
-        data = utils.validate_json(SCHEMA)
+        data = utils.validate_json(INSERT_SCHEMA)
         oid = self._collection.insert_one(data).inserted_id
         result = self._collection.find_one({"_id": oid})
-        return jsonify(utils.convert_bson(result))
+        return jsonify(utils.bson2dict(result))
 
 
 class DestinationDetailAPI(MongoMixin, MethodView):
@@ -168,7 +174,20 @@ class DestinationDetailAPI(MongoMixin, MethodView):
         super().__init__()
 
     def get(self, id):
-        if id not in DESTINATIONS:
-            raise NotFound()
+        try:
+            bson = self._collection.find_one({"_id": ObjectId(id)})
+            if bson:
+                return jsonify(utils.bson2dict(bson))
+            else:
+                raise NotFound(f'{id} does not found')
+        except InvalidId as e:
+            raise NotFound(f'{id} is invalid: {str(e)}')
 
-        return jsonify(DESTINATIONS[id])
+    def put(self, id):
+        data = utils.validate_json(UPDATE_SCHEMA)
+        self._collection.update_one({"_id": ObjectId(id)}, {"$set": data})
+        return self.get(id)
+
+    def delete(self, id):
+        self._collection.delete_one({"_id": ObjectId(id)})
+        return ('', 204)

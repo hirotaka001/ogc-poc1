@@ -19,6 +19,10 @@ def validate_json(schema):
         raise BadRequest(msg)
     try:
         data = request.json
+        if not data:
+            msg = f'request json is empty'
+            logger.warning(msg)
+            raise BadRequest(msg)
         jsonschema.validate(data, schema)
         return data
     except jsonschema.exceptions.ValidationError as e:
@@ -31,7 +35,7 @@ def validate_json(schema):
         raise BadRequest(msg)
 
 
-def convert_bson(bson):
+def bson2dict(bson):
     raw = json.loads(json_util.dumps(bson, ensure_ascii=False))
     oid = raw['_id']['$oid']
     del raw['_id']
