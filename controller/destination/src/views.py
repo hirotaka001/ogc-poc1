@@ -19,46 +19,6 @@ logger = getLogger(__name__)
 
 FILTER_RE = re.compile(r'^(?P<k>[^|]+)\|(?P<v>[^|]+)$')
 
-DESTINATIONS = {
-    "dest-n4uRxmtdWv6jOHpI": {
-        "id": "dest-n4uRxmtdWv6jOHpI",
-        "name": "管理センター",
-        "floor": 1,
-        "dest_pos": "0.001151,0.000134",
-        "dest_led_id": "dest_led_0000000000000001",
-        "dest_led_pos": "0.000000,0.000000",
-        "dest_human_sensor_id": "dest_human_sensor_0000000000000001",
-    },
-    "dest-vLBTZbPXc3Al0hMT": {
-        "id": "dest-vLBTZbPXc3Al0hMT",
-        "name": "203号室",
-        "floor": 2,
-        "dest_pos": "125.12345,92.12345",
-        "dest_led_id": "dest_led_0000000000000002",
-        "dest_led_pos": "122.001122,91.991122",
-        "dest_human_sensor_id": "dest_human_sensor_0000000000000002",
-    },
-    "dest-9QgohxohSmb3AECD": {
-        "id": "dest-9QgohxohSmb3AECD",
-        "name": "204号室",
-        "floor": 2,
-        "dest_pos": "110.120101,0.993313",
-        "dest_led_id": "dest_led_0000000000000002",
-        "dest_led_pos": "98.980808,0.881122",
-        "dest_human_sensor_id": "dest_human_sensor_0000000000000002",
-    },
-    "dest-Ymq1aoftEIViZjry": {
-        "id": "dest-Ymq1aoftEIViZjry",
-        "name": "ProjectRoom 1",
-        "floor": 3,
-        "dest_pos": "125.12345,92.12345",
-        "dest_led_id": "dest_led_0000000000000003",
-        "dest_led_pos": "122.001122,91.991122",
-        "dest_human_sensor_id": "dest_human_sensor_0000000000000003",
-        "slack_webhook": "https://hooks.slack.com/services/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-    },
-}
-
 UPDATE_SCHEMA = {
     'type': 'object',
     'properties': {
@@ -85,6 +45,9 @@ UPDATE_SCHEMA = {
         },
         'slack_webhook': {
             'type': 'string',
+        },
+        'initial': {
+            'type': 'boolean',
         },
     },
     'additionalProperties': False,
@@ -113,46 +76,33 @@ class DestinationListAPI(MongoMixin, MethodView):
         super().__init__()
 
     def get(self):
-        result = list(DESTINATIONS.values())
-
-        if 'pos.x' in request.args and 'pos.y' in request.args and 'floor' in request.args:
-            return jsonify([r for r in result if str(r['floor']).strip() == request.args['floor'].strip()][:1])
+        if 'pos.x' in request.args and 'pos.y' in request.args and 'floor' in request.args and request.args['floor'].isdigit():
+            # TODO: fix logic
+            dest_led_pos = f'{request.args["pos.x"]},{request.args["pos.y"]}'
+            floor = int(request.args['floor'])
+            filter_dict = {'dest_led_pos': dest_led_pos, 'floor': floor, 'initial': {'$ne': True}}
+            return jsonify([utils.bson2dict(r) for r in self._collection.find(filter_dict)])
 
         if 'dest_human_sensor_id' in request.args:
-            return jsonify([r for r in result
-                            if str(r['dest_human_sensor_id']).strip() == request.args['dest_human_sensor_id'].strip()][:1])
+            filter_dict = {'dest_human_sensor_id': request.args['dest_human_sensor_id'], 'initial': {'$ne': True}}
+            return jsonify([utils.bson2dict(r) for r in self._collection.find(filter_dict)])
 
-        if 'floor_initial' in request.args:
-            if request.args['floor_initial'] == '1':
-                return jsonify([{
-                    "id": "dest-FtYNG505n7aIOJ0m",
-                    "name": "1階初期位置",
-                    "floor": 1,
-                    "dest_pos": "0.0,0.0",
-                    "dest_led_id": "dest_led_0000000000000001",
-                    "dest_led_pos": "0.0,0.0",
-                    "dest_human_sensor_id": "dest_human_sensor_0000000000000001",
-                }])
-            elif request.args['floor_initial'] == '2':
-                return jsonify([{
-                    "id": "dest-GtYNG595n7aIOJ15",
-                    "name": "2階初期位置",
-                    "floor": 2,
-                    "dest_pos": "0.0,0.0",
-                    "dest_led_id": "dest_led_0000000000000002",
-                    "dest_led_pos": "0.0,0.0",
-                    "dest_human_sensor_id": "dest_human_sensor_0000000000000002",
-                }])
-            else:
-                return jsonify([])
+        if 'floor_initial' in request.args and request.args['floor_initial'].isdigit():
+            filter_dict = {'initial': True, 'floor': int(request.args['floor_initial'])}
+            return jsonify([utils.bson2dict(r) for r in self._collection.find(filter_dict)])
 
         if 'filter' in request.args:
+            filter_dict = {'initial': {'$ne': True}}
             for f in [f.strip() for f in request.args['filter'].split(',')]:
                 m = FILTER_RE.match(f)
-                if f:
+                if m:
                     k = m.group('k')
                     v = m.group('v')
-                    result = [r for r in result if k in r and str(r[k]) == str(v)]
+                    filter_dict[k] = int(v) if k == 'floor' and v.isdigit() else v
+            result = [utils.bson2dict(r) for r in self._collection.find(filter_dict)]
+        else:
+            filter_dict = {'initial': {'$ne': True}}
+            result = [utils.bson2dict(r) for r in self._collection.find(filter_dict)]
 
         if 'attr' in request.args:
             attrs = [a.strip() for a in request.args['attr'].split(',')]
