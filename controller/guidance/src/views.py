@@ -53,7 +53,7 @@ class StartMovementAPI(RobotFloorMapMixin, MethodView):
 
             if destx is not None and desty is not None and floor in (1, 2):
                 robot_id = self.get_available_robot_from_floor(floor)
-                value = f'r_cmd|Navi|pos.x|{destx}|pos.y|{desty}'
+                value = f'r_cmd|Navi|x|{destx}|y|{desty}'
                 message = self.orion.send_cmd(robot_id, self.type, 'robot_request', value)
                 result['result'] = 'success'
                 result['message'] = message
@@ -177,7 +177,7 @@ class ArrivalAPI(RobotFloorMapMixin, MethodView):
                     if not initial_pos:
                         raise DestinationFormatError('initial dest_pos is empty')
                     initx, inity = [float(x.strip()) for x in initial_pos.split(',')]
-                    value = f'r_cmd|Navi|pos.x|{initx}|pos.y|{inity}'
+                    value = f'r_cmd|Navi|x|{initx}|y|{inity}'
                     message = self.robot_orion.send_cmd(robot_id, self.robot_type, 'robot_request', value)
                     result['result'] = 'success'
                     result['message'] = message
