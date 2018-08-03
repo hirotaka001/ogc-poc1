@@ -4,9 +4,9 @@ import os
 import re
 from logging import getLogger
 
-from flask import request, jsonify
+from flask import request, jsonify, current_app
 from flask.views import MethodView
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, BadRequest
 
 from pymongo import MongoClient
 
@@ -29,16 +29,20 @@ UPDATE_SCHEMA = {
             'type': 'integer',
             'minimum': 1,
         },
-        'dest_pos': {
-            'type': 'string',
-            'pattern': '^(-)?[0-9]+(.[0-9]+)?,(-)?[0-9]+(.[0-9]+)?$',
+        'dest_pos_x': {
+            'type': 'number',
+        },
+        'dest_pos_y': {
+            'type': 'number',
         },
         'dest_led_id': {
             'type': 'string',
         },
-        'dest_led_pos': {
-            'type': 'string',
-            'pattern': '^(-)?[0-9]+(.[0-9]+)?,(-)?[0-9]+(.[0-9]+)?$',
+        'dest_led_pos_x': {
+            'type': 'number',
+        },
+        'dest_led_pos_y': {
+            'type': 'number',
         },
         'dest_human_sensor_id': {
             'type': 'string',
@@ -53,7 +57,8 @@ UPDATE_SCHEMA = {
     'additionalProperties': False,
 }
 INSERT_SCHEMA = copy.copy(UPDATE_SCHEMA)
-INSERT_SCHEMA['required'] = ['name', 'floor', 'dest_pos', 'dest_led_id', 'dest_led_pos', 'dest_human_sensor_id']
+INSERT_SCHEMA['required'] = ['name', 'floor', 'dest_pos_x', 'dest_pos_y', 'dest_led_id',
+                             'dest_led_pos_x', 'dest_led_pos_y', 'dest_human_sensor_id']
 
 
 class MongoMixin:
@@ -74,34 +79,79 @@ class DestinationListAPI(MongoMixin, MethodView):
 
     def __init__(self):
         super().__init__()
+        if const.POS_DELTA in os.environ:
+            try:
+                self.pos_delta = float(os.environ[const.POS_DELTA])
+            except (TypeError, ValueError):
+                self.pos_delta = current_app.config[const.DEFAULT_POS_DELTA]
+        else:
+            self.pos_delta = current_app.config[const.DEFAULT_POS_DELTA]
 
     def get(self):
-        if 'pos.x' in request.args and 'pos.y' in request.args and 'floor' in request.args and request.args['floor'].isdigit():
-            # TODO: fix logic
-            dest_led_pos = f'{request.args["pos.x"]},{request.args["pos.y"]}'
-            floor = int(request.args['floor'])
-            filter_dict = {'dest_led_pos': dest_led_pos, 'floor': floor, 'initial': {'$ne': True}}
-            return jsonify([utils.bson2dict(r) for r in self._collection.find(filter_dict)])
+        if 'pos.x' in request.args and 'pos.y' in request.args and 'floor' in request.args:
+            try:
+                pos_x = float(request.args['pos.x'])
+                pos_y = float(request.args['pos.y'])
+                floor = int(request.args['floor'])
+            except (TypeError, ValueError) as e:
+                msg = f'invalid query parameter(s) : {str(e)}'
+                logger.warning(msg)
+                raise BadRequest(msg)
+            else:
+                filter_dict = {
+                    'dest_led_pos_x': {
+                        '$gte': pos_x - self.pos_delta,
+                        '$lte': pos_x + self.pos_delta,
+                    },
+                    'dest_led_pos_y': {
+                        '$gte': pos_y - self.pos_delta,
+                        '$lte': pos_y + self.pos_delta,
+                    },
+                    'floor': floor,
+                    'initial': {
+                        '$ne': True,
+                    }
+                }
+                return jsonify([utils.bson2dict(r) for r in self._collection.find(filter_dict)])
 
         if 'dest_human_sensor_id' in request.args:
             filter_dict = {'dest_human_sensor_id': request.args['dest_human_sensor_id'], 'initial': {'$ne': True}}
             return jsonify([utils.bson2dict(r) for r in self._collection.find(filter_dict)])
 
-        if 'floor_initial' in request.args and request.args['floor_initial'].isdigit():
-            filter_dict = {'initial': True, 'floor': int(request.args['floor_initial'])}
-            return jsonify([utils.bson2dict(r) for r in self._collection.find(filter_dict)])
+        if 'floor_initial' in request.args:
+            try:
+                floor = int(request.args['floor_initial'])
+            except (TypeError, ValueError) as e:
+                msg = f'invalid query parameter(s) : {str(e)}'
+                logger.warning(msg)
+                raise BadRequest(msg)
+            else:
+                filter_dict = {'initial': True, 'floor': floor}
+                return jsonify([utils.bson2dict(r) for r in self._collection.find(filter_dict)])
 
+        filter_dict = {'initial': {'$ne': True}}
         if 'filter' in request.args:
-            filter_dict = {'initial': {'$ne': True}}
             for f in [f.strip() for f in request.args['filter'].split(',')]:
                 m = FILTER_RE.match(f)
                 if m:
                     k = m.group('k')
                     v = m.group('v')
-                    filter_dict[k] = int(v) if k == 'floor' and v.isdigit() else v
+                    if k not in UPDATE_SCHEMA['properties'] or k == 'initial':
+                        continue
+                    if UPDATE_SCHEMA['properties'][k]['type'] == 'integer':
+                        try:
+                            v = int(v)
+                        except (TypeError, ValueError):
+                            pass
+                    elif UPDATE_SCHEMA['properties'][k]['type'] == 'number':
+                        try:
+                            v = float(v)
+                        except (TypeError, ValueError):
+                            pass
+                    filter_dict[k] = v
+
             result = [utils.bson2dict(r) for r in self._collection.find(filter_dict)]
         else:
-            filter_dict = {'initial': {'$ne': True}}
             result = [utils.bson2dict(r) for r in self._collection.find(filter_dict)]
 
         if 'attr' in request.args:
