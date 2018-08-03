@@ -3,11 +3,11 @@
 ## preparation
 * start roscore & rosbridge on guide robot and external camera
 * echo request topic of guide robot and external camera like below:
-    * `rostopic echo /Robot1F-1/request`
-    * `rostopic echo /Robot2F-1/request`
-    * `rostopic echo /ExternalCamera1F-1/request`
-    * `rostopic echo /ExternalCamera1F-2/request`
-    * `rostopic echo /ExternalCamera2F-1/request`
+    * `rostopic echo /robot_1f_1/request`
+    * `rostopic echo /robot_2f_1/request`
+    * `rostopic echo /external_camera_1f_1/request`
+    * `rostopic echo /external_camera_1f_2/request`
+    * `rostopic echo /external_camera_2f_1/request`
 
 ## reception
 1. subscribe all topics
@@ -118,14 +118,14 @@
         Client mosqsub|17444-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/cmdexe', ... (108 bytes))
         guide_robot_0000000000000001@robot_request|result,success/time,2018-08-03 14:05:07/r_cmd,Navi/x,-10.0/y,10.0
         ```
-    * send ros message to ros topic `/Robot1F-1/request` automatically
+    * send ros message to ros topic `/robot_1f_1/request` automatically
 
         ```bash
-        root@rosbridge:/opt/ros_ws# rostopic type /Robot1F-1/request
+        root@rosbridge:/opt/ros_ws# rostopic type /robot_1f_1/request
         office_guide_robot/r_req
         ```
         ```bash
-        root@rosbridge:/opt/ros_ws# rostopic echo /Robot1F-1/request
+        root@rosbridge:/opt/ros_ws# rostopic echo /robot_1f_1/request
         time: "2018-08-03 14:05:07"
         r_cmd: "Navi"
         pos:
@@ -154,10 +154,10 @@
 
 ## navigating (floor 1)
 1. simulate to receive robot state (Navi)
-    * publish ros message to `/Robot1F-1/state` near the start position
+    * publish ros message to `/robot_1f_1/state` near the start position
 
     ```bash
-    root@rosbridge:/opt/ros_ws# rostopic pub -1 /Robot1F-1/state office_guide_robot/r_state "
+    root@rosbridge:/opt/ros_ws# rostopic pub -1 /robot_1f_1/state office_guide_robot/r_state "
     time: '2018-09-08 07:06:01'
     r_mode: 'Navi'
     pos:
@@ -172,10 +172,10 @@
         Client mosqsub|17444-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/attrs', ... (91 bytes))
         2018-08-03T14:09:27.564404+0900|time|2018-09-08 07:06:01|r_mode|Navi|x|-1.1|y|1.2|theta|0.3
         ```
-    * publish ros message to `/Robot1F-1/state` near the `dest_led_pos`
+    * publish ros message to `/robot_1f_1/state` near the `dest_led_pos`
 
     ```bash
-    root@rosbridge:/opt/ros_ws# rostopic pub -1 /Robot1F-1/state office_guide_robot/r_state "
+    root@rosbridge:/opt/ros_ws# rostopic pub -1 /robot_1f_1/state office_guide_robot/r_state "
     time: '2018-09-08 07:06:05'
     r_mode: 'Navi'
     pos:
@@ -202,10 +202,10 @@
     Client mosqpub|22763-Nobuyukin sending DISCONNECT
     ```
 1. simulate to receive robot state (Standby)
-    * publish ros message to `/Robot1F-1/state`
+    * publish ros message to `/robot_1f_1/state`
 
     ```bash
-    root@rosbridge:/opt/ros_ws# rostopic pub -1 /Robot1F-1/state office_guide_robot/r_state "
+    root@rosbridge:/opt/ros_ws# rostopic pub -1 /robot_1f_1/state office_guide_robot/r_state "
     time: '2018-09-08 07:06:15'
     r_mode: 'Standby'
     pos:
@@ -248,10 +248,10 @@
         Client mosqsub|17444-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/cmdexe', ... (105 bytes))
         guide_robot_0000000000000001@robot_request|result,success/time,2018-08-03 14:15:31/r_cmd,Navi/x,0.0/y,0.0
         ```
-    * send ros message to ros topic `/Robot1F-1/request` automatically
+    * send ros message to ros topic `/robot_1f_1/request` automatically
 
         ```bash
-        root@rosbridge:/opt/ros_ws# rostopic echo /Robot1F-1/request
+        root@rosbridge:/opt/ros_ws# rostopic echo /robot_1f_1/request
         time: "2018-08-03 14:15:31"
         r_cmd: "Navi"
         pos:
@@ -269,10 +269,10 @@
     Client mosqpub|22763-Nobuyukin sending DISCONNECT
     ```
 1. simulate to receive robot state (Standby)
-    * publish ros message to `/Robot1F-1/state`
+    * publish ros message to `/robot_1f_1/state`
 
     ```bash
-    root@rosbridge:/opt/ros_ws# rostopic pub -1 /Robot1F-1/state office_guide_robot/r_state "
+    root@rosbridge:/opt/ros_ws# rostopic pub -1 /robot_1f_1/state office_guide_robot/r_state "
     time: '2018-09-08 07:06:15'
     r_mode: 'Standby'
     pos:
@@ -364,14 +364,14 @@
         Client mosqsub|17444-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/cmdexe', ... (107 bytes))
         guide_robot_0000000000000002@robot_request|result,success/time,2018-08-03 14:19:04/r_cmd,Navi/x,20.0/y,20.0
         ```
-    * send ros message to ros topic `/Robot2F-1/request` automatically
+    * send ros message to ros topic `/robot_2f_1/request` automatically
 
         ```bash
-        root@rosbridge:/opt/ros_ws# rostopic type /Robot2F-1/request
+        root@rosbridge:/opt/ros_ws# rostopic type /robot_2f_1/request
         office_guide_robot/r_req
         ```
         ```bash
-        root@rosbridge:/opt/ros_ws# rostopic echo /Robot2F-1/request
+        root@rosbridge:/opt/ros_ws# rostopic echo /robot_2f_1/request
         time: "2018-08-03 14:19:04"
         r_cmd: "Navi"
         pos:
@@ -401,10 +401,10 @@
 
 ## navigating (floor 2)
 1. simulate to receive robot state (Navi)
-    * publish ros message to `/Robot1F-1/state` near the start position
+    * publish ros message to `/robot_1f_1/state` near the start position
 
     ```bash
-    root@rosbridge:/opt/ros_ws# rostopic pub -1 /Robot2F-1/state office_guide_robot/r_state "
+    root@rosbridge:/opt/ros_ws# rostopic pub -1 /robot_2f_1/state office_guide_robot/r_state "
     time: '2018-10-09 08:07:01'
     r_mode: 'Navi'
     pos:
@@ -419,10 +419,10 @@
         Client mosqsub|17444-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/attrs', ... (90 bytes))
         2018-08-03T14:22:09.667690+0900|time|2018-10-09 08:07:01|r_mode|Navi|x|1.1|y|1.2|theta|0.3
         ```
-    * publish ros message to `/Robot2F-1/state`
+    * publish ros message to `/robot_2f_1/state`
 
     ```bash
-    root@rosbridge:/opt/ros_ws# rostopic pub -1 /Robot2F-1/state office_guide_robot/r_state "
+    root@rosbridge:/opt/ros_ws# rostopic pub -1 /robot_2f_1/state office_guide_robot/r_state "
     time: '2018-10-09 08:07:06'
     r_mode: 'Navi'
     pos:
@@ -449,10 +449,10 @@
     Client mosqpub|22763-Nobuyukin sending DISCONNECT
     ```
 1. simulate to receive robot state (Standby)
-    * publish ros message to `/Robot2F-1/state`
+    * publish ros message to `/robot_2f_1/state`
 
     ```bash
-    root@rosbridge:/opt/ros_ws# rostopic pub -1 /Robot2F-1/state office_guide_robot/r_state "
+    root@rosbridge:/opt/ros_ws# rostopic pub -1 /robot_2f_1/state office_guide_robot/r_state "
     time: '2018-10-09 08:07:16'
     r_mode: 'Standby'
     pos:
@@ -495,10 +495,10 @@
         Client mosqsub|17444-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/cmdexe', ... (105 bytes))
         guide_robot_0000000000000002@robot_request|result,success/time,2018-08-03 14:28:27/r_cmd,Navi/x,0.0/y,0.0
         ```
-    * send ros message to ros topic `/Robot2F-1/request` automatically
+    * send ros message to ros topic `/robot_2f_1/request` automatically
 
         ```bash
-        root@rosbridge:/opt/ros_ws# rostopic echo /Robot2F-1/request
+        root@rosbridge:/opt/ros_ws# rostopic echo /robot_2f_1/request
         time: "2018-08-03 14:28:27"
         r_cmd: "Navi"
         pos:
@@ -516,10 +516,10 @@
     Client mosqpub|22763-Nobuyukin sending DISCONNECT
     ```
 1. simulate to receive robot state (Standby)
-    * publish ros message to `/Robot2F-1/state`
+    * publish ros message to `/robot_2f_1/state`
 
     ```bash
-    root@rosbridge:/opt/ros_ws# rostopic pub -1 /Robot2F-1/state office_guide_robot/r_state "
+    root@rosbridge:/opt/ros_ws# rostopic pub -1 /robot_2f_1/state office_guide_robot/r_state "
     time: '2018-10-09 08:07:26'
     r_mode: 'Standby'
     pos:
@@ -613,14 +613,14 @@
         Client mosqsub|17444-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/external_camera/external_camera_0000000000000011/cmdexe', ... (110 bytes))
         external_camera_0000000000000011@external_camera_request|result,success/time,2018-08-03 14:32:00/c_cmd,Monitor
         ```
-    * send ros message to ros topic `/ExternalCamera1F-1/request` automatically
+    * send ros message to ros topic `/external_camera_1f_1/request` automatically
 
         ```bash
-        root@rosbridge:/opt/ros_ws# rostopic type /ExternalCamera1F-1/request
+        root@rosbridge:/opt/ros_ws# rostopic type /external_camera_1f_1/request
         external_camera/c_req
         ```
         ```bash
-        root@rosbridge:/opt/ros_ws# rostopic echo /ExternalCamera1F-1/request
+        root@rosbridge:/opt/ros_ws# rostopic echo /external_camera_1f_1/request
         time: "2018-08-03 14:32:00"
         c_cmd: "Monitor"
         ---
@@ -655,14 +655,14 @@
         Client mosqsub|17444-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/external_camera/external_camera_0000000000000012/cmdexe', ... (110 bytes))
         external_camera_0000000000000012@external_camera_request|result,success/time,2018-08-03 14:32:50/c_cmd,Standby
         ```
-    * send ros message to ros topic `/ExternalCamera1F-2/request` automatically
+    * send ros message to ros topic `/external_camera_1f_2/request` automatically
 
         ```bash
-        root@rosbridge:/opt/ros_ws# rostopic type /ExternalCamera1F-2/request
+        root@rosbridge:/opt/ros_ws# rostopic type /external_camera_1f_2/request
         external_camera/c_req
         ```
         ```bash
-        root@rosbridge:/opt/ros_ws# rostopic echo /ExternalCamera1F-2/request
+        root@rosbridge:/opt/ros_ws# rostopic echo /external_camera_1f_2/request
         time: "2018-08-03 14:32:50"
         c_cmd: "Standby"
         ---
@@ -697,14 +697,14 @@
         Client mosqsub|17444-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/external_camera/external_camera_0000000000000021/cmdexe', ... (110 bytes))
         external_camera_0000000000000021@external_camera_request|result,success/time,2018-08-03 14:33:34/c_cmd,Monitor
         ```
-    * send ros message to ros topic `/ExternalCamera2F-1/request` automatically
+    * send ros message to ros topic `/external_camera_2f_1/request` automatically
 
         ```bash
-        root@rosbridge:/opt/ros_ws# rostopic type /ExternalCamera2F-1/request
+        root@rosbridge:/opt/ros_ws# rostopic type /external_camera_2f_1/request
         external_camera/c_req
         ```
         ```bash
-        root@rosbridge:/opt/ros_ws# rostopic echo /ExternalCamera2F-1/request
+        root@rosbridge:/opt/ros_ws# rostopic echo /external_camera_2f_1/request
         time: "2018-08-03 14:33:34"
         c_cmd: "Monitor"
         ---
@@ -712,10 +712,10 @@
 
 ## state of external camera
 1. simulate to receive the state of external camera 1F-1
-    * publish ros message to `/ExternalCamera1F-1/state`
+    * publish ros message to `/external_camera_1f_1/state`
 
     ```bash
-    root@rosbridge:/opt/ros_ws# rostopic pub -1 /ExternalCamera1F-1/state external_camera/c_state "
+    root@rosbridge:/opt/ros_ws# rostopic pub -1 /external_camera_1f_1/state external_camera/c_state "
     time: '2018-02-03 04:05:06'
     c_mode: 'Monitor'
     num_p: 0
@@ -740,10 +740,10 @@
         { "_id" : ObjectId("5b63e95723b570000ae54531"), "recvTime" : ISODate("2018-08-03T05:34:15.846Z"), "attrName" : "time", "attrType" : "string", "attrValue" : "2018-02-03 04:05:06" }
         ```
 1. simulate to receive the state of external camera 1F-2
-    * publish ros message to `/ExternalCamera1F-2/state`
+    * publish ros message to `/external_camera_1f_2/state`
 
     ```bash
-    root@rosbridge:/opt/ros_ws# rostopic pub -1 /ExternalCamera1F-2/state external_camera/c_state "
+    root@rosbridge:/opt/ros_ws# rostopic pub -1 /external_camera_1f_2/state external_camera/c_state "
     time: '2018-02-03 04:15:16'
     c_mode: 'Standby'
     num_p: 1
@@ -771,10 +771,10 @@
         { "_id" : ObjectId("5b63e99923b570000ae54537"), "recvTime" : ISODate("2018-08-03T05:35:21.805Z"), "attrName" : "time", "attrType" : "string", "attrValue" : "2018-02-03 04:15:16" }
         ```
 1. simulate to receive the state of external camera 2F-1
-    * publish ros message to `/ExternalCamera2F-1/state`
+    * publish ros message to `/external_camera_2f_1/state`
 
     ```bash
-    root@rosbridge:/opt/ros_ws# rostopic pub -1 /ExternalCamera2F-1/state external_camera/c_state "
+    root@rosbridge:/opt/ros_ws# rostopic pub -1 /external_camera_2f_1/state external_camera/c_state "
     time: '2018-02-03 04:25:26'
     c_mode: 'Error'
     num_p: 2
