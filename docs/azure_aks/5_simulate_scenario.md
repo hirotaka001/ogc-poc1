@@ -1,8 +1,13 @@
 # 5. simulate scenario
 
 ## preparation
-* start roscore & rosbridge on robot and camera
-* start `rostopic echo /Robot/request`
+* start roscore & rosbridge on guide robot and external camera
+* echo request topic of guide robot and external camera like below:
+    * `rostopic echo /Robot1F-1/request`
+    * `rostopic echo /Robot2F-1/request`
+    * `rostopic echo /ExternalCamera1F-1/request`
+    * `rostopic echo /ExternalCamera1F-2/request`
+    * `rostopic echo /ExternalCamera2F-1/request`
 
 ## reception
 1. subscribe all topics
