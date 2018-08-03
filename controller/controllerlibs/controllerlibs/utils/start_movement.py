@@ -3,17 +3,19 @@ import datetime
 
 import pytz
 
-from controllerlibs import DEST_POS, DEST_FLOOR
+from controllerlibs import DEST_POS_X, DEST_POS_Y, DEST_FLOOR
 from controllerlibs.services.orion import Orion
 from controllerlibs.services.destination import DestinationFormatError
 
 
 def notify_start_movement(service, service_path, id, type, dest):
-    dest_pos = dest.get(DEST_POS)
-    if not dest_pos:
-        raise DestinationFormatError('dest_pos is empty')
+    dest_pos_x = dest.get(DEST_POS_X)
+    dest_pos_y = dest.get(DEST_POS_Y)
+    if dest_pos_x is None or dest_pos_y is None:
+        raise DestinationFormatError('dest_pos_x or dest_pos_y is empty')
     try:
-        destx, desty = [float(x.strip()) for x in dest_pos.split(',')]
+        destx = float(dest_pos_x)
+        desty = float(dest_pos_y)
         floor = int(dest.get(DEST_FLOOR))
     except (TypeError, ValueError):
         raise DestinationFormatError('invalid dest_pos or floor')

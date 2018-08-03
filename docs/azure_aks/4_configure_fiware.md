@@ -20,7 +20,7 @@ Configure fiware on AKS by following steps:
 1. [register `stop-movement` of "guidance" as a subscriber of "ROBOT"](#register-stop-movement-of-guidance-as-a-subscriber-of-robot)
 1. [register `record-arrival` of "ledger" as a subscriber of "DEST-HUMAN-SENSOR"](#register-record-arrival-of-ledger-as-a-subscriber-of-dest-human-sensor)
 1. [register `arrival` of "guidance" as a subscriber of "DEST-HUMAN-SENSOR"](#register-arrival-of-guidance-as-a-subscriber-of-dest-human-sensor)
-
+1. [register desinations](#register-destinations)
 
 ## register BUTTON-SENSOR to cygnus
 ```bash
@@ -1694,4 +1694,93 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     }
   }
 ]
+```
+
+## register destinations
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl https://api.tech-sketch.jp/destinations/ -H "Authorization: bearer ${TOKEN}" -H "Content-Type: application/json" -X POST -d @- <<__EOS__ | jq .
+{
+    "name":"initial-1",
+    "floor": 1,
+    "dest_pos_x": 0.0,
+    "dest_pos_y": 0.0,
+    "dest_led_id": null,
+    "dest_led_pos_x": null,
+    "dest_led_pos_y": null,
+    "dest_human_sensor_id": null,
+    "initial": true
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl https://api.tech-sketch.jp/destinations/ -H "Authorization: bearer ${TOKEN}" -H "Content-Type: application/json" -X POST -d @- <<__EOS__ | jq .
+{
+    "name":"initial-2",
+    "floor": 2,
+    "dest_pos_x": 0.0,
+    "dest_pos_y": 0.0,
+    "dest_led_id": null,
+    "dest_led_pos_x": null,
+    "dest_led_pos_y": null,
+    "dest_human_sensor_id": null,
+    "initial": true
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl https://api.tech-sketch.jp/destinations/ -H "Authorization: bearer ${TOKEN}" -H "Content-Type: application/json" -X POST -d @- <<__EOS__ | jq .
+{
+    "name":"管理センター",
+    "floor": 1,
+    "dest_pos_x": -10.0,
+    "dest_pos_y": 10.0,
+    "dest_led_id": "dest_led_0000000000000001",
+    "dest_led_pos_x": -9.0,
+    "dest_led_pos_y": 9.0,
+    "dest_human_sensor_id": "dest_human_sensor_0000000000000001"
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl https://api.tech-sketch.jp/destinations/ -H "Authorization: bearer ${TOKEN}" -H "Content-Type: application/json" -X POST -d @- <<__EOS__ | jq .
+{
+    "name":"203号室",
+    "floor": 2,
+    "dest_pos_x": 20.0,
+    "dest_pos_y": 20.0,
+    "dest_led_id": "dest_led_0000000000000002",
+    "dest_led_pos_x": 19.0,
+    "dest_led_pos_y": 19.0,
+    "dest_human_sensor_id": "dest_human_sensor_0000000000000002"
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl https://api.tech-sketch.jp/destinations/ -H "Authorization: bearer ${TOKEN}" -H "Content-Type: application/json" -X POST -d @- <<__EOS__ | jq .
+{
+    "name":"204号室",
+    "floor": 2,
+    "dest_pos_x": 20.0,
+    "dest_pos_y": -10.0,
+    "dest_led_id": "dest_led_0000000000000003",
+    "dest_led_pos_x": 19.0,
+    "dest_led_pos_y": -19.0,
+    "dest_human_sensor_id": "dest_human_sensor_0000000000000003"
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl https://api.tech-sketch.jp/destinations/ -H "Authorization: bearer ${TOKEN}" -H "Content-Type: application/json" -X POST -d @- <<__EOS__ | jq .
+{
+    "name":"ProjectRoom 1",
+    "floor": 3,
+    "dest_pos_x": null,
+    "dest_pos_y": null,
+    "dest_led_id": null,
+    "dest_led_pos_x": null,
+    "dest_led_pos_y": null,
+    "dest_human_sensor_id": null,
+    "slack_webhook": "https://hooks.slack.com/services/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+}
+__EOS__
 ```

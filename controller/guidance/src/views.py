@@ -98,7 +98,7 @@ class CheckDestinationAPI(RobotFloorMapMixin, MethodView):
 
             if posx is not None and posy is not None and floor is not None:
                 destination = Destination().get_destination_by_pos(posx, posy, floor)
-                if destination is not None and const.DEST_LED_ID in destination:
+                if destination is not None and const.DEST_LED_ID in destination and destination[const.DEST_LED_ID] is not None:
                     dest_led_id = destination[const.DEST_LED_ID]
                     message = self.orion.send_cmd(dest_led_id, self.type, 'action', 'on')
                     result['result'] = 'success'
@@ -162,7 +162,7 @@ class ArrivalAPI(RobotFloorMapMixin, MethodView):
                 id = get_id(content)
                 destService = Destination()
                 destination = destService.get_destination_by_dest_human_sensor_id(id)
-                if destination is not None and const.DEST_LED_ID in destination:
+                if destination is not None and const.DEST_LED_ID in destination and destination[const.DEST_LED_ID] is not None:
                     dest_led_id = destination[const.DEST_LED_ID]
                     message = self.dest_led_orion.send_cmd(dest_led_id, self.dest_led_type, 'action', 'off')
                 if destination is not None and const.DEST_FLOOR in destination:
@@ -173,11 +173,11 @@ class ArrivalAPI(RobotFloorMapMixin, MethodView):
 
                     robot_id = self.get_available_robot_from_floor(floor)
                     initial = destService.get_initial_of_floor(floor)
-                    initial_pos = initial.get(const.DEST_POS)
-                    if not initial_pos:
-                        raise DestinationFormatError('initial dest_pos is empty')
-                    initx, inity = [float(x.strip()) for x in initial_pos.split(',')]
-                    value = f'r_cmd|Navi|x|{initx}|y|{inity}'
+                    initial_pos_x = initial.get(const.DEST_POS_X)
+                    initial_pos_y = initial.get(const.DEST_POS_Y)
+                    if initial_pos_x is None or initial_pos_y is None:
+                        raise DestinationFormatError('initial dest_pos_x or dest_pos_y is empty')
+                    value = f'r_cmd|Navi|x|{initial_pos_x}|y|{initial_pos_y}'
                     message = self.robot_orion.send_cmd(robot_id, self.robot_type, 'robot_request', value)
                     result['result'] = 'success'
                     result['message'] = message
