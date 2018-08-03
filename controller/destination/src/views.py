@@ -1,100 +1,215 @@
 # -*- coding: utf-8 -*-
+import copy
+import os
 import re
 from logging import getLogger
 
-from flask import request, jsonify
+from flask import request, jsonify, current_app
 from flask.views import MethodView
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, BadRequest
+
+from pymongo import MongoClient
+
+from bson.objectid import ObjectId
+from bson.errors import InvalidId
+
+from src import const, utils
 
 logger = getLogger(__name__)
 
 FILTER_RE = re.compile(r'^(?P<k>[^|]+)\|(?P<v>[^|]+)$')
 
-DESTINATIONS = {
-    "dest-n4uRxmtdWv6jOHpI": {
-        "id": "dest-n4uRxmtdWv6jOHpI",
-        "name": "管理センター",
-        "floor": 1,
-        "dest_pos": "0.001151,0.000134",
-        "dest_led_id": "dest_led_0000000000000001",
-        "dest_led_pos": "0.000000,0.000000",
-        "dest_human_sensor_id": "dest_human_sensor_0000000000000001",
+UPDATE_SCHEMA = {
+    'type': 'object',
+    'properties': {
+        'name': {
+            'type': 'string',
+        },
+        'floor': {
+            'type': 'integer',
+            'minimum': 1,
+        },
+        'dest_pos_x': {
+            'anyOf': [{
+                'type': 'number',
+            }, {
+                'type': 'null',
+            }],
+        },
+        'dest_pos_y': {
+            'anyOf': [{
+                'type': 'number',
+            }, {
+                'type': 'null',
+            }],
+        },
+        'dest_led_id': {
+            'anyOf': [{
+                'type': 'string',
+            }, {
+                'type': 'null',
+            }],
+        },
+        'dest_led_pos_x': {
+            'anyOf': [{
+                'type': 'number',
+            }, {
+                'type': 'null',
+            }],
+        },
+        'dest_led_pos_y': {
+            'anyOf': [{
+                'type': 'number',
+            }, {
+                'type': 'null',
+            }],
+        },
+        'dest_human_sensor_id': {
+            'anyOf': [{
+                'type': 'string',
+            }, {
+                'type': 'null',
+            }],
+        },
+        'slack_webhook': {
+            'type': 'string',
+        },
+        'initial': {
+            'type': 'boolean',
+        },
     },
-    "dest-vLBTZbPXc3Al0hMT": {
-        "id": "dest-vLBTZbPXc3Al0hMT",
-        "name": "203号室",
-        "floor": 2,
-        "dest_pos": "125.12345,92.12345",
-        "dest_led_id": "dest_led_0000000000000002",
-        "dest_led_pos": "122.001122,91.991122",
-        "dest_human_sensor_id": "dest_human_sensor_0000000000000002",
-    },
-    "dest-9QgohxohSmb3AECD": {
-        "id": "dest-9QgohxohSmb3AECD",
-        "name": "204号室",
-        "floor": 2,
-        "dest_pos": "110.120101,0.993313",
-        "dest_led_id": "dest_led_0000000000000002",
-        "dest_led_pos": "98.980808,0.881122",
-        "dest_human_sensor_id": "dest_human_sensor_0000000000000002",
-    },
-    "dest-Ymq1aoftEIViZjry": {
-        "id": "dest-Ymq1aoftEIViZjry",
-        "name": "ProjectRoom 1",
-        "floor": 3,
-        "dest_pos": "125.12345,92.12345",
-        "dest_led_id": "dest_led_0000000000000003",
-        "dest_led_pos": "122.001122,91.991122",
-        "dest_human_sensor_id": "dest_human_sensor_0000000000000003",
-        "slack_webhook": "https://hooks.slack.com/services/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-    },
+    'additionalProperties': False,
 }
+INSERT_SCHEMA = copy.copy(UPDATE_SCHEMA)
+INSERT_SCHEMA['required'] = ['name', 'floor', 'dest_pos_x', 'dest_pos_y', 'dest_led_id',
+                             'dest_led_pos_x', 'dest_led_pos_y', 'dest_human_sensor_id']
 
 
-class DestinationListAPI(MethodView):
+class DuplicateKeyError(Exception):
+    pass
+
+
+class MongoMixin:
+    def __init__(self):
+        super().__init__()
+        url = os.environ.get(const.MONGODB_URL, 'mongodb://localhost:27017')
+        rs = os.environ.get(const.MONGODB_REPLICASET, None)
+
+        if rs:
+            client = MongoClient(url, replicaset=rs)
+        else:
+            client = MongoClient(url)
+        self._collection = client[const.MONGODB_DATABASE][const.MONGODB_COLLECTION]
+
+    def check_duplication(self, data):
+        try:
+            if (data.get('name') is not None
+                    and self._collection.find({"name": data['name']}).count() > 0):
+                raise DuplicateKeyError(f'name({data["name"]}) is duplicate')
+            if (data.get('dest_led_id') is not None
+                    and self._collection.find({"dest_led_id": data['dest_led_id']}).count() > 0):
+                raise DuplicateKeyError(f'dest_led_id({data["dest_led_id"]}) is duplicate')
+            if (data.get('dest_human_sensor_id') is not None
+                    and self._collection.find({"dest_human_sensor_id": data['dest_human_sensor_id']}).count() > 0):
+                raise DuplicateKeyError(f'dest_human_sensor_id({data["dest_human_sensor_id"]}) is duplicate')
+            if (data.get('dest_pos_x') is not None and data.get('dest_pos_y') is not None
+                    and self._collection.find({"floor": data['floor'],
+                                               "dest_pos_x": data['dest_pos_x'],
+                                               "dest_pos_y": data['dest_pos_y']}).count() > 0):
+                raise DuplicateKeyError(f'floor({data["floor"]}) and dest_pos_x({data["dest_pos_x"]}) '
+                                        f'and dest_pos_y({data["dest_pos_y"]}) is duplicate')
+            if (data.get('dest_led_pos_x') is not None and data.get('dest_led_pos_y') is not None
+                    and self._collection.find({"floor": data['floor'],
+                                               "dest_led_pos_x": data['dest_led_pos_x'],
+                                               "dest_led_pos_y": data['dest_led_pos_y']}).count() > 0):
+                raise DuplicateKeyError(f'floor({data["floor"]}) and dest_led_pos_x({data["dest_led_pos_x"]}) '
+                                        f'and dest_led_pos_y({data["dest_led_pos_y"]}) is duplicate')
+        except DuplicateKeyError as e:
+            logger.warning(str(e))
+            raise e
+
+
+class DestinationListAPI(MongoMixin, MethodView):
     NAME = 'destination-list'
 
-    def get(self):
-        result = list(DESTINATIONS.values())
+    def __init__(self):
+        super().__init__()
+        if const.POS_DELTA in os.environ:
+            try:
+                self.pos_delta = float(os.environ[const.POS_DELTA])
+            except (TypeError, ValueError):
+                self.pos_delta = current_app.config[const.DEFAULT_POS_DELTA]
+        else:
+            self.pos_delta = current_app.config[const.DEFAULT_POS_DELTA]
 
+    def get(self):
         if 'pos.x' in request.args and 'pos.y' in request.args and 'floor' in request.args:
-            return jsonify([r for r in result if str(r['floor']).strip() == request.args['floor'].strip()][:1])
+            try:
+                pos_x = float(request.args['pos.x'])
+                pos_y = float(request.args['pos.y'])
+                floor = int(request.args['floor'])
+            except (TypeError, ValueError) as e:
+                msg = f'invalid query parameter(s) : {str(e)}'
+                logger.warning(msg)
+                raise BadRequest(msg)
+            else:
+                filter_dict = {
+                    'dest_led_pos_x': {
+                        '$gte': pos_x - self.pos_delta,
+                        '$lte': pos_x + self.pos_delta,
+                    },
+                    'dest_led_pos_y': {
+                        '$gte': pos_y - self.pos_delta,
+                        '$lte': pos_y + self.pos_delta,
+                    },
+                    'floor': floor,
+                    'initial': {
+                        '$ne': True,
+                    }
+                }
+                return jsonify([utils.bson2dict(r) for r in self._collection.find(filter_dict)])
 
         if 'dest_human_sensor_id' in request.args:
-            return jsonify([r for r in result
-                            if str(r['dest_human_sensor_id']).strip() == request.args['dest_human_sensor_id'].strip()][:1])
+            filter_dict = {'dest_human_sensor_id': request.args['dest_human_sensor_id'], 'initial': {'$ne': True}}
+            return jsonify([utils.bson2dict(r) for r in self._collection.find(filter_dict)])
 
         if 'floor_initial' in request.args:
-            if request.args['floor_initial'] == '1':
-                return jsonify([{
-                    "id": "dest-FtYNG505n7aIOJ0m",
-                    "name": "1階初期位置",
-                    "floor": 1,
-                    "dest_pos": "0.0,0.0",
-                    "dest_led_id": "dest_led_0000000000000001",
-                    "dest_led_pos": "0.0,0.0",
-                    "dest_human_sensor_id": "dest_human_sensor_0000000000000001",
-                }])
-            elif request.args['floor_initial'] == '2':
-                return jsonify([{
-                    "id": "dest-GtYNG595n7aIOJ15",
-                    "name": "2階初期位置",
-                    "floor": 2,
-                    "dest_pos": "0.0,0.0",
-                    "dest_led_id": "dest_led_0000000000000002",
-                    "dest_led_pos": "0.0,0.0",
-                    "dest_human_sensor_id": "dest_human_sensor_0000000000000002",
-                }])
+            try:
+                floor = int(request.args['floor_initial'])
+            except (TypeError, ValueError) as e:
+                msg = f'invalid query parameter(s) : {str(e)}'
+                logger.warning(msg)
+                raise BadRequest(msg)
             else:
-                return jsonify([])
+                filter_dict = {'initial': True, 'floor': floor}
+                return jsonify([utils.bson2dict(r) for r in self._collection.find(filter_dict)])
 
+        filter_dict = dict()
+        if 'include_initial' not in request.args or request.args['include_initial'] != 'true':
+            filter_dict = {'initial': {'$ne': True}}
         if 'filter' in request.args:
             for f in [f.strip() for f in request.args['filter'].split(',')]:
                 m = FILTER_RE.match(f)
-                if f:
+                if m:
                     k = m.group('k')
                     v = m.group('v')
-                    result = [r for r in result if k in r and str(r[k]) == str(v)]
+                    if k not in UPDATE_SCHEMA['properties'] or k == 'initial':
+                        continue
+                    if UPDATE_SCHEMA['properties'][k]['type'] == 'integer':
+                        try:
+                            v = int(v)
+                        except (TypeError, ValueError):
+                            pass
+                    elif UPDATE_SCHEMA['properties'][k]['type'] == 'number':
+                        try:
+                            v = float(v)
+                        except (TypeError, ValueError):
+                            pass
+                    filter_dict[k] = v
+
+            result = [utils.bson2dict(r) for r in self._collection.find(filter_dict)]
+        else:
+            result = [utils.bson2dict(r) for r in self._collection.find(filter_dict)]
 
         if 'attr' in request.args:
             attrs = [a.strip() for a in request.args['attr'].split(',')]
@@ -102,12 +217,48 @@ class DestinationListAPI(MethodView):
 
         return jsonify(result)
 
+    def post(self):
+        data = utils.validate_json(INSERT_SCHEMA)
+        try:
+            self.check_duplication(data)
+        except DuplicateKeyError as e:
+            msg = f'insert error : {str(e)}'
+            logger.warning(msg)
+            raise BadRequest(msg)
+        else:
+            oid = self._collection.insert_one(data).inserted_id
+            result = self._collection.find_one({"_id": oid})
+            return jsonify(utils.bson2dict(result))
 
-class DestinationDetailAPI(MethodView):
+
+class DestinationDetailAPI(MongoMixin, MethodView):
     NAME = 'destination-detail'
 
-    def get(self, id):
-        if id not in DESTINATIONS:
-            raise NotFound()
+    def __init__(self):
+        super().__init__()
 
-        return jsonify(DESTINATIONS[id])
+    def get(self, id):
+        try:
+            bson = self._collection.find_one({"_id": ObjectId(id)})
+            if bson:
+                return jsonify(utils.bson2dict(bson))
+            else:
+                raise NotFound(f'{id} does not found')
+        except InvalidId as e:
+            raise NotFound(f'{id} is invalid: {str(e)}')
+
+    def put(self, id):
+        data = utils.validate_json(UPDATE_SCHEMA)
+        try:
+            self.check_duplication(data)
+        except DuplicateKeyError as e:
+            msg = f'insert error : {str(e)}'
+            logger.warning(msg)
+            raise BadRequest(msg)
+        else:
+            self._collection.update_one({"_id": ObjectId(id)}, {"$set": data})
+            return self.get(id)
+
+    def delete(self, id):
+        self._collection.delete_one({"_id": ObjectId(id)})
+        return ('', 204)

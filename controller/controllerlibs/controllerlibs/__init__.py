@@ -35,5 +35,6 @@ ORION_PAYLOAD_TEMPLATE = {
 # destination specification
 DESTINATION_LIST_PATH = '/'
 DEST_NAME = 'name'
-DEST_POS = 'dest_pos'
+DEST_POS_X = 'dest_pos_x'
+DEST_POS_Y = 'dest_pos_y'
 DEST_FLOOR = 'floor'

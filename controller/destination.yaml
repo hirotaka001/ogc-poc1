@@ -41,6 +41,12 @@ spec:
           value: "8888"
         - name: LOG_LEVEL
           value: "DEBUG"
+        - name: MONGODB_URL
+          value: "mongodb://mongodb:27017"
+        - name: MONGODB_REPLICASET
+          value: "rs0"
+        - name: POS_DELTA
+          value: "0.1"
         ports:
           - name: destination
             containerPort: 8888
