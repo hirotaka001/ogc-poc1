@@ -30,22 +30,46 @@ UPDATE_SCHEMA = {
             'minimum': 1,
         },
         'dest_pos_x': {
-            'type': 'number',
+            'anyOf': [{
+                'type': 'number',
+            }, {
+                'type': 'null',
+            }],
         },
         'dest_pos_y': {
-            'type': 'number',
+            'anyOf': [{
+                'type': 'number',
+            }, {
+                'type': 'null',
+            }],
         },
         'dest_led_id': {
-            'type': 'string',
+            'anyOf': [{
+                'type': 'string',
+            }, {
+                'type': 'null',
+            }],
         },
         'dest_led_pos_x': {
-            'type': 'number',
+            'anyOf': [{
+                'type': 'number',
+            }, {
+                'type': 'null',
+            }],
         },
         'dest_led_pos_y': {
-            'type': 'number',
+            'anyOf': [{
+                'type': 'number',
+            }, {
+                'type': 'null',
+            }],
         },
         'dest_human_sensor_id': {
-            'type': 'string',
+            'anyOf': [{
+                'type': 'string',
+            }, {
+                'type': 'null',
+            }],
         },
         'slack_webhook': {
             'type': 'string',
@@ -61,6 +85,10 @@ INSERT_SCHEMA['required'] = ['name', 'floor', 'dest_pos_x', 'dest_pos_y', 'dest_
                              'dest_led_pos_x', 'dest_led_pos_y', 'dest_human_sensor_id']
 
 
+class DuplicateKeyError(Exception):
+    pass
+
+
 class MongoMixin:
     def __init__(self):
         super().__init__()
@@ -72,6 +100,33 @@ class MongoMixin:
         else:
             client = MongoClient(url)
         self._collection = client[const.MONGODB_DATABASE][const.MONGODB_COLLECTION]
+
+    def check_duplication(self, data):
+        try:
+            if (data.get('name') is not None
+                    and self._collection.find({"name": data['name']}).count() > 0):
+                raise DuplicateKeyError(f'name({data["name"]}) is duplicate')
+            if (data.get('dest_led_id') is not None
+                    and self._collection.find({"dest_led_id": data['dest_led_id']}).count() > 0):
+                raise DuplicateKeyError(f'dest_led_id({data["dest_led_id"]}) is duplicate')
+            if (data.get('dest_human_sensor_id') is not None
+                    and self._collection.find({"dest_human_sensor_id": data['dest_human_sensor_id']}).count() > 0):
+                raise DuplicateKeyError(f'dest_human_sensor_id({data["dest_human_sensor_id"]}) is duplicate')
+            if (data.get('dest_pos_x') is not None and data.get('dest_pos_y') is not None
+                    and self._collection.find({"floor": data['floor'],
+                                               "dest_pos_x": data['dest_pos_x'],
+                                               "dest_pos_y": data['dest_pos_y']}).count() > 0):
+                raise DuplicateKeyError(f'floor({data["floor"]}) and dest_pos_x({data["dest_pos_x"]}) '
+                                        f'and dest_pos_y({data["dest_pos_y"]}) is duplicate')
+            if (data.get('dest_led_pos_x') is not None and data.get('dest_led_pos_y') is not None
+                    and self._collection.find({"floor": data['floor'],
+                                               "dest_led_pos_x": data['dest_led_pos_x'],
+                                               "dest_led_pos_y": data['dest_led_pos_y']}).count() > 0):
+                raise DuplicateKeyError(f'floor({data["floor"]}) and dest_led_pos_x({data["dest_led_pos_x"]}) '
+                                        f'and dest_led_pos_y({data["dest_led_pos_y"]}) is duplicate')
+        except DuplicateKeyError as e:
+            logger.warning(str(e))
+            raise e
 
 
 class DestinationListAPI(MongoMixin, MethodView):
@@ -129,7 +184,9 @@ class DestinationListAPI(MongoMixin, MethodView):
                 filter_dict = {'initial': True, 'floor': floor}
                 return jsonify([utils.bson2dict(r) for r in self._collection.find(filter_dict)])
 
-        filter_dict = {'initial': {'$ne': True}}
+        filter_dict = dict()
+        if 'include_initial' not in request.args or request.args['include_initial'] != 'true':
+            filter_dict = {'initial': {'$ne': True}}
         if 'filter' in request.args:
             for f in [f.strip() for f in request.args['filter'].split(',')]:
                 m = FILTER_RE.match(f)
@@ -162,9 +219,16 @@ class DestinationListAPI(MongoMixin, MethodView):
 
     def post(self):
         data = utils.validate_json(INSERT_SCHEMA)
-        oid = self._collection.insert_one(data).inserted_id
-        result = self._collection.find_one({"_id": oid})
-        return jsonify(utils.bson2dict(result))
+        try:
+            self.check_duplication(data)
+        except DuplicateKeyError as e:
+            msg = f'insert error : {str(e)}'
+            logger.warning(msg)
+            raise BadRequest(msg)
+        else:
+            oid = self._collection.insert_one(data).inserted_id
+            result = self._collection.find_one({"_id": oid})
+            return jsonify(utils.bson2dict(result))
 
 
 class DestinationDetailAPI(MongoMixin, MethodView):
@@ -185,8 +249,15 @@ class DestinationDetailAPI(MongoMixin, MethodView):
 
     def put(self, id):
         data = utils.validate_json(UPDATE_SCHEMA)
-        self._collection.update_one({"_id": ObjectId(id)}, {"$set": data})
-        return self.get(id)
+        try:
+            self.check_duplication(data)
+        except DuplicateKeyError as e:
+            msg = f'insert error : {str(e)}'
+            logger.warning(msg)
+            raise BadRequest(msg)
+        else:
+            self._collection.update_one({"_id": ObjectId(id)}, {"$set": data})
+            return self.get(id)
 
     def delete(self, id):
         self._collection.delete_one({"_id": ObjectId(id)})
