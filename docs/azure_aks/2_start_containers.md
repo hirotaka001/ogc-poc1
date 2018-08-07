@@ -547,8 +547,8 @@ cygnus    ClusterIP   10.103.255.240   <none>        5050/TCP,8081/TCP   1m
 ```bash
 mac:$ pip install wheel
 mac:$ sh ./controller/controllerlibs/build.sh
-mac:$ ls controller/controllerlibs/dist/controllerlibs-0.1.0-py3-none-any.whl
-controller/controllerlibs/dist/controllerlibs-0.1.0-py3-none-any.whl
+mac:$ ls -al controller/controllerlibs/dist/controllerlibs-0.1.0-py3-none-any.whl
+-rw-r--r--  1 nmatsui  staff  6270  8  7 16:19 controller/controllerlibs/dist/controllerlibs-0.1.0-py3-none-any.whl
 ```
 
 ## start reception service on AKS
@@ -641,11 +641,11 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 ## start ledger service on AKS
 ```bash
 mac:$ az acr login --name ogcacr
-mac:$ docker build --build-arg SERVICE_PATH="./controller/ledger" -t ${REPOSITORY}/tech-sketch/ledger:0.1.0 -f ./controller/docker/Dockerfile_etcd .
+mac:$ docker build --build-arg SERVICE_PATH="./controller/ledger" -t ${REPOSITORY}/tech-sketch/ledger:0.1.0 -f ./controller/docker/Dockerfile .
 mac:$ docker push ${REPOSITORY}/tech-sketch/ledger:0.1.0
 ```
 ```bash
-mac:$ env PEPPER_SERVICE="pepper" PEPPER_SERVICEPATH="/" PEPPER_TYPE="pepper" PEPPER_2_ID="pepper_0000000000000002" envsubst < controller/ledger.yaml | kubectl apply -f -
+mac:$ env PEPPER_SERVICE="pepper" PEPPER_SERVICEPATH="/" PEPPER_TYPE="pepper" PEPPER_2_ID="pepper_0000000000000002" ROBOT_SERVICE="robot" ROBOT_SERVICEPATH="/" ROBOT_TYPE="guide_robot" ROBOT_FLOOR_MAP="{\"guide_robot_0000000000000001\": 1, \"guide_robot_0000000000000002\": 2}" envsubst < controller/ledger.yaml | kubectl apply -f -
 ```
 ```bash
 mac:$ kubectl get pods -l pod=ledger

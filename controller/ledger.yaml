@@ -45,6 +45,14 @@ spec:
           value: "${PEPPER_TYPE}"
         - name: PEPPER_2_ID
           value: "${PEPPER_2_ID}"
+        - name: ROBOT_SERVICE
+          value: "${ROBOT_SERVICE}"
+        - name: ROBOT_SERVICEPATH
+          value: "${ROBOT_SERVICEPATH}"
+        - name: ROBOT_TYPE
+          value: "${ROBOT_TYPE}"
+        - name: ROBOT_FLOOR_MAP
+          value: '${ROBOT_FLOOR_MAP}'
         - name: START_MOVEMENT_SERVICE
           value: "start_movement"
         - name: START_MOVEMENT_SERVICEPATH
@@ -53,8 +61,10 @@ spec:
           value: "start_movement"
         - name: START_MOVEMENT_TYPE
           value: "start_movement"
-        - name: ETCD_HOST
-          value: "etcd-cluster-client"
+        - name: MONGODB_URL
+          value: "mongodb://mongodb:27017"
+        - name: MONGODB_REPLICASET
+          value: "rs0"
         ports:
           - name: reception
             containerPort: 8888
