@@ -2,10 +2,13 @@
 import os
 import copy
 import json
+import datetime
 from urllib.parse import urljoin
 from logging import getLogger
 
 from flask import current_app
+
+import pytz
 
 import requests
 
@@ -68,6 +71,21 @@ class Orion:
         except json.JSONDecodeError:
             raise NGSIPayloadError()
 
+    def get_attrs(self, id, attrs):
+        headers = dict()
+        headers['Fiware-Service'] = self.service
+        headers['Fiware-Servicepath'] = self.service_path
+
+        url = urljoin(Orion.get_orion_get_url(), id + '/')
+        params = {
+            'attrs': attrs,
+        }
+        response = requests.get(url, headers=headers, params=params)
+        try:
+            return response.json()
+        except json.JSONDecodeError:
+            raise NGSIPayloadError()
+
     def send_cmd(self, id, type, cmd, value):
         attributes = [
             {
@@ -80,9 +98,17 @@ class Orion:
     def update_attributes(self, id, type, attributes):
         if not isinstance(attributes, list):
             raise NGSIPayloadError()
+        timestamp = datetime.datetime.now(pytz.timezone('Asia/Tokyo')).strftime('%Y-%m-%dT%H:%M:%S.%f%z')
         for attr in attributes:
             if not isinstance(attr, dict) or 'name' not in attr or 'value' not in attr:
                 raise NGSIPayloadError()
+            attr['metadatas'] = [
+                {
+                    'name': 'TimeInstant',
+                    'type': 'ISO8601',
+                    'value': timestamp,
+                }
+            ]
 
         return self.__update_context(id, type, attributes)
 
@@ -93,6 +119,7 @@ class Orion:
         headers['Content-Type'] = 'application/json'
 
         data = copy.deepcopy(ORION_PAYLOAD_TEMPLATE)
+
         data['contextElements'][0]['id'] = str(id)
         data['contextElements'][0]['isPattern'] = False
         data['contextElements'][0]['type'] = str(type)
