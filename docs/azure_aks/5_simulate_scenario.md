@@ -9,6 +9,126 @@
     * `rostopic echo /external_camera_1f_2/request`
     * `rostopic echo /external_camera_2f_1/request`
 
+
+## initialize
+1. set `r_state` of guide robot as `Waiting`
+
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v1/updateContext -d @-<<__EOS__ | jq .
+    {
+      "contextElements": [
+        {
+          "id": "guide_robot_0000000000000001",
+          "isPattern": "false",
+          "type": "guide_robot",
+          "attributes": [
+            {
+              "name": "r_state",
+              "value": "Waiting",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "destx",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "desty",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "visitor",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "updateAction": "UPDATE"
+    }
+    __EOS__
+    ```
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v1/updateContext -d @-<<__EOS__ | jq .
+    {
+      "contextElements": [
+        {
+          "id": "guide_robot_0000000000000002",
+          "isPattern": "false",
+          "type": "guide_robot",
+          "attributes": [
+            {
+              "name": "r_state",
+              "value": "Waiting",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "destx",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "desty",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "visitor",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "updateAction": "UPDATE"
+    }
+    __EOS__
+    ```
+
+
 ## reception
 1. subscribe all topics
 
@@ -133,6 +253,22 @@
           y: 10.0
         --- 
         ```
+    * update `r_state` to `Guiding` automatically
+
+        ```bash
+        mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000001/attrs/r_state/ | jq .
+        {
+          "type": "string",
+          "value": "Guiding",
+          "metadata": {
+            "TimeInstant": {
+              "type": "ISO8601",
+              "value": "2018-08-07T17:43:43.258942+0900"
+            }
+          }
+        }
+        ```
+
 1. simulate to send `welcome` cmd result from `pepper(floor 1)`
 
     ```bash
@@ -220,10 +356,20 @@
         Client mosqsub|17444-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/attrs', ... (98 bytes))
         2018-08-03T14:14:22.061180+0900|time|2018-09-08 07:06:15|r_mode|Standby|x|-10.01|y|10.02|theta|9.11
         ```
-    * nothing to do when stopping robot
+    * update `r_state` to `Suspending` automatically
 
         ```bash
-        guidance-857987f97b-krxgd guidance 2018/08/03 05:14:22 [   INFO] src.views - nothing to do when called stop-movement
+        mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000001/attrs/r_state/ | jq .
+        {
+          "type": "string",
+          "value": "Suspending",
+          "metadata": {
+            "TimeInstant": {
+              "type": "ISO8601",
+              "value": "2018-08-07T18:16:01.195449+0900"
+            }
+          }
+        }
         ```
 
 ## arrival (floor 1)
@@ -379,6 +525,21 @@
           y: 20.0
         ---
         ```
+    * update `r_state` to `Guiding` automatically
+
+        ```bash
+        mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000002/attrs/r_state/ | jq .
+        {
+          "type": "string",
+          "value": "Guiding",
+          "metadata": {
+            "TimeInstant": {
+              "type": "ISO8601",
+              "value": "2018-08-07T21:07:57.548785+0900"
+            }
+          }
+        }
+        ```
 1. simulate to send `facedetect` cmd result from `pepper(floor 2)`
 
     ```bash
@@ -467,10 +628,20 @@
         Client mosqsub|17444-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/attrs', ... (96 bytes))
         2018-08-03T14:26:23.306219+0900|time|2018-10-09 08:07:16|r_mode|Standby|x|20.0|y|20.2|theta|19.5
         ```
-    * nothing to do when stopping robot
+    * update `r_state` to `Suspending` automatically
 
         ```bash
-        guidance-857987f97b-6qr57 guidance 2018/08/03 05:26:23 [   INFO] src.views - nothing to do when called stop-movement
+        mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000002/attrs/r_state/ | jq .
+        {
+          "type": "string",
+          "value": "Suspending",
+          "metadata": {
+            "TimeInstant": {
+              "type": "ISO8601",
+              "value": "2018-08-07T21:13:01.904062+0900"
+            }
+          }
+        }
         ```
 
 ## arrival (floor 2)

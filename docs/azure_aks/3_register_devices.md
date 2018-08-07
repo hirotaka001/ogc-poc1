@@ -954,6 +954,18 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
         }, {
           "name": "theta",
           "type": "float"
+        }, {
+          "name": "r_state",
+          "type": "string"
+        }, {
+          "name": "destx",
+          "type": "float"
+        }, {
+          "name": "desty",
+          "type": "float"
+        }, {
+          "name": "visitor",
+          "type": "string"
         }
       ],
       "commands": [
@@ -994,6 +1006,18 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
         }, {
           "name": "theta",
           "type": "float"
+        }, {
+          "name": "r_state",
+          "type": "string"
+        }, {
+          "name": "destx",
+          "type": "float"
+        }, {
+          "name": "desty",
+          "type": "float"
+        }, {
+          "name": "visitor",
+          "type": "string"
         }
       ],
       "commands": [
@@ -1042,6 +1066,26 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "object_id": "theta",
       "name": "theta",
       "type": "float"
+    },
+    {
+      "object_id": "r_state",
+      "name": "r_state",
+      "type": "string"
+    },
+    {
+      "object_id": "destx",
+      "name": "destx",
+      "type": "float"
+    },
+    {
+      "object_id": "desty",
+      "name": "desty",
+      "type": "float"
+    },
+    {
+      "object_id": "visitor",
+      "name": "visitor",
+      "type": "string"
     }
   ],
   "lazy": [],
@@ -1066,7 +1110,22 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "value": " ",
     "metadata": {}
   },
+  "destx": {
+    "type": "float",
+    "value": " ",
+    "metadata": {}
+  },
+  "desty": {
+    "type": "float",
+    "value": " ",
+    "metadata": {}
+  },
   "r_mode": {
+    "type": "string",
+    "value": " ",
+    "metadata": {}
+  },
+  "r_state": {
     "type": "string",
     "value": " ",
     "metadata": {}
@@ -1087,6 +1146,11 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "metadata": {}
   },
   "time": {
+    "type": "string",
+    "value": " ",
+    "metadata": {}
+  },
+  "visitor": {
     "type": "string",
     "value": " ",
     "metadata": {}
@@ -1126,7 +1190,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "attributes": [
         {
           "name": "robot_request",
-          "value": "r_cmd|Navi|pos.x|123.4|pos.y|-987.6"
+          "value": "r_cmd|Navi|x|123.4|y|-987.6"
         }
       ]
     }
@@ -1148,10 +1212,25 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
   "type": "guide_robot",
   "TimeInstant": {
     "type": "ISO8601",
-    "value": "2018-08-01T02:21:08.00Z",
+    "value": "2018-08-07T04:45:05.00Z",
+    "metadata": {}
+  },
+  "destx": {
+    "type": "float",
+    "value": " ",
+    "metadata": {}
+  },
+  "desty": {
+    "type": "float",
+    "value": " ",
     "metadata": {}
   },
   "r_mode": {
+    "type": "string",
+    "value": " ",
+    "metadata": {}
+  },
+  "r_state": {
     "type": "string",
     "value": " ",
     "metadata": {}
@@ -1167,7 +1246,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-08-01T02:21:08.148Z"
+        "value": "2018-08-07T04:45:05.573Z"
       }
     }
   },
@@ -1177,6 +1256,11 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "metadata": {}
   },
   "time": {
+    "type": "string",
+    "value": " ",
+    "metadata": {}
+  },
+  "visitor": {
     "type": "string",
     "value": " ",
     "metadata": {}
@@ -1199,7 +1283,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 ```
 ```bash
-mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /guide_robot/guide_robot_0000000000000001/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000001@robot_request|result,success/time,2018-08-01 11:21:07/r_cmd,Navi/pos.x,123.4/pos.y,-987.6"
+mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /guide_robot/guide_robot_0000000000000001/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000001@robot_request|result,success/time,2018-08-01 11:21:07/r_cmd,Navi/x,123.4/y,-987.6"
 Client mosqpub|80036-Nobuyukin sending CONNECT
 Client mosqpub|80036-Nobuyukin received CONNACK
 Client mosqpub|80036-Nobuyukin sending PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/cmdexe', ... (118 bytes))
@@ -1218,7 +1302,17 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
   "type": "guide_robot",
   "TimeInstant": {
     "type": "ISO8601",
-    "value": "2018-08-01T02:21:08.00Z",
+    "value": "2018-08-07T04:46:48.00Z",
+    "metadata": {}
+  },
+  "destx": {
+    "type": "float",
+    "value": " ",
+    "metadata": {}
+  },
+  "desty": {
+    "type": "float",
+    "value": " ",
     "metadata": {}
   },
   "r_mode": {
@@ -1226,13 +1320,18 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "value": " ",
     "metadata": {}
   },
+  "r_state": {
+    "type": "string",
+    "value": " ",
+    "metadata": {}
+  },
   "robot_request_info": {
     "type": "commandResult",
-    "value": "result,success/time,2018-08-01 11:21:07/r_cmd,Navi/pos.x,123.4/pos.y,-987.6",
+    "value": "result,success/time,2018-08-01 11:21:07/r_cmd,Navi/x,123.4/y,-987.6",
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-08-01T02:21:08.148Z"
+        "value": "2018-08-07T04:46:48.190Z"
       }
     }
   },
@@ -1242,7 +1341,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-08-01T02:21:08.148Z"
+        "value": "2018-08-07T04:46:48.190Z"
       }
     }
   },
@@ -1252,6 +1351,11 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "metadata": {}
   },
   "time": {
+    "type": "string",
+    "value": " ",
+    "metadata": {}
+  },
+  "visitor": {
     "type": "string",
     "value": " ",
     "metadata": {}
@@ -1278,6 +1382,166 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 
 ## test ROBOT attribute
 ```bash
+mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v1/updateContext -d @-<<__EOS__ | jq .
+{
+  "contextElements": [
+    {
+      "id": "guide_robot_0000000000000001",
+      "isPattern": "false",
+      "type": "guide_robot",
+      "attributes": [
+        {
+          "name": "r_state",
+          "value": "Guiding",
+          "metadatas": [
+            {
+              "name": "TimeInstant",
+              "type": "ISO8601",
+              "value": "${d}"
+            }
+          ]
+        }, {
+          "name": "destx",
+          "value": "20.0",
+          "metadatas": [
+            {
+              "name": "TimeInstant",
+              "type": "ISO8601",
+              "value": "${d}"
+            }
+          ]
+        }, {
+          "name": "desty",
+          "value": "-10.8",
+          "metadatas": [
+            {
+              "name": "TimeInstant",
+              "type": "ISO8601",
+              "value": "${d}"
+            }
+          ]
+        }, {
+          "name": "visitor",
+          "value": "bxA21JOPcNhyQr0YqylCaqXV",
+          "metadatas": [
+            {
+              "name": "TimeInstant",
+              "type": "ISO8601",
+              "value": "${d}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "updateAction": "UPDATE"
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000001/ | jq .
+{
+  "id": "guide_robot_0000000000000001",
+  "type": "guide_robot",
+  "TimeInstant": {
+    "type": "ISO8601",
+    "value": "2018-08-07T04:46:48.00Z",
+    "metadata": {}
+  },
+  "destx": {
+    "type": "float",
+    "value": "20.0",
+    "metadata": {
+      "TimeInstant": {
+        "type": "ISO8601",
+        "value": "2018-08-07T14:02:31.1533618151+0900"
+      }
+    }
+  },
+  "desty": {
+    "type": "float",
+    "value": "-10.8",
+    "metadata": {
+      "TimeInstant": {
+        "type": "ISO8601",
+        "value": "2018-08-07T14:02:31.1533618151+0900"
+      }
+    }
+  },
+  "r_mode": {
+    "type": "string",
+    "value": " ",
+    "metadata": {}
+  },
+  "r_state": {
+    "type": "string",
+    "value": "Guiding",
+    "metadata": {
+      "TimeInstant": {
+        "type": "ISO8601",
+        "value": "2018-08-07T14:02:31.1533618151+0900"
+      }
+    }
+  },
+  "robot_request_info": {
+    "type": "commandResult",
+    "value": "result,success/time,2018-08-01 11:21:07/r_cmd,Navi/x,123.4/y,-987.6",
+    "metadata": {
+      "TimeInstant": {
+        "type": "ISO8601",
+        "value": "2018-08-07T04:46:48.190Z"
+      }
+    }
+  },
+  "robot_request_status": {
+    "type": "commandStatus",
+    "value": "OK",
+    "metadata": {
+      "TimeInstant": {
+        "type": "ISO8601",
+        "value": "2018-08-07T04:46:48.190Z"
+      }
+    }
+  },
+  "theta": {
+    "type": "float",
+    "value": " ",
+    "metadata": {}
+  },
+  "time": {
+    "type": "string",
+    "value": " ",
+    "metadata": {}
+  },
+  "visitor": {
+    "type": "string",
+    "value": "bxA21JOPcNhyQr0YqylCaqXV",
+    "metadata": {
+      "TimeInstant": {
+        "type": "ISO8601",
+        "value": "2018-08-07T14:02:31.1533618151+0900"
+      }
+    }
+  },
+  "x": {
+    "type": "float",
+    "value": " ",
+    "metadata": {}
+  },
+  "y": {
+    "type": "float",
+    "value": " ",
+    "metadata": {}
+  },
+  "robot_request": {
+    "type": "string",
+    "value": "",
+    "metadata": {}
+  }
+}
+```
+
+```bash
 mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
 ```
 ```bash
@@ -1290,8 +1554,8 @@ Client mosqpub|80236-Nobuyukin sending DISCONNECT
 ```bash
 mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
 ...
-Client mosqsub|15957-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/attrs', ... (90 bytes))
-2018-08-01T11:28:39.949474+0900|time|2018-09-08 07:06:05|r_mode|Navi|x|0.1|y|0.2|theta|0.3
+Client mosqsub|90377-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/attrs', ... (94 bytes))
+2018-08-07T14:06:50.1533618410+0900|time|2018-09-08 07:06:05|r_mode|Navi|x|0.1|y|0.2|theta|0.3
 ```
 ```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000001/ | jq .
@@ -1300,8 +1564,28 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
   "type": "guide_robot",
   "TimeInstant": {
     "type": "ISO8601",
-    "value": "2018-08-01T11:28:39.949474+0900",
+    "value": "2018-08-07T14:06:50.1533618410+0900",
     "metadata": {}
+  },
+  "destx": {
+    "type": "float",
+    "value": "20.0",
+    "metadata": {
+      "TimeInstant": {
+        "type": "ISO8601",
+        "value": "2018-08-07T14:02:31.1533618151+0900"
+      }
+    }
+  },
+  "desty": {
+    "type": "float",
+    "value": "-10.8",
+    "metadata": {
+      "TimeInstant": {
+        "type": "ISO8601",
+        "value": "2018-08-07T14:02:31.1533618151+0900"
+      }
+    }
   },
   "r_mode": {
     "type": "string",
@@ -1309,17 +1593,27 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-08-01T11:28:39.949474+0900"
+        "value": "2018-08-07T14:06:50.1533618410+0900"
+      }
+    }
+  },
+  "r_state": {
+    "type": "string",
+    "value": "Guiding",
+    "metadata": {
+      "TimeInstant": {
+        "type": "ISO8601",
+        "value": "2018-08-07T14:02:31.1533618151+0900"
       }
     }
   },
   "robot_request_info": {
     "type": "commandResult",
-    "value": "result,success/time,2018-08-01 11:21:07/r_cmd,Navi/pos.x,123.4/pos.y,-987.6",
+    "value": "result,success/time,2018-08-01 11:21:07/r_cmd,Navi/x,123.4/y,-987.6",
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-08-01T02:21:08.148Z"
+        "value": "2018-08-07T04:46:48.190Z"
       }
     }
   },
@@ -1329,7 +1623,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-08-01T02:21:08.148Z"
+        "value": "2018-08-07T04:46:48.190Z"
       }
     }
   },
@@ -1339,7 +1633,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-08-01T11:28:39.949474+0900"
+        "value": "2018-08-07T14:06:50.1533618410+0900"
       }
     }
   },
@@ -1349,7 +1643,17 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-08-01T11:28:39.949474+0900"
+        "value": "2018-08-07T14:06:50.1533618410+0900"
+      }
+    }
+  },
+  "visitor": {
+    "type": "string",
+    "value": "bxA21JOPcNhyQr0YqylCaqXV",
+    "metadata": {
+      "TimeInstant": {
+        "type": "ISO8601",
+        "value": "2018-08-07T14:02:31.1533618151+0900"
       }
     }
   },
@@ -1359,7 +1663,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-08-01T11:28:39.949474+0900"
+        "value": "2018-08-07T14:06:50.1533618410+0900"
       }
     }
   },
@@ -1369,7 +1673,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "metadata": {
       "TimeInstant": {
         "type": "ISO8601",
-        "value": "2018-08-01T11:28:39.949474+0900"
+        "value": "2018-08-07T14:06:50.1533618410+0900"
       }
     }
   },
