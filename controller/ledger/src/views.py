@@ -281,13 +281,55 @@ class DetectVisitorAPI(MongoMixin, MethodView):
         return result
 
 
-class ReaskDestinationAPI(MethodView):
+class ReaskDestinationAPI(MongoMixin, MethodView):
     NAME = 'reask-destination'
+
+    def __init__(self):
+        super().__init__()
 
     def post(self):
         content = request.data.decode('utf-8')
         logger.info(f'request content={content}')
 
-        result = {'result': 'failure'}
+        try:
+            dest = get_attr_value(content, 'dest')
+            timestamp = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
 
-        return jsonify(result)
+            data = {
+                'status': 'reask',
+                'face': None,
+                'faceIds': [],
+                'dest': Destination().get_destination_by_name(dest),
+                'reaskDatetime': timestamp,
+            }
+            logger.info(f'record reask, data={data}')
+            oid = self._collection.insert_one(data).inserted_id
+            result = self._collection.find_one({"_id": oid})
+
+            dest_name = data['dest'].get(DEST_NAME)
+            try:
+                dest_floor = int(data['dest'].get(DEST_FLOOR))
+            except (TypeError, ValueError):
+                raise DestinationFormatError('dest_floor is invalid')
+
+            if dest_floor == 2:
+                logger.info(f'call start-movement to guide_robot, dest_name={dest_name}, floor={dest_floor}')
+                notify_start_movement(os.environ.get(const.START_MOVEMENT_SERVICE, ''),
+                                      os.environ.get(const.START_MOVEMENT_SERVICEPATH, ''),
+                                      os.environ.get(const.START_MOVEMENT_ID, ''),
+                                      os.environ.get(const.START_MOVEMENT_TYPE, ''),
+                                      data['dest'], str(oid))
+            else:
+                logger.info(f'nothing to do, dest_name={dest_name}, floor={dest_floor}')
+
+        except AttrDoesNotExist as e:
+            logger.error(f'AttrDoesNotExist: {str(e)}')
+            raise BadRequest(str(e))
+        except NGSIPayloadError as e:
+            logger.error(f'NGSIPayloadError: {str(e)}')
+            raise BadRequest(str(e))
+        except Exception as e:
+            logger.exception(e)
+            raise e
+
+        return jsonify(utils.bson2dict(result))
