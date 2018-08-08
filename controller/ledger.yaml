@@ -65,6 +65,17 @@ spec:
           value: "mongodb://mongodb:27017"
         - name: MONGODB_REPLICASET
           value: "rs0"
+        - name: FACE_API_KEY
+          value: "${FACE_API_KEY}"
+        - name: FACE_API_BASEURL
+          value: "${FACE_API_BASEURL}"
         ports:
           - name: reception
             containerPort: 8888
+        volumeMounts:
+        - mountPath: "/shared/faces"
+          name: shared-storage-claim
+      volumes:
+        - name: shared-storage-claim
+          persistentVolumeClaim:
+            claimName: face-upload-shared-storage
