@@ -234,7 +234,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
           "name": "facedetect",
           "type": "string"
         }, {
-          "name": "retry",
+          "name": "reask",
           "type": "string"
         }
       ],
@@ -274,7 +274,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
           "name": "facedetect",
           "type": "string"
         }, {
-          "name": "retry",
+          "name": "reask",
           "type": "string"
         }
       ],
@@ -326,8 +326,8 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
           "type": "string"
         },
         {
-          "object_id": "retry",
-          "name": "retry",
+          "object_id": "reask",
+          "name": "reask",
           "type": "string"
         }
       ],
@@ -371,8 +371,8 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
           "type": "string"
         },
         {
-          "object_id": "retry",
-          "name": "retry",
+          "object_id": "reask",
+          "name": "reask",
           "type": "string"
         }
       ],
@@ -423,12 +423,12 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "value": "UNKNOWN",
       "metadata": {}
     },
-    "retry_info": {
+    "reask_info": {
       "type": "commandResult",
       "value": " ",
       "metadata": {}
     },
-    "retry_status": {
+    "reask_status": {
       "type": "commandStatus",
       "value": "UNKNOWN",
       "metadata": {}
@@ -458,7 +458,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "value": "",
       "metadata": {}
     },
-    "retry": {
+    "reask": {
       "type": "string",
       "value": "",
       "metadata": {}
@@ -502,12 +502,12 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "value": "UNKNOWN",
       "metadata": {}
     },
-    "retry_info": {
+    "reask_info": {
       "type": "commandResult",
       "value": " ",
       "metadata": {}
     },
-    "retry_status": {
+    "reask_status": {
       "type": "commandStatus",
       "value": "UNKNOWN",
       "metadata": {}
@@ -537,7 +537,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "value": "",
       "metadata": {}
     },
-    "retry": {
+    "reask": {
       "type": "string",
       "value": "",
       "metadata": {}
@@ -616,12 +616,12 @@ $ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -
     "value": "UNKNOWN",
     "metadata": {}
   },
-  "retry_info": {
+  "reask_info": {
     "type": "commandResult",
     "value": " ",
     "metadata": {}
   },
-  "retry_status": {
+  "reask_status": {
     "type": "commandStatus",
     "value": "UNKNOWN",
     "metadata": {}
@@ -656,7 +656,7 @@ $ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -
     "value": "",
     "metadata": {}
   },
-  "retry": {
+  "reask": {
     "type": "string",
     "value": "",
     "metadata": {}
@@ -716,12 +716,12 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "value": "UNKNOWN",
     "metadata": {}
   },
-  "retry_info": {
+  "reask_info": {
     "type": "commandResult",
     "value": " ",
     "metadata": {}
   },
-  "retry_status": {
+  "reask_status": {
     "type": "commandStatus",
     "value": "UNKNOWN",
     "metadata": {}
@@ -761,7 +761,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "value": "",
     "metadata": {}
   },
-  "retry": {
+  "reask": {
     "type": "string",
     "value": "",
     "metadata": {}
@@ -836,12 +836,12 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "value": "UNKNOWN",
     "metadata": {}
   },
-  "retry_info": {
+  "reask_info": {
     "type": "commandResult",
     "value": " ",
     "metadata": {}
   },
-  "retry_status": {
+  "reask_status": {
     "type": "commandStatus",
     "value": "UNKNOWN",
     "metadata": {}
@@ -881,7 +881,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "value": "",
     "metadata": {}
   },
-  "retry": {
+  "reask": {
     "type": "string",
     "value": "",
     "metadata": {}
