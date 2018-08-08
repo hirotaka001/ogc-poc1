@@ -11,7 +11,6 @@ from src import slack, const
 from controllerlibs import DEST_NAME, DEST_FLOOR
 from controllerlibs.services.orion import Orion, get_attr_value, NGSIPayloadError, AttrDoesNotExist
 from controllerlibs.services.destination import Destination, DestinationDoesNotExist, DestinationFormatError
-from controllerlibs.utils.start_movement import notify_start_movement
 
 logger = getLogger(__name__)
 
@@ -82,14 +81,7 @@ class FinishReceptionAPI(MethodView):
             if const.SLACK_WEBHOOK in dest:
                 slack.send_message_to_slack(dest[const.SLACK_WEBHOOK], dest_name)
 
-            if dest_floor == 1:
-                logger.info(f'call start-movement to guide_robot, dest_name={dest_name}, floor={dest_floor}')
-                notify_start_movement(os.environ.get(const.START_MOVEMENT_SERVICE, ''),
-                                      os.environ.get(const.START_MOVEMENT_SERVICEPATH, ''),
-                                      os.environ.get(const.START_MOVEMENT_ID, ''),
-                                      os.environ.get(const.START_MOVEMENT_TYPE, ''),
-                                      dest)
-            elif dest_floor == 2:
+            if dest_floor == 2:
                 logger.info(f'call facedetect to pepper({self.pepper_2_id}), dest_name={dest_name}, floor={dest_floor}')
                 self.orion.send_cmd(self.pepper_2_id, self.type, 'facedetect', 'start')
             else:

@@ -8,7 +8,7 @@ from controllerlibs.services.orion import Orion
 from controllerlibs.services.destination import DestinationFormatError
 
 
-def notify_start_movement(service, service_path, id, type, dest):
+def notify_start_movement(service, service_path, id, type, dest, visitor_id):
     dest_pos_x = dest.get(DEST_POS_X)
     dest_pos_y = dest.get(DEST_POS_Y)
     if dest_pos_x is None or dest_pos_y is None:
@@ -34,6 +34,9 @@ def notify_start_movement(service, service_path, id, type, dest):
             }, {
                 'name': 'floor',
                 'value': floor,
+            }, {
+                'name': 'visitor_id',
+                'value': visitor_id,
             }
         ]
         Orion(service, service_path).update_attributes(id, type, attributes)

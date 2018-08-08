@@ -14,3 +14,9 @@ DEST_LED_ID = 'dest_led_id'
 DEST_FLOOR = 'floor'
 DEST_POS_X = 'dest_pos_x'
 DEST_POS_Y = 'dest_pos_y'
+
+# robot state
+WAITING = 'Waiting'
+GUIDING = 'Guiding'
+SUSPENDING = 'Suspending'
+RETURNING = 'Returning'
