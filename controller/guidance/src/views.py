@@ -258,7 +258,8 @@ class ArrivalAPI(RobotFloorMapMixin, MethodView):
                         destx = float(robot_attrs['destx']['value'])
                         desty = float(robot_attrs['desty']['value'])
                     except (TypeError, ValueError):
-                        raise DestinationFormatError('destx or desty from guide_robot entity is not a float value')
+                        destx = float('inf')
+                        desty = float('inf')
 
                     if (current_state != const.SUSPENDING
                             or destx != float(destination.get(const.DEST_POS_X))
