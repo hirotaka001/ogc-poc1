@@ -26,3 +26,9 @@ DEST_FLOOR = 'floor'
 MONGODB_DATABASE = 'ledger'
 MONGODB_COLLECTION = 'visitors'
 FACE_VERIFY_DELTA_MIN = 30
+
+# robot state
+WAITING = 'Waiting'
+GUIDING = 'Guiding'
+SUSPENDING = 'Suspending'
+RETURNING = 'Returning'

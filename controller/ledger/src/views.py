@@ -52,17 +52,23 @@ class RobotFloorMapMixin:
         return [r_id for r_id, f in self.robot_floor_map.items() if f == floor][0]
 
 
-class RecordReceptionAPI(MongoMixin, MethodView):
+class RecordReceptionAPI(RobotFloorMapMixin, MongoMixin, MethodView):
     NAME = 'record-reception'
 
     def __init__(self):
         super().__init__()
-        service = os.environ.get(const.PEPPER_SERVICE, '')
-        service_path = os.environ.get(const.PEPPER_SERVICEPATH, '')
-        self.type = os.environ.get(const.PEPPER_TYPE, '')
+        pepper_service = os.environ.get(const.PEPPER_SERVICE, '')
+        pepper_service_path = os.environ.get(const.PEPPER_SERVICEPATH, '')
+        self.pepper_type = os.environ.get(const.PEPPER_TYPE, '')
 
-        self.orion = Orion(service, service_path)
+        self.pepper_orion = Orion(pepper_service, pepper_service_path)
         self.pepper_1_id = os.environ.get(const.PEPPER_1_ID, '')
+
+        robot_service = os.environ.get(const.ROBOT_SERVICE, '')
+        robot_service_path = os.environ.get(const.ROBOT_SERVICEPATH, '')
+        self.robot_type = os.environ.get(const.ROBOT_TYPE, '')
+
+        self.robot_orion = Orion(robot_service, robot_service_path)
 
     def post(self):
         content = request.data.decode('utf-8')
@@ -89,7 +95,6 @@ class RecordReceptionAPI(MongoMixin, MethodView):
             }
             logger.info(f'record reception, data={data}')
             oid = self._collection.insert_one(data).inserted_id
-            self._collection.find_one({"_id": oid})
 
             dest_name = data['dest'].get(DEST_NAME)
             try:
@@ -97,17 +102,33 @@ class RecordReceptionAPI(MongoMixin, MethodView):
             except (TypeError, ValueError):
                 raise DestinationFormatError('dest_floor is invalid')
 
+            handover_value = dest_floor
             if dest_floor == 1:
-                logger.info(f'call start-movement to guide_robot, dest_name={dest_name}, floor={dest_floor}')
-                notify_start_movement(os.environ.get(const.START_MOVEMENT_SERVICE, ''),
-                                      os.environ.get(const.START_MOVEMENT_SERVICEPATH, ''),
-                                      os.environ.get(const.START_MOVEMENT_ID, ''),
-                                      os.environ.get(const.START_MOVEMENT_TYPE, ''),
-                                      data['dest'], str(oid))
+                robot_id = self.get_available_robot_from_floor(dest_floor)
+                current_state = self.robot_orion.get_attrs(robot_id, 'r_state')['r_state']['value'].strip()
+
+                if current_state == const.WAITING:
+                    logger.info(f'call start-movement to guide_robot, dest_name={dest_name}, floor={dest_floor}')
+                    notify_start_movement(os.environ.get(const.START_MOVEMENT_SERVICE, ''),
+                                          os.environ.get(const.START_MOVEMENT_SERVICEPATH, ''),
+                                          os.environ.get(const.START_MOVEMENT_ID, ''),
+                                          os.environ.get(const.START_MOVEMENT_TYPE, ''),
+                                          data['dest'], str(oid))
+                else:
+                    handover_value = 'busy'
+                    message = f'cannot accept command at RecordReceptionAPI, current_state={current_state}, robot_id={robot_id}'
+                    logger.warning(message)
+
+                    timestamp = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
+                    update_data = {
+                        'status': 'busy',
+                        'busyDatetime': timestamp,
+                    }
+                    self._collection.update_one({"_id": oid}, {"$set": update_data})
             else:
                 logger.info(f'nothing to do, dest_name={dest_name}, floor={dest_floor}')
 
-            message = self.orion.send_cmd(self.pepper_1_id, self.type, 'handover', dest_floor)
+            message = self.pepper_orion.send_cmd(self.pepper_1_id, self.pepper_type, 'handover', handover_value)
             result['result'] = 'success'
             result['message'] = message
         except AttrDoesNotExist as e:
@@ -115,6 +136,9 @@ class RecordReceptionAPI(MongoMixin, MethodView):
             raise BadRequest(str(e))
         except NGSIPayloadError as e:
             logger.error(f'NGSIPayloadError: {str(e)}')
+            raise BadRequest(str(e))
+        except DestinationFormatError as e:
+            logger.error(f'DestinationFormatError: {str(e)}')
             raise BadRequest(str(e))
         except Exception as e:
             logger.exception(e)
@@ -128,11 +152,11 @@ class RecordArrivalAPI(RobotFloorMapMixin, MongoMixin, MethodView):
 
     def __init__(self):
         super().__init__()
-        service = os.environ.get(const.ROBOT_SERVICE, '')
-        service_path = os.environ.get(const.ROBOT_SERVICEPATH, '')
-        self.type = os.environ.get(const.ROBOT_TYPE, '')
+        robot_service = os.environ.get(const.ROBOT_SERVICE, '')
+        robot_service_path = os.environ.get(const.ROBOT_SERVICEPATH, '')
+        self.robot_type = os.environ.get(const.ROBOT_TYPE, '')
 
-        self.orion = Orion(service, service_path)
+        self.robot_orion = Orion(robot_service, robot_service_path)
 
     def post(self):
         content = request.data.decode('utf-8')
@@ -151,7 +175,7 @@ class RecordArrivalAPI(RobotFloorMapMixin, MongoMixin, MethodView):
                         raise DestinationFormatError('dest_floor is invalid')
 
                     robot_id = self.get_available_robot_from_floor(floor)
-                    visitor_id = self.orion.get_attrs(robot_id, 'visitor')['visitor']['value'].strip()
+                    visitor_id = self.robot_orion.get_attrs(robot_id, 'visitor')['visitor']['value'].strip()
 
                     if visitor_id:
                         timestamp = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
@@ -167,7 +191,7 @@ class RecordArrivalAPI(RobotFloorMapMixin, MongoMixin, MethodView):
                                 'value': '',
                             }
                         ]
-                        message = self.orion.update_attributes(robot_id, self.type, attributes)
+                        message = self.robot_orion.update_attributes(robot_id, self.robot_type, attributes)
                         result['result'] = 'success'
                         result['message'] = message
             logger.info(f'record arrival, id={id}, arrival={arrival}')
@@ -184,17 +208,23 @@ class RecordArrivalAPI(RobotFloorMapMixin, MongoMixin, MethodView):
         return jsonify(result)
 
 
-class DetectVisitorAPI(MongoMixin, MethodView):
+class DetectVisitorAPI(RobotFloorMapMixin, MongoMixin, MethodView):
     NAME = 'detect-visitor'
 
     def __init__(self):
         super().__init__()
-        service = os.environ.get(const.PEPPER_SERVICE, '')
-        service_path = os.environ.get(const.PEPPER_SERVICEPATH, '')
-        self.type = os.environ.get(const.PEPPER_TYPE, '')
+        pepper_service = os.environ.get(const.PEPPER_SERVICE, '')
+        pepper_service_path = os.environ.get(const.PEPPER_SERVICEPATH, '')
+        self.pepper_type = os.environ.get(const.PEPPER_TYPE, '')
 
-        self.orion = Orion(service, service_path)
+        self.pepper_orion = Orion(pepper_service, pepper_service_path)
         self.pepper_2_id = os.environ.get(const.PEPPER_2_ID, '')
+
+        robot_service = os.environ.get(const.ROBOT_SERVICE, '')
+        robot_service_path = os.environ.get(const.ROBOT_SERVICEPATH, '')
+        self.robot_type = os.environ.get(const.ROBOT_TYPE, '')
+
+        self.robot_orion = Orion(robot_service, robot_service_path)
 
     def post(self):
         content = request.data.decode('utf-8')
@@ -240,19 +270,36 @@ class DetectVisitorAPI(MongoMixin, MethodView):
             except (TypeError, ValueError):
                 raise DestinationFormatError('dest_floor is invalid')
 
+            handover_value = 'continue'
             if dest_floor == 2:
-                logger.info(f'call start-movement to guide_robot, dest_name={dest_name}, floor={dest_floor}')
-                notify_start_movement(os.environ.get(const.START_MOVEMENT_SERVICE, ''),
-                                      os.environ.get(const.START_MOVEMENT_SERVICEPATH, ''),
-                                      os.environ.get(const.START_MOVEMENT_ID, ''),
-                                      os.environ.get(const.START_MOVEMENT_TYPE, ''),
-                                      data['dest'], data['id'])
+                robot_id = self.get_available_robot_from_floor(dest_floor)
+                current_state = self.robot_orion.get_attrs(robot_id, 'r_state')['r_state']['value'].strip()
+
+                if current_state == const.WAITING:
+                    logger.info(f'call start-movement to guide_robot, dest_name={dest_name}, floor={dest_floor}')
+                    notify_start_movement(os.environ.get(const.START_MOVEMENT_SERVICE, ''),
+                                          os.environ.get(const.START_MOVEMENT_SERVICEPATH, ''),
+                                          os.environ.get(const.START_MOVEMENT_ID, ''),
+                                          os.environ.get(const.START_MOVEMENT_TYPE, ''),
+                                          data['dest'], data['id'])
+                else:
+                    handover_value = 'busy'
+                    message = f'cannot accept command at RecordReceptionAPI, current_state={current_state}, robot_id={robot_id}'
+                    logger.warning(message)
+
+                    timestamp = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
+                    update_data = {
+                        'status': 'busy',
+                        'busyDatetime': timestamp,
+                    }
+                    self._collection.update_one({"_id": ObjectId(data['id'])}, {"$set": update_data})
+
+                message = self.pepper_orion.send_cmd(self.pepper_2_id, self.pepper_type, 'handover', handover_value)
+                result['result'] = 'success'
+                result['message'] = message
             else:
                 logger.warning(f'invalid floor, dest_name={dest_name}, floor={dest_floor}')
 
-            message = self.orion.send_cmd(self.pepper_2_id, self.type, 'handover', 'continue')
-            result['result'] = 'success'
-            result['message'] = message
         except AttrDoesNotExist as e:
             logger.error(f'AttrDoesNotExist: {str(e)}')
             raise BadRequest(str(e))
@@ -273,7 +320,7 @@ class DetectVisitorAPI(MongoMixin, MethodView):
 
     def __send_reask(self):
         try:
-            message = self.orion.send_cmd(self.pepper_2_id, self.type, 'reask', 'true')
+            message = self.pepper_orion.send_cmd(self.pepper_2_id, self.pepper_type, 'reask', 'true')
             result = {
                 'result': 'success',
                 'message': message,
@@ -291,17 +338,23 @@ class DetectVisitorAPI(MongoMixin, MethodView):
         return result
 
 
-class ReaskDestinationAPI(MongoMixin, MethodView):
+class ReaskDestinationAPI(RobotFloorMapMixin, MongoMixin, MethodView):
     NAME = 'reask-destination'
 
     def __init__(self):
         super().__init__()
-        service = os.environ.get(const.PEPPER_SERVICE, '')
-        service_path = os.environ.get(const.PEPPER_SERVICEPATH, '')
-        self.type = os.environ.get(const.PEPPER_TYPE, '')
+        pepper_service = os.environ.get(const.PEPPER_SERVICE, '')
+        pepper_service_path = os.environ.get(const.PEPPER_SERVICEPATH, '')
+        self.pepper_type = os.environ.get(const.PEPPER_TYPE, '')
 
-        self.orion = Orion(service, service_path)
+        self.pepper_orion = Orion(pepper_service, pepper_service_path)
         self.pepper_2_id = os.environ.get(const.PEPPER_2_ID, '')
+
+        robot_service = os.environ.get(const.ROBOT_SERVICE, '')
+        robot_service_path = os.environ.get(const.ROBOT_SERVICEPATH, '')
+        self.robot_type = os.environ.get(const.ROBOT_TYPE, '')
+
+        self.robot_orion = Orion(robot_service, robot_service_path)
 
     def post(self):
         content = request.data.decode('utf-8')
@@ -328,19 +381,36 @@ class ReaskDestinationAPI(MongoMixin, MethodView):
             except (TypeError, ValueError):
                 raise DestinationFormatError('dest_floor is invalid')
 
+            handover_value = 'continue'
             if dest_floor == 2:
-                logger.info(f'call start-movement to guide_robot, dest_name={dest_name}, floor={dest_floor}')
-                notify_start_movement(os.environ.get(const.START_MOVEMENT_SERVICE, ''),
-                                      os.environ.get(const.START_MOVEMENT_SERVICEPATH, ''),
-                                      os.environ.get(const.START_MOVEMENT_ID, ''),
-                                      os.environ.get(const.START_MOVEMENT_TYPE, ''),
-                                      data['dest'], str(oid))
+                robot_id = self.get_available_robot_from_floor(dest_floor)
+                current_state = self.robot_orion.get_attrs(robot_id, 'r_state')['r_state']['value'].strip()
+
+                if current_state == const.WAITING:
+                    logger.info(f'call start-movement to guide_robot, dest_name={dest_name}, floor={dest_floor}')
+                    notify_start_movement(os.environ.get(const.START_MOVEMENT_SERVICE, ''),
+                                          os.environ.get(const.START_MOVEMENT_SERVICEPATH, ''),
+                                          os.environ.get(const.START_MOVEMENT_ID, ''),
+                                          os.environ.get(const.START_MOVEMENT_TYPE, ''),
+                                          data['dest'], str(oid))
+                else:
+                    handover_value = 'busy'
+                    message = f'cannot accept command at RecordReceptionAPI, current_state={current_state}, robot_id={robot_id}'
+                    logger.warning(message)
+
+                    timestamp = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
+                    update_data = {
+                        'status': 'busy',
+                        'busyDatetime': timestamp,
+                    }
+                    self._collection.update_one({"_id": oid}, {"$set": update_data})
+
+                message = self.pepper_orion.send_cmd(self.pepper_2_id, self.pepper_type, 'handover', handover_value)
+                result['result'] = 'success'
+                result['message'] = message
             else:
                 logger.info(f'nothing to do, dest_name={dest_name}, floor={dest_floor}')
 
-            message = self.orion.send_cmd(self.pepper_2_id, self.type, 'handover', 'continue')
-            result['result'] = 'success'
-            result['message'] = message
         except AttrDoesNotExist as e:
             logger.error(f'AttrDoesNotExist: {str(e)}')
             raise BadRequest(str(e))

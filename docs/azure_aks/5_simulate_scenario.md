@@ -883,6 +883,7 @@
         ---
         ```
     * update `r_state` to `Returning` automatically
+
         ```bash
         mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000002/attrs/r_state/ | jq .
         {
@@ -1341,7 +1342,67 @@
         { "_id" : ObjectId("5b63e9f2f8a94e000a6eb165"), "recvTime" : ISODate("2018-08-03T05:36:48.863Z"), "attrName" : "time", "attrType" : "string", "attrValue" : "2018-02-03 04:25:26" }
         ```
 
-## face verify failure: guidancee (floor 2)
+## face verify failure: initialize robot
+1. set `r_state` of guide robot as `Waiting`
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v1/updateContext -d @-<<__EOS__ | jq .
+    {
+      "contextElements": [
+        {
+          "id": "guide_robot_0000000000000002",
+          "isPattern": "false",
+          "type": "guide_robot",
+          "attributes": [
+            {
+              "name": "r_state",
+              "value": "Waiting",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "destx",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "desty",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "visitor",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "updateAction": "UPDATE"
+    }
+    __EOS__
+    ```
+
+## face verify failure: guidance (floor 2)
 1. simulate to be called `/storage/faces/` REST API by pepper(floor 1)
 
     ```bash
@@ -1430,7 +1491,6 @@
     Client mosqpub|97057-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000002/attrs', ... (76 bytes))
     Client mosqpub|97057-Nobuyukin sending DISCONNECT
     ```
-
     * send `reask` command to `pepper(floor 2)`
 
         ```bash
@@ -1616,3 +1676,1799 @@
     Client mosqpub|48779-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000002/cmdexe', ... (40 bytes))
     Client mosqpub|48779-Nobuyukin sending DISCONNECT
     ```
+
+## face verify failure: clean robot
+1. set `r_state` of guide robot as `Waiting`
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v1/updateContext -d @-<<__EOS__ | jq .
+    {
+      "contextElements": [
+        {
+          "id": "guide_robot_0000000000000002",
+          "isPattern": "false",
+          "type": "guide_robot",
+          "attributes": [
+            {
+              "name": "r_state",
+              "value": "Waiting",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "destx",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "desty",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "visitor",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "updateAction": "UPDATE"
+    }
+    __EOS__
+    ```
+
+## robot busy (floor 1): initialize robot
+1. set `r_state` of guide robot as `Waiting`
+
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v1/updateContext -d @-<<__EOS__ | jq .
+    {
+      "contextElements": [
+        {
+          "id": "guide_robot_0000000000000001",
+          "isPattern": "false",
+          "type": "guide_robot",
+          "attributes": [
+            {
+              "name": "r_state",
+              "value": "Waiting",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "destx",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "desty",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "visitor",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "updateAction": "UPDATE"
+    }
+    __EOS__
+    ```
+
+## robot busy (floor 1): guidance a visitor
+1. simulate to finish reception (floor 1)
+
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000001/attrs -u iotagent -P XXXXXXXX -m "$d|face|null|dest|管理センター"
+    Client mosqpub|37117-Nobuyukin sending CONNECT
+    Client mosqpub|37117-Nobuyukin received CONNACK
+    Client mosqpub|37117-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/attrs', ... (100 bytes))
+    Client mosqpub|37117-Nobuyukin sending DISCONNECT
+    ```
+    * send `handover` command to `pepper(floor 1)` and `robot_request` command to `guide_robot` automatically
+
+        ```bash
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/attrs', ... (69 bytes))
+        2018-08-09T17:36:39.1533803799+0900|face|null|dest|管理センター
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/cmd', ... (34 bytes))
+        pepper_0000000000000001@handover|1
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/cmd', ... (68 bytes))
+        guide_robot_0000000000000001@robot_request|r_cmd|Navi|x|-10.0|y|10.0
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/cmdexe', ... (108 bytes))
+        guide_robot_0000000000000001@robot_request|result,success/time,2018-08-09 17:36:40/r_cmd,Navi/x,-10.0/y,10.0
+        ```
+    * update `r_state` to `Guiding` automatically
+
+        ```bash
+        mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000001/attrs/r_state/ | jq .
+        {
+          "type": "string",
+          "value": "Guiding",
+          "metadata": {
+            "TimeInstant": {
+              "type": "ISO8601",
+              "value": "2018-08-09T17:36:39.984954+0900"
+            }
+          }
+        }
+        ```
+    * set `visitor` automatically
+
+        ```bash
+        mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000001/attrs/visitor/ | jq .
+        {
+          "type": "string",
+          "value": "5b6bfd1733d92500132faa80",
+          "metadata": {
+            "TimeInstant": {
+              "type": "ISO8601",
+              "value": "2018-08-09T17:36:39.984954+0900"
+            }
+          }
+        }
+        ```
+    * record ledger automatically
+
+        ```bash
+        mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(1).pretty()'
+        MongoDB shell version v3.6.5
+        connecting to: mongodb://127.0.0.1:27017/ledger
+        MongoDB server version: 3.6.5
+        {
+          "_id" : ObjectId("5b6bfd1733d92500132faa80"),
+          "status" : "reception",
+          "face" : null,
+          "faceIds" : [ ],
+          "dest" : {
+            "dest_human_sensor_id" : "dest_human_sensor_0000000000000001",
+            "dest_led_id" : "dest_led_0000000000000001",
+            "dest_led_pos_x" : -9,
+            "dest_led_pos_y" : 9,
+            "dest_pos_x" : -10,
+            "dest_pos_y" : 10,
+            "floor" : 1,
+            "id" : "5b63d66d7597100013d0b2a7",
+            "name" : "管理センター"
+          },
+          "receptionDatetime" : ISODate("2018-08-09T08:36:39.864Z")
+        }
+        ```
+1. simulate to send `welcome` cmd result from `pepper(floor 1)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000001/cmdexe -u iotagent -P XXXXXXXX -m "pepper_0000000000000001@welcome|success"
+    Client mosqpub|22365-Nobuyukin sending CONNECT
+    Client mosqpub|22365-Nobuyukin received CONNACK
+    Client mosqpub|22365-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/cmdexe', ... (39 bytes))
+    Client mosqpub|22365-Nobuyukin sending DISCONNECT
+    ```
+1. simulate to send `handover` cmd result from `pepper(floor 1)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000001/cmdexe -u iotagent -P XXXXXXXX -m "pepper_0000000000000001@handover|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/cmdexe', ... (40 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
+
+## robot busy (floor 1): guidance another visitor while guiding previous visitor
+1. simulate to finish reception (floor 1)
+
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000001/attrs -u iotagent -P XXXXXXXX -m "$d|face|null|dest|管理センター"
+    Client mosqpub|37117-Nobuyukin sending CONNECT
+    Client mosqpub|37117-Nobuyukin received CONNACK
+    Client mosqpub|37117-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/attrs', ... (100 bytes))
+    Client mosqpub|37117-Nobuyukin sending DISCONNECT
+    ```
+    * send `handover|busy` command to `pepper(floor 1)` and do not send `robot_request` command
+
+        ```bash
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/attrs', ... (69 bytes))
+        2018-08-09T17:41:06.1533804066+0900|face|null|dest|管理センター
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/cmd', ... (37 bytes))
+        pepper_0000000000000001@handover|busy
+        ```
+    * do not send ros message to ros topic `/robot_1f_1/request`
+    * do not update `r_state`
+
+        ```bash
+        mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000001/attrs/r_state/ | jq .
+        {
+          "type": "string",
+          "value": "Guiding",
+          "metadata": {
+            "TimeInstant": {
+              "type": "ISO8601",
+              "value": "2018-08-09T17:36:39.984954+0900"
+            }
+          }
+        }
+        ```
+    * do not update `visitor`
+
+        ```bash
+        mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000001/attrs/visitor/ | jq .
+        {
+          "type": "string",
+          "value": "5b6bfd1733d92500132faa80",
+          "metadata": {
+            "TimeInstant": {
+              "type": "ISO8601",
+              "value": "2018-08-09T17:36:39.984954+0900"
+            }
+          }
+        }
+        ```
+    * record ledger automatically as busy state
+
+        ```bash
+        mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(2).pretty()'
+        MongoDB shell version v3.6.5
+        connecting to: mongodb://127.0.0.1:27017/ledger
+        MongoDB server version: 3.6.5
+        {
+          "_id" : ObjectId("5b6bfe2355d7fb0013c57183"),
+          "status" : "busy",
+          "face" : null,
+          "faceIds" : [ ],
+          "dest" : {
+            "dest_human_sensor_id" : "dest_human_sensor_0000000000000001",
+            "dest_led_id" : "dest_led_0000000000000001",
+            "dest_led_pos_x" : -9,
+            "dest_led_pos_y" : 9,
+            "dest_pos_x" : -10,
+            "dest_pos_y" : 10,
+            "floor" : 1,
+            "id" : "5b63d66d7597100013d0b2a7",
+            "name" : "管理センター"
+          },
+          "receptionDatetime" : ISODate("2018-08-09T08:41:07.169Z"),
+          "busyDatetime" : ISODate("2018-08-09T08:41:07.243Z")
+        }
+        {
+          "_id" : ObjectId("5b6bfd1733d92500132faa80"),
+          "status" : "reception",
+          "face" : null,
+          "faceIds" : [ ],
+          "dest" : {
+            "dest_human_sensor_id" : "dest_human_sensor_0000000000000001",
+            "dest_led_id" : "dest_led_0000000000000001",
+            "dest_led_pos_x" : -9,
+            "dest_led_pos_y" : 9,
+            "dest_pos_x" : -10,
+            "dest_pos_y" : 10,
+            "floor" : 1,
+            "id" : "5b63d66d7597100013d0b2a7",
+            "name" : "管理センター"
+          },
+          "receptionDatetime" : ISODate("2018-08-09T08:36:39.864Z")
+        }
+        ```
+
+## robot busy (floor 1): arrival previous visitor
+1. simulate to receive robot state (Standby)
+    * publish ros message to `/robot_1f_1/state`
+
+    ```bash
+    root@rosbridge:/opt/ros_ws# rostopic pub -1 /robot_1f_1/state office_guide_robot/r_state "
+    time: '2018-09-08 07:06:15'
+    r_mode: 'Standby'
+    pos:
+      x: -10.01
+      y: 10.02
+      theta: 9.1
+    "
+    ```
+    * update `r_state` to `Suspending` automatically
+
+        ```bash
+        mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000001/attrs/r_state/ | jq .
+        {
+          "type": "string",
+          "value": "Suspending",
+          "metadata": {
+            "TimeInstant": {
+              "type": "ISO8601",
+              "value": "2018-08-09T17:47:42.636688+0900"
+            }
+          }
+        }
+        ```
+1. simuate visitor arriving at the destination
+
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /dest_human_sensor/dest_human_sensor_0000000000000001/attrs -u iotagent -P XXXXXXXX -m "$d|arrival|$d"
+    Client mosqpub|65572-Nobuyukin sending CONNECT
+    Client mosqpub|65572-Nobuyukin received CONNACK
+    Client mosqpub|65572-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/dest_human_sensor/dest_human_sensor_0000000000000001/attrs', ... (79 bytes))
+    Client mosqpub|65572-Nobuyukin sending DISCONNECT
+    ```
+    * receive MQTT message and send `action|off` message to `dest_led_0000000000000001` and `robot_request` command to `guide_robot_0000000000000001` automatically
+
+        ```bash
+        mac:Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/dest_human_sensor/dest_human_sensor_0000000000000001/attrs', ... (79 bytes))
+        2018-08-09T17:48:55.1533804535+0900|arrival|2018-08-09T17:48:55.1533804535+0900
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/dest_led/dest_led_0000000000000001/cmd', ... (36 bytes))
+        dest_led_0000000000000001@action|off
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/cmd', ... (65 bytes))
+        guide_robot_0000000000000001@robot_request|r_cmd|Navi|x|0.0|y|0.0
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/cmdexe', ... (105 bytes))
+        guide_robot_0000000000000001@robot_request|result,success/time,2018-08-09 17:48:56/r_cmd,Navi/x,0.0/y,0.0
+        ```
+    * send ros message to ros topic `/robot_1f_1/request` automatically
+
+        ```bash
+        root@rosbridge:/opt/ros_ws# rostopic echo /robot_1f_1/request
+        time: "2018-08-09 17:48:56"
+        r_cmd: "Navi"
+        pos:
+          x: 0.0
+          y: 0.0
+        ---
+        ```
+    * update `r_state` to `Returning` automatically
+
+        ```bash
+        mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000001/attrs/r_state/ | jq .
+        {
+          "type": "string",
+          "value": "Returning",
+          "metadata": {
+            "TimeInstant": {
+              "type": "ISO8601",
+              "value": "2018-08-09T17:48:56.292958+0900"
+            }
+          }
+        }
+        ```
+    * record ledger automatically
+
+        ```bash
+        mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(2).pretty()'
+        MongoDB shell version v3.6.5
+        connecting to: mongodb://127.0.0.1:27017/ledger
+        MongoDB server version: 3.6.5
+        {
+          "_id" : ObjectId("5b6bfe2355d7fb0013c57183"),
+          "status" : "busy",
+          "face" : null,
+          "faceIds" : [ ],
+          "dest" : {
+            "dest_human_sensor_id" : "dest_human_sensor_0000000000000001",
+            "dest_led_id" : "dest_led_0000000000000001",
+            "dest_led_pos_x" : -9,
+            "dest_led_pos_y" : 9,
+            "dest_pos_x" : -10,
+            "dest_pos_y" : 10,
+            "floor" : 1,
+            "id" : "5b63d66d7597100013d0b2a7",
+            "name" : "管理センター"
+          },
+          "receptionDatetime" : ISODate("2018-08-09T08:41:07.169Z"),
+          "busyDatetime" : ISODate("2018-08-09T08:41:07.243Z")
+        }
+        {
+          "_id" : ObjectId("5b6bfd1733d92500132faa80"),
+          "status" : "arrival",
+          "face" : null,
+          "faceIds" : [ ],
+          "dest" : {
+            "dest_human_sensor_id" : "dest_human_sensor_0000000000000001",
+            "dest_led_id" : "dest_led_0000000000000001",
+            "dest_led_pos_x" : -9,
+            "dest_led_pos_y" : 9,
+            "dest_pos_x" : -10,
+            "dest_pos_y" : 10,
+            "floor" : 1,
+            "id" : "5b63d66d7597100013d0b2a7",
+            "name" : "管理センター"
+          },
+          "receptionDatetime" : ISODate("2018-08-09T08:36:39.864Z"),
+          "arrivalDatetime" : ISODate("2018-08-09T08:48:56.202Z")
+        }
+        ```
+
+## robot busy (floor 1): clean robot
+1. set `r_state` of guide robot as `Waiting`
+
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v1/updateContext -d @-<<__EOS__ | jq .
+    {
+      "contextElements": [
+        {
+          "id": "guide_robot_0000000000000001",
+          "isPattern": "false",
+          "type": "guide_robot",
+          "attributes": [
+            {
+              "name": "r_state",
+              "value": "Waiting",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "destx",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "desty",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "visitor",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "updateAction": "UPDATE"
+    }
+    __EOS__
+    ```
+
+## robot busy (floor 2) face detect: initialize robot
+1. set `r_state` of guide robot as `Waiting`
+
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v1/updateContext -d @-<<__EOS__ | jq .
+    {
+      "contextElements": [
+        {
+          "id": "guide_robot_0000000000000002",
+          "isPattern": "false",
+          "type": "guide_robot",
+          "attributes": [
+            {
+              "name": "r_state",
+              "value": "Waiting",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "destx",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "desty",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "visitor",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "updateAction": "UPDATE"
+    }
+    __EOS__
+    ```
+
+## robot busy (floor 2) face detect: guidance a visitor
+1. simulate to be called `/storage/faces/` REST API by pepper(floor 1)
+
+    ```bash
+    mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);export FACEPATH=$(curl -sS -H "Authorization: bearer ${TOKEN}" -H "Content-Type: multipart/form-data" https://api.tech-sketch.jp/storage/faces/ -X POST -F face=@face.jpg | jq .path -r);echo ${FACEPATH}
+    /shared/faces/5eOMQwLJSuQ0SVHb.JPEG
+    ```
+1. simulate to finish reception (floor 2)
+
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000001/attrs -u iotagent -P XXXXXXXX -m "$d|face|${FACEPATH}|dest|203号室"
+    Client mosqpub|37447-Nobuyukin sending CONNECT
+    Client mosqpub|37447-Nobuyukin received CONNACK
+    Client mosqpub|37447-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/attrs', ... (91 bytes))
+    Client mosqpub|37447-Nobuyukin sending DISCONNECT
+    ```
+    * send `handover` command to `pepper(floor 1)` and `facedetect` command to `pepper(floor 2)` automatically
+
+        ```bash
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/attrs', ... (91 bytes))
+        2018-08-09T17:57:17.1533805037+0900|face|/shared/faces/5eOMQwLJSuQ0SVHb.JPEG|dest|203号室
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/cmd', ... (40 bytes))
+        pepper_0000000000000002@facedetect|start
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/cmd', ... (34 bytes))
+        pepper_0000000000000001@handover|2
+        ```
+    * record ledger automatically
+
+        ```bash
+        mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(1).pretty()'
+        MongoDB shell version v3.6.5
+        connecting to: mongodb://127.0.0.1:27017/ledger
+        MongoDB server version: 3.6.5
+        {
+          "_id" : ObjectId("5b6c01ed55d7fb0013c57185"),
+          "status" : "reception",
+          "face" : "/shared/faces/5eOMQwLJSuQ0SVHb.JPEG",
+          "faceIds" : [
+            "4bf9d5b1-08be-46ec-8c0c-e52c09987d81"
+          ],
+          "dest" : {
+            "dest_human_sensor_id" : "dest_human_sensor_0000000000000002",
+            "dest_led_id" : "dest_led_0000000000000002",
+            "dest_led_pos_x" : 19,
+            "dest_led_pos_y" : 19,
+            "dest_pos_x" : 20,
+            "dest_pos_y" : 20,
+            "floor" : 2,
+            "id" : "5b63d672f6f8a80013b85abf",
+            "name" : "203号室"
+          },
+          "receptionDatetime" : ISODate("2018-08-09T08:57:17.305Z")
+        }
+        ```
+1. simulate to send `welcome` cmd result from `pepper(floor 1)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000001/cmdexe -u iotagent -P XXXXXXXX -m "pepper_0000000000000001@welcome|success"
+    Client mosqpub|22365-Nobuyukin sending CONNECT
+    Client mosqpub|22365-Nobuyukin received CONNACK
+    Client mosqpub|22365-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/cmdexe', ... (39 bytes))
+    Client mosqpub|22365-Nobuyukin sending DISCONNECT
+    ```
+1. simulate to send `handover` cmd result from `pepper(floor 1)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000001/cmdexe -u iotagent -P XXXXXXXX -m "pepper_0000000000000001@handover|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/cmdexe', ... (40 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
+
+## robot busy (floor 2) face detect: detect a visitor
+1. simulate to be called `/storage/faces/` REST API by pepper(floor 2)
+
+    ```bash
+    mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);export FACEPATH=$(curl -sS -H "Authorization: bearer ${TOKEN}" -H "Content-Type: multipart/form-data" https://api.tech-sketch.jp/storage/faces/ -X POST -F face=@another_face.jpg | jq .path -r);echo ${FACEPATH}
+    /shared/faces/VNDKcDCEUhFR7P7T.JPEG
+    ```
+1. simulate to detect visitor
+
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000002/attrs -u iotagent -P XXXXXXXX -m "$d|face|${FACEPATH}"
+    Client mosqpub|97057-Nobuyukin sending CONNECT
+    Client mosqpub|97057-Nobuyukin received CONNACK
+    Client mosqpub|97057-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000002/attrs', ... (76 bytes))
+    Client mosqpub|97057-Nobuyukin sending DISCONNECT
+    ```
+    * send `handover` command to `pepper(floor 2)` and `robot_request` command to `guide_robot` automatically
+
+        ```bash
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/attrs', ... (76 bytes))
+        2018-08-09T18:01:31.1533805291+0900|face|/shared/faces/VNDKcDCEUhFR7P7T.JPEG
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/cmd', ... (41 bytes))
+        pepper_0000000000000002@handover|continue
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/cmd', ... (67 bytes))
+        guide_robot_0000000000000002@robot_request|r_cmd|Navi|x|20.0|y|20.0
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/cmdexe', ... (107 bytes))
+        guide_robot_0000000000000002@robot_request|result,success/time,2018-08-09 18:01:32/r_cmd,Navi/x,20.0/y,20.0
+        ```
+    * send ros message to ros topic `/robot_2f_1/request` automatically
+
+        ```bash
+        root@rosbridge:/opt/ros_ws# rostopic echo /robot_2f_1/request
+        time: "2018-08-09 18:01:32"
+        r_cmd: "Navi"
+        pos:
+          x: 20.0
+          y: 20.0
+        ---
+        ```
+    * update `r_state` to `Guiding` automatically
+
+        ```bash
+        mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000002/attrs/r_state/ | jq .
+        {
+          "type": "string",
+          "value": "Guiding",
+          "metadata": {
+            "TimeInstant": {
+              "type": "ISO8601",
+              "value": "2018-08-09T18:01:31.981792+0900"
+            }
+          }
+        }
+        ```
+    * set `visitor` automatically
+
+        ```bash
+        mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000002/attrs/visitor/ | jq .
+        {
+          "type": "string",
+          "value": "5b6c01ed55d7fb0013c57185",
+          "metadata": {
+            "TimeInstant": {
+              "type": "ISO8601",
+              "value": "2018-08-09T18:01:31.981792+0900"
+            }
+          }
+        }
+        ```
+1. simulate to send `facedetect` cmd result from `pepper(floor 2)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000002/cmdexe -u iotagent -P XXXXXXXX -m "pepper_0000000000000002@facedetect|success"
+    Client mosqpub|48535-Nobuyukin sending CONNECT
+    Client mosqpub|48535-Nobuyukin received CONNACK
+    Client mosqpub|48535-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000002/cmdexe', ... (42 bytes))
+    Client mosqpub|48535-Nobuyukin sending DISCONNECT
+    ```
+1. simulate to send `handover` cmd result from `pepper(floor 2)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000002/cmdexe -u iotagent -P XXXXXXXX -m "pepper_0000000000000002@handover|success"
+    Client mosqpub|48779-Nobuyukin sending CONNECT
+    Client mosqpub|48779-Nobuyukin received CONNACK
+    Client mosqpub|48779-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000002/cmdexe', ... (40 bytes))
+    Client mosqpub|48779-Nobuyukin sending DISCONNECT
+    ```
+
+## robot busy (floor 2) face detect: guidance another visitor while guiding previous visitor
+1. simulate to be called `/storage/faces/` REST API by pepper(floor 1)
+
+    ```bash
+    mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);export FACEPATH=$(curl -sS -H "Authorization: bearer ${TOKEN}" -H "Content-Type: multipart/form-data" https://api.tech-sketch.jp/storage/faces/ -X POST -F face=@other_persons_face.jpg | jq .path -r);echo ${FACEPATH}
+    /shared/faces/ppRBgMmkcMXdhw36.JPEG
+    ```
+1. simulate to finish reception (floor 2)
+
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000001/attrs -u iotagent -P XXXXXXXX -m "$d|face|${FACEPATH}|dest|204号室"
+    Client mosqpub|37447-Nobuyukin sending CONNECT
+    Client mosqpub|37447-Nobuyukin received CONNACK
+    Client mosqpub|37447-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/attrs', ... (91 bytes))
+    Client mosqpub|37447-Nobuyukin sending DISCONNECT
+    ```
+    * send `handover` command to `pepper(floor 1)` and `facedetect` command to `pepper(floor 2)` automatically
+
+        ```bash
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/attrs', ... (91 bytes))
+        2018-08-09T18:08:23.1533805703+0900|face|/shared/faces/ppRBgMmkcMXdhw36.JPEG|dest|204号室
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/cmd', ... (40 bytes))
+        pepper_0000000000000002@facedetect|start
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/cmd', ... (34 bytes))
+        pepper_0000000000000001@handover|2
+        ```
+    * record ledger automatically
+
+        ```bash
+        mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(2).pretty()'
+        MongoDB shell version v3.6.5
+        connecting to: mongodb://127.0.0.1:27017/ledger
+        MongoDB server version: 3.6.5
+        {
+          "_id" : ObjectId("5b6c0488caee090013dcbf44"),
+          "status" : "reception",
+          "face" : "/shared/faces/ppRBgMmkcMXdhw36.JPEG",
+          "faceIds" : [
+            "9f071ce8-d5f9-4790-968e-a25a25d8ef1a"
+          ],
+          "dest" : {
+            "dest_human_sensor_id" : "dest_human_sensor_0000000000000003",
+            "dest_led_id" : "dest_led_0000000000000003",
+            "dest_led_pos_x" : 19,
+            "dest_led_pos_y" : -19,
+            "dest_pos_x" : 20,
+            "dest_pos_y" : -10,
+            "floor" : 2,
+            "id" : "5b63d6787597100013d0b2a9",
+            "name" : "204号室"
+          },
+          "receptionDatetime" : ISODate("2018-08-09T09:08:23.938Z")
+        }
+        {
+          "_id" : ObjectId("5b6c01ed55d7fb0013c57185"),
+          "status" : "reception",
+          "face" : "/shared/faces/5eOMQwLJSuQ0SVHb.JPEG",
+          "faceIds" : [
+            "4bf9d5b1-08be-46ec-8c0c-e52c09987d81"
+          ],
+          "dest" : {
+            "dest_human_sensor_id" : "dest_human_sensor_0000000000000002",
+            "dest_led_id" : "dest_led_0000000000000002",
+            "dest_led_pos_x" : 19,
+            "dest_led_pos_y" : 19,
+            "dest_pos_x" : 20,
+            "dest_pos_y" : 20,
+            "floor" : 2,
+            "id" : "5b63d672f6f8a80013b85abf",
+            "name" : "203号室"
+          },
+          "receptionDatetime" : ISODate("2018-08-09T08:57:17.305Z")
+        }
+        ```
+1. simulate to send `welcome` cmd result from `pepper(floor 1)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000001/cmdexe -u iotagent -P XXXXXXXX -m "pepper_0000000000000001@welcome|success"
+    Client mosqpub|22365-Nobuyukin sending CONNECT
+    Client mosqpub|22365-Nobuyukin received CONNACK
+    Client mosqpub|22365-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/cmdexe', ... (39 bytes))
+    Client mosqpub|22365-Nobuyukin sending DISCONNECT
+    ```
+1. simulate to send `handover` cmd result from `pepper(floor 1)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000001/cmdexe -u iotagent -P XXXXXXXX -m "pepper_0000000000000001@handover|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/cmdexe', ... (40 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
+
+## robot busy (floor 2) face detect: detect another visitor while guiding previous visitor
+1. simulate to be called `/storage/faces/` REST API by pepper(floor 2)
+
+    ```bash
+    mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);export FACEPATH=$(curl -sS -H "Authorization: bearer ${TOKEN}" -H "Content-Type: multipart/form-data" https://api.tech-sketch.jp/storage/faces/ -X POST -F face=@other_persons_face2.jpg | jq .path -r);echo ${FACEPATH}
+    /shared/faces/7Xhz8TdQLr7aphFI.JPEG
+    ```
+1. simulate to detect visitor
+
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000002/attrs -u iotagent -P XXXXXXXX -m "$d|face|${FACEPATH}"
+    Client mosqpub|97057-Nobuyukin sending CONNECT
+    Client mosqpub|97057-Nobuyukin received CONNACK
+    Client mosqpub|97057-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000002/attrs', ... (76 bytes))
+    Client mosqpub|97057-Nobuyukin sending DISCONNECT
+    ```
+    * send `handover|busy` command to `pepper(floor 2)` and do not send `robot_request` command to `guide_robot`
+
+        ```bash
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/attrs', ... (76 bytes))
+        2018-08-09T18:12:27.1533805947+0900|face|/shared/faces/7Xhz8TdQLr7aphFI.JPEG
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/cmd', ... (37 bytes))
+        pepper_0000000000000002@handover|busy
+        ```
+    * do not send ros message to ros topic `/robot_2f_1/request`
+    * do not update `r_state`
+
+        ```bash
+        mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000002/attrs/r_state/ | jq .
+        {
+          "type": "string",
+          "value": "Guiding",
+          "metadata": {
+            "TimeInstant": {
+              "type": "ISO8601",
+              "value": "2018-08-09T18:01:31.981792+0900"
+            }
+          }
+        }
+        ```
+    * do not update `visitor`
+
+        ```bash
+        mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000002/attrs/visitor/ | jq .
+        {
+          "type": "string",
+          "value": "5b6c01ed55d7fb0013c57185",
+          "metadata": {
+            "TimeInstant": {
+              "type": "ISO8601",
+              "value": "2018-08-09T18:01:31.981792+0900"
+            }
+          }
+        }
+        ```
+    * record ledger automatically as busy state
+
+        ```bash
+        mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(2).pretty()'
+        MongoDB shell version v3.6.5
+        connecting to: mongodb://127.0.0.1:27017/ledger
+        MongoDB server version: 3.6.5
+        {
+          "_id" : ObjectId("5b6c0488caee090013dcbf44"),
+          "status" : "busy",
+          "face" : "/shared/faces/ppRBgMmkcMXdhw36.JPEG",
+          "faceIds" : [
+            "9f071ce8-d5f9-4790-968e-a25a25d8ef1a"
+          ],
+          "dest" : {
+            "dest_human_sensor_id" : "dest_human_sensor_0000000000000003",
+            "dest_led_id" : "dest_led_0000000000000003",
+            "dest_led_pos_x" : 19,
+            "dest_led_pos_y" : -19,
+            "dest_pos_x" : 20,
+            "dest_pos_y" : -10,
+            "floor" : 2,
+            "id" : "5b63d6787597100013d0b2a9",
+            "name" : "204号室"
+          },
+          "receptionDatetime" : ISODate("2018-08-09T09:08:23.938Z"),
+          "busyDatetime" : ISODate("2018-08-09T09:12:28.015Z")
+        }
+        {
+          "_id" : ObjectId("5b6c01ed55d7fb0013c57185"),
+          "status" : "reception",
+          "face" : "/shared/faces/5eOMQwLJSuQ0SVHb.JPEG",
+          "faceIds" : [
+            "4bf9d5b1-08be-46ec-8c0c-e52c09987d81"
+          ],
+          "dest" : {
+            "dest_human_sensor_id" : "dest_human_sensor_0000000000000002",
+            "dest_led_id" : "dest_led_0000000000000002",
+            "dest_led_pos_x" : 19,
+            "dest_led_pos_y" : 19,
+            "dest_pos_x" : 20,
+            "dest_pos_y" : 20,
+            "floor" : 2,
+            "id" : "5b63d672f6f8a80013b85abf",
+            "name" : "203号室"
+          },
+          "receptionDatetime" : ISODate("2018-08-09T08:57:17.305Z")
+        }
+        ```
+
+## robot busy (floor 2) face detect: arrival previous visitor
+1. simulate to receive robot state (Standby)
+    * publish ros message to `/robot_2f_1/state`
+
+    ```bash
+    root@rosbridge:/opt/ros_ws# rostopic pub -1 /robot_2f_1/state office_guide_robot/r_state "
+    time: '2018-10-09 08:07:16'
+    r_mode: 'Standby'
+    pos:
+      x: 20.0
+      y: 20.2
+      theta: 19.5
+    "
+    ```
+    * update `r_state` to `Suspending` automatically
+
+        ```bash
+        mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000002/attrs/r_state/ | jq .
+        {
+          "type": "string",
+          "value": "Suspending",
+          "metadata": {
+            "TimeInstant": {
+              "type": "ISO8601",
+              "value": "2018-08-09T18:18:00.608256+0900"
+            }
+          }
+        }
+        ```
+1. simuate visitor arriving at the destination
+
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /dest_human_sensor/dest_human_sensor_0000000000000002/attrs -u iotagent -P XXXXXXXX -m "$d|arrival|$d"
+    Client mosqpub|65572-Nobuyukin sending CONNECT
+    Client mosqpub|65572-Nobuyukin received CONNACK
+    Client mosqpub|65572-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/dest_human_sensor/dest_human_sensor_0000000000000002/attrs', ... (79 bytes))
+    Client mosqpub|65572-Nobuyukin sending DISCONNECT
+    ```
+    * receive MQTT message and send `action|off` message to `dest_led_0000000000000002` and `robot_request` command to `guide_robot_0000000000000002` automatically
+
+        ```bash
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/dest_human_sensor/dest_human_sensor_0000000000000002/attrs', ... (79 bytes))
+        2018-08-09T18:19:10.1533806350+0900|arrival|2018-08-09T18:19:10.1533806350+0900
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/dest_led/dest_led_0000000000000002/cmd', ... (36 bytes))
+        dest_led_0000000000000002@action|off
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/cmd', ... (65 bytes))
+        guide_robot_0000000000000002@robot_request|r_cmd|Navi|x|0.0|y|0.0
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/cmdexe', ... (105 bytes))
+        guide_robot_0000000000000002@robot_request|result,success/time,2018-08-09 18:19:11/r_cmd,Navi/x,0.0/y,0.0
+        ```
+    * send ros message to ros topic `/robot_2f_1/request` automatically
+
+        ```bash
+        root@rosbridge:/opt/ros_ws# rostopic echo /robot_2f_1/request
+        time: "2018-08-09 18:19:11"
+        r_cmd: "Navi"
+        pos:
+          x: 0.0
+          y: 0.0
+        ---
+        ```
+    * update `r_state` to `Returning` automatically
+
+        ```bash
+        mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000002/attrs/r_state/ | jq .
+        {
+          "type": "string",
+          "value": "Returning",
+          "metadata": {
+            "TimeInstant": {
+              "type": "ISO8601",
+              "value": "2018-08-09T18:19:11.166233+0900"
+            }
+          }
+        }
+        ```
+    * record ledger automatically
+
+        ```bash
+        mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(2).pretty()'
+        MongoDB shell version v3.6.5
+        connecting to: mongodb://127.0.0.1:27017/ledger
+        MongoDB server version: 3.6.5
+        {
+          "_id" : ObjectId("5b6c0488caee090013dcbf44"),
+          "status" : "busy",
+          "face" : "/shared/faces/ppRBgMmkcMXdhw36.JPEG",
+          "faceIds" : [
+            "9f071ce8-d5f9-4790-968e-a25a25d8ef1a"
+          ],
+          "dest" : {
+            "dest_human_sensor_id" : "dest_human_sensor_0000000000000003",
+            "dest_led_id" : "dest_led_0000000000000003",
+            "dest_led_pos_x" : 19,
+            "dest_led_pos_y" : -19,
+            "dest_pos_x" : 20,
+            "dest_pos_y" : -10,
+            "floor" : 2,
+            "id" : "5b63d6787597100013d0b2a9",
+            "name" : "204号室"
+          },
+          "receptionDatetime" : ISODate("2018-08-09T09:08:23.938Z"),
+          "busyDatetime" : ISODate("2018-08-09T09:12:28.015Z")
+        }
+        {
+          "_id" : ObjectId("5b6c01ed55d7fb0013c57185"),
+          "status" : "arrival",
+          "face" : "/shared/faces/5eOMQwLJSuQ0SVHb.JPEG",
+          "faceIds" : [
+            "4bf9d5b1-08be-46ec-8c0c-e52c09987d81"
+          ],
+          "dest" : {
+            "dest_human_sensor_id" : "dest_human_sensor_0000000000000002",
+            "dest_led_id" : "dest_led_0000000000000002",
+            "dest_led_pos_x" : 19,
+            "dest_led_pos_y" : 19,
+            "dest_pos_x" : 20,
+            "dest_pos_y" : 20,
+            "floor" : 2,
+            "id" : "5b63d672f6f8a80013b85abf",
+            "name" : "203号室"
+          },
+          "receptionDatetime" : ISODate("2018-08-09T08:57:17.305Z"),
+          "arrivalDatetime" : ISODate("2018-08-09T09:19:11.133Z")
+        }
+        ```
+
+## robot busy (floor 2) face detect: clean robot
+1. set `r_state` of guide robot as `Waiting`
+
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v1/updateContext -d @-<<__EOS__ | jq .
+    {
+      "contextElements": [
+        {
+          "id": "guide_robot_0000000000000002",
+          "isPattern": "false",
+          "type": "guide_robot",
+          "attributes": [
+            {
+              "name": "r_state",
+              "value": "Waiting",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "destx",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "desty",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "visitor",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "updateAction": "UPDATE"
+    }
+    __EOS__
+    ```
+
+## robot busy (floor 2) face verify failure: initialize robot
+1. set `r_state` of guide robot as `Waiting`
+
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v1/updateContext -d @-<<__EOS__ | jq .
+    {
+      "contextElements": [
+        {
+          "id": "guide_robot_0000000000000002",
+          "isPattern": "false",
+          "type": "guide_robot",
+          "attributes": [
+            {
+              "name": "r_state",
+              "value": "Waiting",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "destx",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "desty",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "visitor",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "updateAction": "UPDATE"
+    }
+    __EOS__
+    ```
+
+## robot busy (floor 2) face verify failure: guidance a visitor
+1. simulate to be called `/storage/faces/` REST API by pepper(floor 1)
+
+    ```bash
+    mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);export FACEPATH=$(curl -sS -H "Authorization: bearer ${TOKEN}" -H "Content-Type: multipart/form-data" https://api.tech-sketch.jp/storage/faces/ -X POST -F face=@face.jpg | jq .path -r);echo ${FACEPATH}
+    /shared/faces/Kib1LCqLG2MLryFm.JPEG
+    ```
+1. simulate to finish reception (floor 2)
+
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000001/attrs -u iotagent -P XXXXXXXX -m "$d|face|${FACEPATH}|dest|203号室"
+    Client mosqpub|37447-Nobuyukin sending CONNECT
+    Client mosqpub|37447-Nobuyukin received CONNACK
+    Client mosqpub|37447-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/attrs', ... (91 bytes))
+    Client mosqpub|37447-Nobuyukin sending DISCONNECT
+    ```
+    * send `handover` command to `pepper(floor 1)` and `facedetect` command to `pepper(floor 2)` automatically
+
+        ```bash
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/attrs', ... (91 bytes))
+        2018-08-09T18:27:11.1533806831+0900|face|/shared/faces/Kib1LCqLG2MLryFm.JPEG|dest|203号室
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/cmd', ... (40 bytes))
+        pepper_0000000000000002@facedetect|start
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/cmd', ... (34 bytes))
+        pepper_0000000000000001@handover|2
+        ```
+    * record ledger automatically
+
+        ```bash
+        mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(1).pretty()'
+        MongoDB shell version v3.6.5
+        connecting to: mongodb://127.0.0.1:27017/ledger
+        MongoDB server version: 3.6.5
+        {
+          "_id" : ObjectId("5b6c08f0caee090013dcbf47"),
+          "status" : "reception",
+          "face" : "/shared/faces/Kib1LCqLG2MLryFm.JPEG",
+          "faceIds" : [
+            "5858e177-93a3-4aa6-9a0d-7d1b56ab9b0d"
+          ],
+          "dest" : {
+            "dest_human_sensor_id" : "dest_human_sensor_0000000000000002",
+            "dest_led_id" : "dest_led_0000000000000002",
+            "dest_led_pos_x" : 19,
+            "dest_led_pos_y" : 19,
+            "dest_pos_x" : 20,
+            "dest_pos_y" : 20,
+            "floor" : 2,
+            "id" : "5b63d672f6f8a80013b85abf",
+            "name" : "203号室"
+          },
+          "receptionDatetime" : ISODate("2018-08-09T09:27:12.176Z")
+        }
+        ```
+1. simulate to send `welcome` cmd result from `pepper(floor 1)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000001/cmdexe -u iotagent -P XXXXXXXX -m "pepper_0000000000000001@welcome|success"
+    Client mosqpub|22365-Nobuyukin sending CONNECT
+    Client mosqpub|22365-Nobuyukin received CONNACK
+    Client mosqpub|22365-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/cmdexe', ... (39 bytes))
+    Client mosqpub|22365-Nobuyukin sending DISCONNECT
+    ```
+1. simulate to send `handover` cmd result from `pepper(floor 1)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000001/cmdexe -u iotagent -P XXXXXXXX -m "pepper_0000000000000001@handover|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/cmdexe', ... (40 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
+
+## robot busy (floor 2) face verify failure: detect a visitor
+1. simulate to be called `/storage/faces/` REST API by pepper(floor 2)
+
+    ```bash
+    mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);export FACEPATH=$(curl -sS -H "Authorization: bearer ${TOKEN}" -H "Content-Type: multipart/form-data" https://api.tech-sketch.jp/storage/faces/ -X POST -F face=@another_face.jpg | jq .path -r);echo ${FACEPATH}
+    /shared/faces/FVD2pA2SxSni0pum.JPEG
+    ```
+1. simulate to detect visitor
+
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000002/attrs -u iotagent -P XXXXXXXX -m "$d|face|${FACEPATH}"
+    Client mosqpub|97057-Nobuyukin sending CONNECT
+    Client mosqpub|97057-Nobuyukin received CONNACK
+    Client mosqpub|97057-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000002/attrs', ... (76 bytes))
+    Client mosqpub|97057-Nobuyukin sending DISCONNECT
+    ```
+    * send `handover` command to `pepper(floor 2)` and `robot_request` command to `guide_robot` automatically
+
+        ```bash
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/attrs', ... (76 bytes))
+        2018-08-09T18:29:59.1533806999+0900|face|/shared/faces/FVD2pA2SxSni0pum.JPEG
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/cmd', ... (41 bytes))
+        pepper_0000000000000002@handover|continue
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/cmd', ... (67 bytes))
+        guide_robot_0000000000000002@robot_request|r_cmd|Navi|x|20.0|y|20.0
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/cmdexe', ... (107 bytes))
+        guide_robot_0000000000000002@robot_request|result,success/time,2018-08-09 18:30:00/r_cmd,Navi/x,20.0/y,20.0
+        ```
+    * send ros message to ros topic `/robot_2f_1/request` automatically
+
+        ```bash
+        root@rosbridge:/opt/ros_ws# rostopic echo /robot_2f_1/request
+        time: "2018-08-09 18:30:00"
+        r_cmd: "Navi"
+        pos:
+          x: 20.0
+          y: 20.0
+        ---
+        ```
+    * update `r_state` to `Guiding` automatically
+
+        ```bash
+        mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000002/attrs/r_state/ | jq .
+        {
+          "type": "string",
+          "value": "Guiding",
+          "metadata": {
+            "TimeInstant": {
+              "type": "ISO8601",
+              "value": "2018-08-09T18:30:00.493667+0900"
+            }
+          }
+        }
+        ```
+    * set `visitor` automatically
+
+        ```bash
+        mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000002/attrs/visitor/ | jq .
+        {
+          "type": "string",
+          "value": "5b6c08f0caee090013dcbf47",
+          "metadata": {
+            "TimeInstant": {
+              "type": "ISO8601",
+              "value": "2018-08-09T18:30:00.493667+0900"
+            }
+          }
+        }
+        ```
+1. simulate to send `facedetect` cmd result from `pepper(floor 2)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000002/cmdexe -u iotagent -P XXXXXXXX -m "pepper_0000000000000002@facedetect|success"
+    Client mosqpub|48535-Nobuyukin sending CONNECT
+    Client mosqpub|48535-Nobuyukin received CONNACK
+    Client mosqpub|48535-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000002/cmdexe', ... (42 bytes))
+    Client mosqpub|48535-Nobuyukin sending DISCONNECT
+    ```
+1. simulate to send `handover` cmd result from `pepper(floor 2)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000002/cmdexe -u iotagent -P XXXXXXXX -m "pepper_0000000000000002@handover|success"
+    Client mosqpub|48779-Nobuyukin sending CONNECT
+    Client mosqpub|48779-Nobuyukin received CONNACK
+    Client mosqpub|48779-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000002/cmdexe', ... (40 bytes))
+    Client mosqpub|48779-Nobuyukin sending DISCONNECT
+    ```
+
+## robot busy (floor 2) face verify failure: guidance another visitor while guiding previous visitor
+1. simulate to be called `/storage/faces/` REST API by pepper(floor 1)
+
+    ```bash
+    mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);export FACEPATH=$(curl -sS -H "Authorization: bearer ${TOKEN}" -H "Content-Type: multipart/form-data" https://api.tech-sketch.jp/storage/faces/ -X POST -F face=@other_persons_face.jpg | jq .path -r);echo ${FACEPATH}
+    /shared/faces/hYuXCIssiVrsYsCy.JPEG
+    ```
+1. simulate to finish reception (floor 2)
+
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000001/attrs -u iotagent -P XXXXXXXX -m "$d|face|${FACEPATH}|dest|204号室"
+    Client mosqpub|37447-Nobuyukin sending CONNECT
+    Client mosqpub|37447-Nobuyukin received CONNACK
+    Client mosqpub|37447-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/attrs', ... (91 bytes))
+    Client mosqpub|37447-Nobuyukin sending DISCONNECT
+    ```
+    * send `handover` command to `pepper(floor 1)` and `facedetect` command to `pepper(floor 2)` automatically
+
+        ```bash
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/attrs', ... (91 bytes))
+        2018-08-09T18:33:30.1533807210+0900|face|/shared/faces/hYuXCIssiVrsYsCy.JPEG|dest|204号室
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/cmd', ... (40 bytes))
+        pepper_0000000000000002@facedetect|start
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/cmd', ... (34 bytes))
+        pepper_0000000000000001@handover|2
+        ```
+    * record ledger automatically
+
+        ```bash
+        mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(2).pretty()'
+        MongoDB shell version v3.6.5
+        connecting to: mongodb://127.0.0.1:27017/ledger
+        MongoDB server version: 3.6.5
+        {
+          "_id" : ObjectId("5b6c0a6a55d7fb0013c57187"),
+          "status" : "reception",
+          "face" : "/shared/faces/hYuXCIssiVrsYsCy.JPEG",
+          "faceIds" : [
+            "e7f044c7-7fad-43ef-aee5-844f29f13e82"
+          ],
+          "dest" : {
+            "dest_human_sensor_id" : "dest_human_sensor_0000000000000003",
+            "dest_led_id" : "dest_led_0000000000000003",
+            "dest_led_pos_x" : 19,
+            "dest_led_pos_y" : -19,
+            "dest_pos_x" : 20,
+            "dest_pos_y" : -10,
+            "floor" : 2,
+            "id" : "5b63d6787597100013d0b2a9",
+            "name" : "204号室"
+          },
+          "receptionDatetime" : ISODate("2018-08-09T09:33:30.323Z")
+        }
+        {
+          "_id" : ObjectId("5b6c08f0caee090013dcbf47"),
+          "status" : "reception",
+          "face" : "/shared/faces/Kib1LCqLG2MLryFm.JPEG",
+          "faceIds" : [
+            "5858e177-93a3-4aa6-9a0d-7d1b56ab9b0d"
+          ],
+          "dest" : {
+            "dest_human_sensor_id" : "dest_human_sensor_0000000000000002",
+            "dest_led_id" : "dest_led_0000000000000002",
+            "dest_led_pos_x" : 19,
+            "dest_led_pos_y" : 19,
+            "dest_pos_x" : 20,
+            "dest_pos_y" : 20,
+            "floor" : 2,
+            "id" : "5b63d672f6f8a80013b85abf",
+            "name" : "203号室"
+          },
+          "receptionDatetime" : ISODate("2018-08-09T09:27:12.176Z")
+        }
+        ```
+1. simulate to send `welcome` cmd result from `pepper(floor 1)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000001/cmdexe -u iotagent -P XXXXXXXX -m "pepper_0000000000000001@welcome|success"
+    Client mosqpub|22365-Nobuyukin sending CONNECT
+    Client mosqpub|22365-Nobuyukin received CONNACK
+    Client mosqpub|22365-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/cmdexe', ... (39 bytes))
+    Client mosqpub|22365-Nobuyukin sending DISCONNECT
+    ```
+1. simulate to send `handover` cmd result from `pepper(floor 1)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000001/cmdexe -u iotagent -P XXXXXXXX -m "pepper_0000000000000001@handover|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/cmdexe', ... (40 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
+
+## robot busy (floor 2) face verify failure: verify failure while guiding previous visitor
+1. simulate to be called `/storage/faces/` REST API by pepper(floor 2)
+
+    ```bash
+    mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);export FACEPATH=$(curl -sS -H "Authorization: bearer ${TOKEN}" -H "Content-Type: multipart/form-data" https://api.tech-sketch.jp/storage/faces/ -X POST -F face=@nobody_face.jpg | jq .path -r);echo ${FACEPATH}
+    /shared/faces/Dxt1O4aN57M2akBJ.JPEG
+    ```
+1. simulate to detect visitor
+
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000002/attrs -u iotagent -P XXXXXXXX -m "$d|face|${FACEPATH}"
+    Client mosqpub|97057-Nobuyukin sending CONNECT
+    Client mosqpub|97057-Nobuyukin received CONNACK
+    Client mosqpub|97057-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000002/attrs', ... (76 bytes))
+    Client mosqpub|97057-Nobuyukin sending DISCONNECT
+    ```
+    * send `reask` command to `pepper(floor 2)`
+
+        ```bash
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/attrs', ... (76 bytes))
+        2018-08-09T18:39:20.1533807560+0900|face|/shared/faces/Dxt1O4aN57M2akBJ.JPEG
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/cmd', ... (34 bytes))
+        pepper_0000000000000002@reask|true
+        ```
+    * do not send ros message to ros topic `/robot_2f_1/request`
+    * do not update `r_state`
+
+        ```bash
+        mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000002/attrs/r_state/ | jq .
+        {
+          "type": "string",
+          "value": "Guiding",
+          "metadata": {
+            "TimeInstant": {
+              "type": "ISO8601",
+              "value": "2018-08-09T18:30:00.493667+0900"
+            }
+          }
+        }
+        ```
+    * do not update `visitor`
+
+        ```bash
+        mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000002/attrs/visitor/ | jq .
+        {
+          "type": "string",
+          "value": "5b6c08f0caee090013dcbf47",
+          "metadata": {
+            "TimeInstant": {
+              "type": "ISO8601",
+              "value": "2018-08-09T18:30:00.493667+0900"
+            }
+          }
+        }
+        ```
+1. simulate to send `facedetect` cmd result from `pepper(floor 2)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000002/cmdexe -u iotagent -P XXXXXXXX -m "pepper_0000000000000002@facedetect|success"
+    Client mosqpub|48535-Nobuyukin sending CONNECT
+    Client mosqpub|48535-Nobuyukin received CONNACK
+    Client mosqpub|48535-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000002/cmdexe', ... (42 bytes))
+    Client mosqpub|48535-Nobuyukin sending DISCONNECT
+    ```
+
+## robot busy (floor 2) face verify failure: reask destination while guiding previous visitor
+1. simulate to finish reasking destination
+
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000002/attrs -u iotagent -P XXXXXXXX -m "$d|dest|204号室"
+    Client mosqpub|21252-Nobuyukin sending CONNECT
+    Client mosqpub|21252-Nobuyukin received CONNACK
+    Client mosqpub|21252-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000002/attrs', ... (50 bytes))
+    Client mosqpub|21252-Nobuyukin sending DISCONNECT
+    ```
+    * send `handover|busy` command to `pepper(floor 2)` and do not send `robot_request` command to `guide_robot`
+
+        ```bash
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/attrs', ... (50 bytes))
+        2018-08-09T18:43:11.1533807791+0900|dest|204号室
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/cmd', ... (37 bytes))
+        pepper_0000000000000002@handover|busy
+        ```
+    * do not send ros message to ros topic `/robot_2f_1/request`
+    * do not update `r_state`
+
+        ```bash
+        mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000002/attrs/r_state/ | jq .
+        {
+          "type": "string",
+          "value": "Guiding",
+          "metadata": {
+            "TimeInstant": {
+              "type": "ISO8601",
+              "value": "2018-08-09T18:30:00.493667+0900"
+            }
+          }
+        }
+        ```
+    * do not update `visitor`
+
+        ```bash
+        mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000002/attrs/visitor/ | jq .
+        {
+          "type": "string",
+          "value": "5b6c08f0caee090013dcbf47",
+          "metadata": {
+            "TimeInstant": {
+              "type": "ISO8601",
+              "value": "2018-08-09T18:30:00.493667+0900"
+            }
+          }
+        }
+        ```
+    * record ledger automatically as reask&busy state
+
+        ```bash
+        mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(2).pretty()'
+        MongoDB shell version v3.6.5
+        connecting to: mongodb://127.0.0.1:27017/ledger
+        MongoDB server version: 3.6.5
+        {
+          "_id" : ObjectId("5b6c0a6a55d7fb0013c57187"),
+          "status" : "reception",
+          "face" : "/shared/faces/hYuXCIssiVrsYsCy.JPEG",
+          "faceIds" : [
+            "e7f044c7-7fad-43ef-aee5-844f29f13e82"
+          ],
+          "dest" : {
+            "dest_human_sensor_id" : "dest_human_sensor_0000000000000003",
+            "dest_led_id" : "dest_led_0000000000000003",
+            "dest_led_pos_x" : 19,
+            "dest_led_pos_y" : -19,
+            "dest_pos_x" : 20,
+            "dest_pos_y" : -10,
+            "floor" : 2,
+            "id" : "5b63d6787597100013d0b2a9",
+            "name" : "204号室"
+          },
+          "receptionDatetime" : ISODate("2018-08-09T09:33:30.323Z")
+        }
+        {
+          "_id" : ObjectId("5b6c08f0caee090013dcbf47"),
+          "status" : "reception",
+          "face" : "/shared/faces/Kib1LCqLG2MLryFm.JPEG",
+          "faceIds" : [
+            "5858e177-93a3-4aa6-9a0d-7d1b56ab9b0d"
+          ],
+          "dest" : {
+            "dest_human_sensor_id" : "dest_human_sensor_0000000000000002",
+            "dest_led_id" : "dest_led_0000000000000002",
+            "dest_led_pos_x" : 19,
+            "dest_led_pos_y" : 19,
+            "dest_pos_x" : 20,
+            "dest_pos_y" : 20,
+            "floor" : 2,
+            "id" : "5b63d672f6f8a80013b85abf",
+            "name" : "203号室"
+          },
+          "receptionDatetime" : ISODate("2018-08-09T09:27:12.176Z")
+        }
+        ```
+        ```bash
+        mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"reaskDatetime":-1}).limit(1).pretty()'
+        MongoDB shell version v3.6.5
+        connecting to: mongodb://127.0.0.1:27017/ledger
+        MongoDB server version: 3.6.5
+        {
+          "_id" : ObjectId("5b6c0caf55d7fb0013c57189"),
+          "status" : "busy",
+          "face" : null,
+          "faceIds" : [ ],
+          "dest" : {
+            "dest_human_sensor_id" : "dest_human_sensor_0000000000000003",
+            "dest_led_id" : "dest_led_0000000000000003",
+            "dest_led_pos_x" : 19,
+            "dest_led_pos_y" : -19,
+            "dest_pos_x" : 20,
+            "dest_pos_y" : -10,
+            "floor" : 2,
+            "id" : "5b63d6787597100013d0b2a9",
+            "name" : "204号室"
+          },
+          "reaskDatetime" : ISODate("2018-08-09T09:43:11.418Z"),
+          "busyDatetime" : ISODate("2018-08-09T09:43:11.470Z")
+        }
+        ```
+
+## robot busy (floor 2) face verify failure: arrival previous visitor
+1. simulate to receive robot state (Standby)
+    * publish ros message to `/robot_2f_1/state`
+
+    ```bash
+    root@rosbridge:/opt/ros_ws# rostopic pub -1 /robot_2f_1/state office_guide_robot/r_state "
+    time: '2018-10-09 08:07:16'
+    r_mode: 'Standby'
+    pos:
+      x: 20.0
+      y: 20.2
+      theta: 19.5
+    "
+    ```
+    * update `r_state` to `Suspending` automatically
+
+        ```bash
+        mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000002/attrs/r_state/ | jq .
+        {
+          "type": "string",
+          "value": "Suspending",
+          "metadata": {
+            "TimeInstant": {
+              "type": "ISO8601",
+              "value": "2018-08-09T18:48:13.749136+0900"
+            }
+          }
+        }
+        ```
+1. simuate visitor arriving at the destination
+
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /dest_human_sensor/dest_human_sensor_0000000000000002/attrs -u iotagent -P XXXXXXXX -m "$d|arrival|$d"
+    Client mosqpub|65572-Nobuyukin sending CONNECT
+    Client mosqpub|65572-Nobuyukin received CONNACK
+    Client mosqpub|65572-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/dest_human_sensor/dest_human_sensor_0000000000000002/attrs', ... (79 bytes))
+    Client mosqpub|65572-Nobuyukin sending DISCONNECT
+    ```
+    * receive MQTT message and send `action|off` message to `dest_led_0000000000000002` and `robot_request` command to `guide_robot_0000000000000002` automatically
+
+        ```bash
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/dest_human_sensor/dest_human_sensor_0000000000000002/attrs', ... (79 bytes))
+        2018-08-09T18:49:39.1533808179+0900|arrival|2018-08-09T18:49:39.1533808179+0900
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/dest_led/dest_led_0000000000000002/cmd', ... (36 bytes))
+        dest_led_0000000000000002@action|off
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/cmd', ... (65 bytes))
+        guide_robot_0000000000000002@robot_request|r_cmd|Navi|x|0.0|y|0.0
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/cmdexe', ... (105 bytes))
+        guide_robot_0000000000000002@robot_request|result,success/time,2018-08-09 18:49:39/r_cmd,Navi/x,0.0/y,0.0
+        ```
+    * send ros message to ros topic `/robot_2f_1/request` automatically
+
+        ```bash
+        root@rosbridge:/opt/ros_ws# rostopic echo /robot_2f_1/request
+        time: "2018-08-09 18:49:39"
+        r_cmd: "Navi"
+        pos:
+          x: 0.0
+          y: 0.0
+        ---
+        ```
+    * update `r_state` to `Returning` automatically
+
+        ```bash
+        mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000002/attrs/r_state/ | jq .
+        {
+          "type": "string",
+          "value": "Returning",
+          "metadata": {
+            "TimeInstant": {
+              "type": "ISO8601",
+              "value": "2018-08-09T18:49:39.529474+0900"
+            }
+          }
+        }
+        ```
+    * record ledger automatically
+
+        ```bash
+        mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(2).pretty()'
+        MongoDB shell version v3.6.5
+        connecting to: mongodb://127.0.0.1:27017/ledger
+        MongoDB server version: 3.6.5
+        {
+          "_id" : ObjectId("5b6c0a6a55d7fb0013c57187"),
+          "status" : "reception",
+          "face" : "/shared/faces/hYuXCIssiVrsYsCy.JPEG",
+          "faceIds" : [
+            "e7f044c7-7fad-43ef-aee5-844f29f13e82"
+          ],
+          "dest" : {
+            "dest_human_sensor_id" : "dest_human_sensor_0000000000000003",
+            "dest_led_id" : "dest_led_0000000000000003",
+            "dest_led_pos_x" : 19,
+            "dest_led_pos_y" : -19,
+            "dest_pos_x" : 20,
+            "dest_pos_y" : -10,
+            "floor" : 2,
+            "id" : "5b63d6787597100013d0b2a9",
+            "name" : "204号室"
+          },
+          "receptionDatetime" : ISODate("2018-08-09T09:33:30.323Z")
+        }
+        {
+          "_id" : ObjectId("5b6c08f0caee090013dcbf47"),
+          "status" : "arrival",
+          "face" : "/shared/faces/Kib1LCqLG2MLryFm.JPEG",
+          "faceIds" : [
+            "5858e177-93a3-4aa6-9a0d-7d1b56ab9b0d"
+          ],
+          "dest" : {
+            "dest_human_sensor_id" : "dest_human_sensor_0000000000000002",
+            "dest_led_id" : "dest_led_0000000000000002",
+            "dest_led_pos_x" : 19,
+            "dest_led_pos_y" : 19,
+            "dest_pos_x" : 20,
+            "dest_pos_y" : 20,
+            "floor" : 2,
+            "id" : "5b63d672f6f8a80013b85abf",
+            "name" : "203号室"
+          },
+          "receptionDatetime" : ISODate("2018-08-09T09:27:12.176Z"),
+          "arrivalDatetime" : ISODate("2018-08-09T09:49:39.457Z")
+        }
+        ```
+
+## robot busy (floor 2) face verify failure: clean robot
+1. set `r_state` of guide robot as `Waiting`
+
+    ```bash
+    mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v1/updateContext -d @-<<__EOS__ | jq .
+    {
+      "contextElements": [
+        {
+          "id": "guide_robot_0000000000000002",
+          "isPattern": "false",
+          "type": "guide_robot",
+          "attributes": [
+            {
+              "name": "r_state",
+              "value": "Waiting",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "destx",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "desty",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }, {
+              "name": "visitor",
+              "value": "",
+              "metadatas": [
+                {
+                  "name": "TimeInstant",
+                  "type": "ISO8601",
+                  "value": "${d}"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "updateAction": "UPDATE"
+    }
+    __EOS__
+    ```
+
