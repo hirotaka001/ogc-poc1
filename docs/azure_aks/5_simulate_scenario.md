@@ -755,7 +755,6 @@
     Client mosqpub|48535-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000002/cmdexe', ... (42 bytes))
     Client mosqpub|48535-Nobuyukin sending DISCONNECT
     ```
-
 1. simulate to send `handover` cmd result from `pepper(floor 2)`
 
     ```bash
@@ -1347,7 +1346,7 @@
 
     ```bash
     mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);export FACEPATH=$(curl -sS -H "Authorization: bearer ${TOKEN}" -H "Content-Type: multipart/form-data" https://api.tech-sketch.jp/storage/faces/ -X POST -F face=@face.jpg | jq .path -r);echo ${FACEPATH}
-    /shared/faces/8m2hsAdnamRgIE5U.JPEG
+    /shared/faces/AmYx4FqPsiSTi7s5.JPEG
     ```
 1. simulate to finish reception (floor 2)
 
@@ -1361,11 +1360,11 @@
     * send `handover` command to `pepper(floor 1)` and `facedetect` command to `pepper(floor 2)` automatically
 
         ```bash
-        Client mosqsub|12863-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/attrs', ... (91 bytes))
-        2018-08-09T08:35:46.1533771346+0900|face|/shared/faces/8m2hsAdnamRgIE5U.JPEG|dest|203号室
-        Client mosqsub|12863-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/cmd', ... (40 bytes))
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/attrs', ... (91 bytes))
+        2018-08-09T15:11:34.1533795094+0900|face|/shared/faces/AmYx4FqPsiSTi7s5.JPEG|dest|203号室
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/cmd', ... (40 bytes))
         pepper_0000000000000002@facedetect|start
-        Client mosqsub|12863-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/cmd', ... (34 bytes))
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/cmd', ... (34 bytes))
         pepper_0000000000000001@handover|2
         ```
     * record ledger automatically
@@ -1376,11 +1375,11 @@
         connecting to: mongodb://127.0.0.1:27017/ledger
         MongoDB server version: 3.6.5
         {
-          "_id" : ObjectId("5b6b7e53a4e91400132cc4a0"),
+          "_id" : ObjectId("5b6bdb16b7326200135945d2"),
           "status" : "reception",
-          "face" : "/shared/faces/8m2hsAdnamRgIE5U.JPEG",
+          "face" : "/shared/faces/AmYx4FqPsiSTi7s5.JPEG",
           "faceIds" : [
-            "e03d7389-c8d2-449f-9254-ce7a3c73f05f"
+            "0225ca9f-91d5-4c23-898d-465dede3faaf"
           ],
           "dest" : {
             "dest_human_sensor_id" : "dest_human_sensor_0000000000000002",
@@ -1393,7 +1392,7 @@
             "id" : "5b63d672f6f8a80013b85abf",
             "name" : "203号室"
           },
-          "receptionDatetime" : ISODate("2018-08-08T23:35:47.260Z")
+          "receptionDatetime" : ISODate("2018-08-09T06:11:34.338Z")
         }
         ```
 1. simulate to send `welcome` cmd result from `pepper(floor 1)`
@@ -1415,13 +1414,12 @@
     Client mosqpub|22763-Nobuyukin sending DISCONNECT
     ```
 
-
 ## face verify failure: face detection (floor 2)
 1. simulate to be called `/storage/faces/` REST API by pepper(floor 2)
 
     ```bash
     mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);export FACEPATH=$(curl -sS -H "Authorization: bearer ${TOKEN}" -H "Content-Type: multipart/form-data" https://api.tech-sketch.jp/storage/faces/ -X POST -F face=@other_persons_face.jpg | jq .path -r);echo ${FACEPATH}
-    /shared/faces/4CYzgVskHUS9ft0K.JPEG
+    /shared/faces/Gx45wxQtb07V0IBc.JPEG
     ```
 1. simulate to detect visitor
 
@@ -1436,9 +1434,9 @@
     * send `reask` command to `pepper(floor 2)`
 
         ```bash
-        Client mosqsub|12863-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/attrs', ... (76 bytes))
-        2018-08-09T08:39:52.1533771592+0900|face|/shared/faces/4CYzgVskHUS9ft0K.JPEG
-        Client mosqsub|12863-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/cmd', ... (34 bytes))
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/attrs', ... (76 bytes))
+        2018-08-09T15:14:50.1533795290+0900|face|/shared/faces/Gx45wxQtb07V0IBc.JPEG
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/cmd', ... (34 bytes))
         pepper_0000000000000002@reask|true
         ```
     * do not send ros message to ros topic `/robot_2f_1/request`
@@ -1452,9 +1450,10 @@
           "metadata": {
             "TimeInstant": {
               "type": "ISO8601",
-              "value": "2018-08-09T08:23:46.101997+0900"
+              "value": "2018-08-09T15:10:27.1533795027+0900"
             }
           }
+        }
         ```
     * do not set `visitor`
 
@@ -1466,11 +1465,20 @@
           "metadata": {
             "TimeInstant": {
               "type": "ISO8601",
-              "value": "2018-08-09T08:19:59.696238+0900"
+              "value": "2018-08-09T15:10:27.1533795027+0900"
             }
           }
         }
         ```
+1. simulate to send `facedetect` cmd result from `pepper(floor 2)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000002/cmdexe -u iotagent -P XXXXXXXX -m "pepper_0000000000000002@facedetect|success"
+    Client mosqpub|48535-Nobuyukin sending CONNECT
+    Client mosqpub|48535-Nobuyukin received CONNACK
+    Client mosqpub|48535-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000002/cmdexe', ... (42 bytes))
+    Client mosqpub|48535-Nobuyukin sending DISCONNECT
+    ```
 
 ## face verify failure: reask destination (floor 2)
 1. simlate to be called `/destinations/?filter=floor|2` REST API by `pepper (floor 2)`
@@ -1511,21 +1519,23 @@
     Client mosqpub|21252-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000002/attrs', ... (50 bytes))
     Client mosqpub|21252-Nobuyukin sending DISCONNECT
     ```
-    * send `robot_request` command to `guide_robot` automatically
+    * send `handover` command to `pepper(floor 2)` and `robot_request` command to `guide_robot` automatically
 
         ```bash
-        Client mosqsub|12863-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/attrs', ... (50 bytes))
-        2018-08-09T08:47:24.1533772044+0900|dest|203号室
-        Client mosqsub|12863-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/cmd', ... (67 bytes))
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/attrs', ... (50 bytes))
+        2018-08-09T15:16:38.1533795398+0900|dest|203号室
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/cmd', ... (41 bytes))
+        pepper_0000000000000002@handover|continue
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/cmd', ... (67 bytes))
         guide_robot_0000000000000002@robot_request|r_cmd|Navi|x|20.0|y|20.0
-        Client mosqsub|12863-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/cmdexe', ... (107 bytes))
-        guide_robot_0000000000000002@robot_request|result,success/time,2018-08-09 08:47:25/r_cmd,Navi/x,20.0/y,20.0
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/cmdexe', ... (107 bytes))
+        guide_robot_0000000000000002@robot_request|result,success/time,2018-08-09 15:16:39/r_cmd,Navi/x,20.0/y,20.0
         ```
     * send ros message to ros topic `/robot_2f_1/request` automatically
 
         ```bash
         root@rosbridge:/opt/ros_ws# rostopic echo /robot_2f_1/request
-        time: "2018-08-09 08:47:25"
+        time: "2018-08-09 15:16:39"
         r_cmd: "Navi"
         pos:
           x: 20.0
@@ -1542,7 +1552,7 @@
           "metadata": {
             "TimeInstant": {
               "type": "ISO8601",
-              "value": "2018-08-09T08:47:24.973405+0900"
+              "value": "2018-08-09T15:16:39.128319+0900"
             }
           }
         }
@@ -1553,11 +1563,11 @@
         mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000002/attrs/visitor/ | jq .
         {
           "type": "string",
-          "value": "5b6b810c5628c50013391016",
+          "value": "5b6bdc472cc3eb0013ab7838",
           "metadata": {
             "TimeInstant": {
               "type": "ISO8601",
-              "value": "2018-08-09T08:47:24.973405+0900"
+              "value": "2018-08-09T15:16:39.128319+0900"
             }
           }
         }
@@ -1570,7 +1580,7 @@
         connecting to: mongodb://127.0.0.1:27017/ledger
         MongoDB server version: 3.6.5
         {
-          "_id" : ObjectId("5b6b810c5628c50013391016"),
+          "_id" : ObjectId("5b6bdc472cc3eb0013ab7838"),
           "status" : "reask",
           "face" : null,
           "faceIds" : [ ],
@@ -1585,7 +1595,7 @@
             "id" : "5b63d672f6f8a80013b85abf",
             "name" : "203号室"
           },
-          "reaskDatetime" : ISODate("2018-08-08T23:47:24.904Z")
+          "reaskDatetime" : ISODate("2018-08-09T06:16:39.063Z")
         }
         ```
 1. simulate to send `reask` cmd result from `pepper(floor 2)`
@@ -1596,4 +1606,13 @@
     Client mosqpub|21833-Nobuyukin received CONNACK
     Client mosqpub|21833-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000002/cmdexe', ... (37 bytes))
     Client mosqpub|21833-Nobuyukin sending DISCONNECT
+    ```
+1. simulate to send `handover` cmd result from `pepper(floor 2)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000002/cmdexe -u iotagent -P XXXXXXXX -m "pepper_0000000000000002@handover|success"
+    Client mosqpub|48779-Nobuyukin sending CONNECT
+    Client mosqpub|48779-Nobuyukin received CONNACK
+    Client mosqpub|48779-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000002/cmdexe', ... (40 bytes))
+    Client mosqpub|48779-Nobuyukin sending DISCONNECT
     ```
