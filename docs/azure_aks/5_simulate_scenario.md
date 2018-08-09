@@ -245,6 +245,7 @@
     * send `handover` command to `pepper(floor 1)` and `robot_request` command to `guide_robot` automatically
 
         ```bash
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/attrs', ... (69 bytes))
         2018-08-08T19:02:34.1533722554+0900|face|null|dest|管理センター
         Client mosqsub|86059-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/cmd', ... (34 bytes))
         pepper_0000000000000001@handover|1
