@@ -286,11 +286,18 @@ class ReaskDestinationAPI(MongoMixin, MethodView):
 
     def __init__(self):
         super().__init__()
+        service = os.environ.get(const.PEPPER_SERVICE, '')
+        service_path = os.environ.get(const.PEPPER_SERVICEPATH, '')
+        self.type = os.environ.get(const.PEPPER_TYPE, '')
+
+        self.orion = Orion(service, service_path)
+        self.pepper_2_id = os.environ.get(const.PEPPER_2_ID, '')
 
     def post(self):
         content = request.data.decode('utf-8')
         logger.info(f'request content={content}')
 
+        result = {'result': 'failure'}
         try:
             dest = get_attr_value(content, 'dest')
             timestamp = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
@@ -304,7 +311,6 @@ class ReaskDestinationAPI(MongoMixin, MethodView):
             }
             logger.info(f'record reask, data={data}')
             oid = self._collection.insert_one(data).inserted_id
-            result = self._collection.find_one({"_id": oid})
 
             dest_name = data['dest'].get(DEST_NAME)
             try:
@@ -322,6 +328,9 @@ class ReaskDestinationAPI(MongoMixin, MethodView):
             else:
                 logger.info(f'nothing to do, dest_name={dest_name}, floor={dest_floor}')
 
+            message = self.orion.send_cmd(self.pepper_2_id, self.type, 'handover', 'continue')
+            result['result'] = 'success'
+            result['message'] = message
         except AttrDoesNotExist as e:
             logger.error(f'AttrDoesNotExist: {str(e)}')
             raise BadRequest(str(e))
@@ -332,4 +341,4 @@ class ReaskDestinationAPI(MongoMixin, MethodView):
             logger.exception(e)
             raise e
 
-        return jsonify(utils.bson2dict(result))
+        return jsonify(result)
