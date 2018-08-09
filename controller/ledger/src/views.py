@@ -13,12 +13,19 @@ from werkzeug.exceptions import BadRequest
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 
+import cognitive_face as CF
+
 from src import const, utils
 
 from controllerlibs import DEST_NAME, DEST_FLOOR
 from controllerlibs.services.orion import Orion, get_id, get_attr_value, NGSIPayloadError, AttrDoesNotExist
 from controllerlibs.services.destination import Destination, DestinationDoesNotExist, DestinationFormatError
 from controllerlibs.utils.start_movement import notify_start_movement
+
+if const.FACE_API_KEY in os.environ:
+    CF.Key.set(os.environ[const.FACE_API_KEY])
+if const.FACE_API_BASEURL in os.environ:
+    CF.BaseUrl.set(os.environ[const.FACE_API_BASEURL])
 
 logger = getLogger(__name__)
 
@@ -58,17 +65,20 @@ class RecordReceptionAPI(MongoMixin, MethodView):
         try:
             face = get_attr_value(content, 'face')
             dest = get_attr_value(content, 'dest')
-            timestamp = datetime.datetime.now(pytz.timezone('Asia/Tokyo')).strftime('%Y-%m-%dT%H:%M:%S.%f%z')
+            timestamp = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
+
+            if face and os.path.isfile(face):
+                face_ids = [result['faceId'] for result in CF.face.detect(face)]
+            else:
+                face_ids = []
+                face = None
+
             data = {
                 'status': 'reception',
                 'face': face,
+                'faceIds': face_ids,
                 'dest': Destination().get_destination_by_name(dest),
-                'timestamps': [
-                    {
-                        'status': 'reception',
-                        'timestamp': timestamp,
-                    },
-                ]
+                'receptionDatetime': timestamp,
             }
             logger.info(f'record reception, data={data}')
             oid = self._collection.insert_one(data).inserted_id
@@ -134,16 +144,10 @@ class RecordArrivalAPI(RobotFloorMapMixin, MongoMixin, MethodView):
                     visitor_id = self.orion.get_attrs(robot_id, 'visitor')['visitor']['value'].strip()
 
                     if visitor_id:
-                        timestamps = utils.bson2dict(self._collection.find_one({"_id": ObjectId(visitor_id)}))['timestamps']
-                        if not timestamps:
-                            timestamps = list()
-                        timestamps.append({
-                            'status': 'arrival',
-                            'timestamp': datetime.datetime.now(pytz.timezone('Asia/Tokyo')).strftime('%Y-%m-%dT%H:%M:%S.%f%z'),
-                        })
+                        timestamp = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
                         update_data = {
                             'status': 'arrival',
-                            'timestamps': timestamps,
+                            'arrivalDatetime': timestamp,
                         }
                         self._collection.update_one({"_id": ObjectId(visitor_id)}, {"$set": update_data})
 
@@ -188,8 +192,35 @@ class DetectVisitorAPI(MongoMixin, MethodView):
 
         result = {'result': 'failure'}
         try:
-            # TODO: use FaceDetectAPI
-            data = utils.bson2dict(self._collection.find({"status": "reception"}).sort([("timestamps", -1), ])[0])
+            face = get_attr_value(content, 'face')
+
+            if face and os.path.isfile(face):
+                face_ids = [result['faceId'] for result in CF.face.detect(face)]
+            else:
+                return jsonify(self.__send_reask())
+
+            now = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
+            visitors = [utils.bson2dict(d) for d in self._collection.find({
+                'status': 'reception',
+                'dest.floor': 2,
+                'receptionDatetime': {'$gte': now - datetime.timedelta(minutes=const.FACE_VERIFY_DELTA_MIN)},
+            }).sort([('receptionDatetime', -1), ])]
+
+            def verify(visitors):
+                for visitor in visitors:
+                    for visitor_fid in visitor['faceIds']:
+                        for fid in face_ids:
+                            res = CF.face.verify(visitor_fid, fid)
+                            res['visitor'] = visitor
+                            yield res
+                            if res['isIdentical']:
+                                raise StopIteration
+            verified = list(verify(visitors))
+            if len(verified) == 0 or not verified[-1]['isIdentical']:
+                return jsonify(self.__send_reask())
+            else:
+                logger.info(f'face api verify: identical result, {verified[-1]}')
+                data = verified[-1]['visitor']
 
             dest_name = data['dest'].get(DEST_NAME)
             if not dest_name:
@@ -230,14 +261,75 @@ class DetectVisitorAPI(MongoMixin, MethodView):
 
         return jsonify(result)
 
+    def __send_reask(self):
+        try:
+            message = self.orion.send_cmd(self.pepper_2_id, self.type, 'reask', 'true')
+            result = {
+                'result': 'success',
+                'message': message,
+            }
+        except AttrDoesNotExist as e:
+            logger.error(f'AttrDoesNotExist: {str(e)}')
+            raise BadRequest(str(e))
+        except NGSIPayloadError as e:
+            logger.error(f'NGSIPayloadError: {str(e)}')
+            raise BadRequest(str(e))
+        except Exception as e:
+            logger.exception(e)
+            raise e
 
-class ReaskDestinationAPI(MethodView):
+        return result
+
+
+class ReaskDestinationAPI(MongoMixin, MethodView):
     NAME = 'reask-destination'
+
+    def __init__(self):
+        super().__init__()
 
     def post(self):
         content = request.data.decode('utf-8')
         logger.info(f'request content={content}')
 
-        result = {'result': 'failure'}
+        try:
+            dest = get_attr_value(content, 'dest')
+            timestamp = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
 
-        return jsonify(result)
+            data = {
+                'status': 'reask',
+                'face': None,
+                'faceIds': [],
+                'dest': Destination().get_destination_by_name(dest),
+                'reaskDatetime': timestamp,
+            }
+            logger.info(f'record reask, data={data}')
+            oid = self._collection.insert_one(data).inserted_id
+            result = self._collection.find_one({"_id": oid})
+
+            dest_name = data['dest'].get(DEST_NAME)
+            try:
+                dest_floor = int(data['dest'].get(DEST_FLOOR))
+            except (TypeError, ValueError):
+                raise DestinationFormatError('dest_floor is invalid')
+
+            if dest_floor == 2:
+                logger.info(f'call start-movement to guide_robot, dest_name={dest_name}, floor={dest_floor}')
+                notify_start_movement(os.environ.get(const.START_MOVEMENT_SERVICE, ''),
+                                      os.environ.get(const.START_MOVEMENT_SERVICEPATH, ''),
+                                      os.environ.get(const.START_MOVEMENT_ID, ''),
+                                      os.environ.get(const.START_MOVEMENT_TYPE, ''),
+                                      data['dest'], str(oid))
+            else:
+                logger.info(f'nothing to do, dest_name={dest_name}, floor={dest_floor}')
+
+        except AttrDoesNotExist as e:
+            logger.error(f'AttrDoesNotExist: {str(e)}')
+            raise BadRequest(str(e))
+        except NGSIPayloadError as e:
+            logger.error(f'NGSIPayloadError: {str(e)}')
+            raise BadRequest(str(e))
+        except Exception as e:
+            logger.exception(e)
+            raise e
+
+        return jsonify(utils.bson2dict(result))

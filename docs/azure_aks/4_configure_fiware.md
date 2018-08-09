@@ -96,7 +96,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "http": {
       "url": "http://cygnus:5050/notify"
     },
-    "attrs": ["dest", "face", "welcome_status", "handover_status", "facedetect_status", "retry_status"],
+    "attrs": ["dest", "face", "welcome_status", "handover_status", "facedetect_status", "reask_status"],
     "attrsFormat": "legacy"
   }
 }
@@ -128,7 +128,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
         "welcome_status",
         "handover_status",
         "facedetect_status",
-        "retry_status"
+        "reask_status"
       ],
       "attrsFormat": "legacy",
       "http": {
@@ -615,7 +615,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
         "welcome_status",
         "handover_status",
         "facedetect_status",
-        "retry_status"
+        "reask_status"
       ],
       "attrsFormat": "legacy",
       "http": {
@@ -706,7 +706,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
         "welcome_status",
         "handover_status",
         "facedetect_status",
-        "retry_status"
+        "reask_status"
       ],
       "attrsFormat": "legacy",
       "http": {
@@ -827,7 +827,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
         "welcome_status",
         "handover_status",
         "facedetect_status",
-        "retry_status"
+        "reask_status"
       ],
       "attrsFormat": "legacy",
       "http": {
@@ -978,7 +978,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
         "welcome_status",
         "handover_status",
         "facedetect_status",
-        "retry_status"
+        "reask_status"
       ],
       "attrsFormat": "legacy",
       "http": {
