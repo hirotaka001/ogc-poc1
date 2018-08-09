@@ -646,7 +646,7 @@ mac:$ docker push ${REPOSITORY}/tech-sketch/ledger:0.1.0
 ```
 ```bash
 mac:$ export FACE_API_KEY="ZZZZZZZZZZZZZZZZZZZZZZZZ"
-mac:$ env PEPPER_SERVICE="pepper" PEPPER_SERVICEPATH="/" PEPPER_TYPE="pepper" PEPPER_2_ID="pepper_0000000000000002" ROBOT_SERVICE="robot" ROBOT_SERVICEPATH="/" ROBOT_TYPE="guide_robot" ROBOT_FLOOR_MAP="{\"guide_robot_0000000000000001\": 1, \"guide_robot_0000000000000002\": 2}" FACE_API_BASEURL="https://japaneast.api.cognitive.microsoft.com/face/v1.0" envsubst < controller/ledger.yaml | kubectl apply -f -
+mac:$ env PEPPER_SERVICE="pepper" PEPPER_SERVICEPATH="/" PEPPER_TYPE="pepper" PEPPER_1_ID="pepper_0000000000000001" PEPPER_2_ID="pepper_0000000000000002" ROBOT_SERVICE="robot" ROBOT_SERVICEPATH="/" ROBOT_TYPE="guide_robot" ROBOT_FLOOR_MAP="{\"guide_robot_0000000000000001\": 1, \"guide_robot_0000000000000002\": 2}" FACE_API_BASEURL="https://japaneast.api.cognitive.microsoft.com/face/v1.0" envsubst < controller/ledger.yaml | kubectl apply -f -
 ```
 ```bash
 mac:$ kubectl get pods -l pod=ledger

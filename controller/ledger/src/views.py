@@ -57,18 +57,25 @@ class RecordReceptionAPI(MongoMixin, MethodView):
 
     def __init__(self):
         super().__init__()
+        service = os.environ.get(const.PEPPER_SERVICE, '')
+        service_path = os.environ.get(const.PEPPER_SERVICEPATH, '')
+        self.type = os.environ.get(const.PEPPER_TYPE, '')
+
+        self.orion = Orion(service, service_path)
+        self.pepper_1_id = os.environ.get(const.PEPPER_1_ID, '')
 
     def post(self):
         content = request.data.decode('utf-8')
         logger.info(f'request content={content}')
 
+        result = {'result': 'failure'}
         try:
             face = get_attr_value(content, 'face')
             dest = get_attr_value(content, 'dest')
             timestamp = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
 
             if face and os.path.isfile(face):
-                face_ids = [result['faceId'] for result in CF.face.detect(face)]
+                face_ids = [r['faceId'] for r in CF.face.detect(face)]
             else:
                 face_ids = []
                 face = None
@@ -82,7 +89,7 @@ class RecordReceptionAPI(MongoMixin, MethodView):
             }
             logger.info(f'record reception, data={data}')
             oid = self._collection.insert_one(data).inserted_id
-            result = self._collection.find_one({"_id": oid})
+            self._collection.find_one({"_id": oid})
 
             dest_name = data['dest'].get(DEST_NAME)
             try:
@@ -100,6 +107,9 @@ class RecordReceptionAPI(MongoMixin, MethodView):
             else:
                 logger.info(f'nothing to do, dest_name={dest_name}, floor={dest_floor}')
 
+            message = self.orion.send_cmd(self.pepper_1_id, self.type, 'handover', dest_floor)
+            result['result'] = 'success'
+            result['message'] = message
         except AttrDoesNotExist as e:
             logger.error(f'AttrDoesNotExist: {str(e)}')
             raise BadRequest(str(e))
@@ -110,7 +120,7 @@ class RecordReceptionAPI(MongoMixin, MethodView):
             logger.exception(e)
             raise e
 
-        return jsonify(utils.bson2dict(result))
+        return jsonify(result)
 
 
 class RecordArrivalAPI(RobotFloorMapMixin, MongoMixin, MethodView):
