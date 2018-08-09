@@ -59,7 +59,6 @@ class FinishReceptionAPI(MethodView):
         self.type = os.environ.get(const.PEPPER_TYPE, '')
 
         self.orion = Orion(service, service_path)
-        self.pepper_1_id = os.environ.get(const.PEPPER_1_ID, '')
         self.pepper_2_id = os.environ.get(const.PEPPER_2_ID, '')
 
     def post(self):
@@ -83,11 +82,11 @@ class FinishReceptionAPI(MethodView):
 
             if dest_floor == 2:
                 logger.info(f'call facedetect to pepper({self.pepper_2_id}), dest_name={dest_name}, floor={dest_floor}')
-                self.orion.send_cmd(self.pepper_2_id, self.type, 'facedetect', 'start')
+                message = self.orion.send_cmd(self.pepper_2_id, self.type, 'facedetect', 'start')
             else:
-                logger.info(f'nothing to do, dest_name={dest_name}, floor={dest_floor}')
+                message = f'nothing to do, dest_name={dest_name}, floor={dest_floor}'
+                logger.info(message)
 
-            message = self.orion.send_cmd(self.pepper_1_id, self.type, 'handover', dest_floor)
             result['result'] = 'success'
             result['message'] = message
         except AttrDoesNotExist as e:

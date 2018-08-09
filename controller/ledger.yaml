@@ -43,6 +43,8 @@ spec:
           value: "${PEPPER_SERVICEPATH}"
         - name: PEPPER_TYPE
           value: "${PEPPER_TYPE}"
+        - name: PEPPER_1_ID
+          value: "${PEPPER_1_ID}"
         - name: PEPPER_2_ID
           value: "${PEPPER_2_ID}"
         - name: ROBOT_SERVICE
