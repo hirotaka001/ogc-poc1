@@ -17,6 +17,7 @@ Start pods & services on AKS by following steps:
 1. [start storage service](#start-storage-service-on-aks)
 1. [start ledger service](#start-ledger-service-on-aks)
 1. [start guidance service](#start-guidance-service-on-aks)
+1. [start monitoring](#start-monitoring)
 
 
 ## start etcd cluster on AKS
@@ -684,4 +685,91 @@ guidance-644f7f6755-sc5m8   1/1       Running   0          21s
 mac:$ kubectl get services -l service=guidance
 NAME       TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
 guidance   ClusterIP   10.0.222.146   <none>        8888/TCP   58s
+```
+
+## start monitoring on AKS
+
+[prometheus](https://prometheus.io/)
+
+* enable coreos helm
+```bash
+mac:$ helm repo add coreos https://s3-eu-west-1.amazonaws.com/coreos-charts/stable/
+```
+
+* install coreos/prometheus-operator
+
+```bash
+mac:$ helm install coreos/prometheus-operator --name ogc-prometheus-operator --namespace monitoring --set rbacEnable=false
+mac:$ kubectl get pods --namespace monitoring
+NAME                                       READY     STATUS    RESTARTS   AGE
+ogc-prometheus-operator-74d768444d-7g2lt   1/1       Running   0          6m
+mac:$ kubectl get jobs --namespace monitoring
+No resources found.
+```
+
+* install coreos/kube-prometheus
+
+```bash
+mac:$ env GRAFANA_ADMIN_PASSWORD=YYYYYYYYYYYYYYYY envsubst < monitoring/kube-prometheus-azure.yaml | helm install coreos/kube-prometheus --name ogc-kube-prometheus --namespace monitoring -f -
+```
+```bash
+mac:$ kubectl get daemonsets --namespace monitoring
+NAME                                DESIRED   CURRENT   READY     UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
+ogc-kube-prometheus-exporter-node   4         4         4         4            4           <none>          4m
+```
+```bash
+mac:$ kubectl get pods --namespace monitoring
+NAME                                                      READY     STATUS    RESTARTS   AGE
+alertmanager-ogc-kube-prometheus-0                        2/2       Running   0          5m
+ogc-kube-prometheus-exporter-kube-state-59cb7c6b7-25z9h   2/2       Running   0          4m
+ogc-kube-prometheus-exporter-node-4fh9v                   1/1       Running   0          5m
+ogc-kube-prometheus-exporter-node-72f68                   1/1       Running   0          5m
+ogc-kube-prometheus-exporter-node-hnb89                   1/1       Running   0          5m
+ogc-kube-prometheus-exporter-node-m4sct                   1/1       Running   0          5m
+ogc-kube-prometheus-grafana-778b7d7784-k9kc9              2/2       Running   0          5m
+ogc-prometheus-operator-74d768444d-7g2lt                  1/1       Running   0          27m
+prometheus-ogc-kube-prometheus-0                          3/3       Running   1          5m
+```
+```bash
+mac:$ kubectl get deployments --namespace monitoring
+NAME                                      DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+ogc-kube-prometheus-exporter-kube-state   1         1         1            1           6m
+ogc-kube-prometheus-grafana               1         1         1            1           6m
+ogc-prometheus-operator                   1         1         1            1           28m
+```
+```bash
+mac:$ kubectl get statefulsets --namespace monitoring
+NAME                               DESIRED   CURRENT   AGE
+alertmanager-ogc-kube-prometheus   1         1         6m
+prometheus-ogc-kube-prometheus     1         1         6m
+```
+```bash
+mac:$ kubectl get services --namespace monitoring
+NAME                                      TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)             AGE
+alertmanager-operated                     ClusterIP   None           <none>        9093/TCP,6783/TCP   8m
+ogc-kube-prometheus                       ClusterIP   10.0.12.222    <none>        9090/TCP            8m
+ogc-kube-prometheus-alertmanager          ClusterIP   10.0.100.232   <none>        9093/TCP            8m
+ogc-kube-prometheus-exporter-kube-state   ClusterIP   10.0.221.39    <none>        80/TCP              8m
+ogc-kube-prometheus-exporter-node         ClusterIP   10.0.141.146   <none>        9100/TCP            8m
+ogc-kube-prometheus-grafana               ClusterIP   10.0.92.166    <none>        80/TCP              8m
+prometheus-operated                       ClusterIP   None           <none>        9090/TCP            8m
+```
+```bash
+mac:$ kubectl get persistentvolumeclaims --namespace monitoring
+NAME                                                                     STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS      AGE
+alertmanager-ogc-kube-prometheus-db-alertmanager-ogc-kube-prometheus-0   Bound     pvc-94a3e841-9e98-11e8-8646-02af8659316c   30Gi       RWO            managed-premium   9m
+prometheus-ogc-kube-prometheus-db-prometheus-ogc-kube-prometheus-0       Bound     pvc-94d234c0-9e98-11e8-8646-02af8659316c   30Gi       RWO            managed-premium   9m
+```
+
+* patch kube-dns-v20 because Azure AKS does not export dns metrics
+
+```bash
+mac:$ kubectl patch deployment -n kube-system kube-dns-v20 --patch "$(cat monitoring/kube-dns-metrics-patch.yaml)"
+```
+
+* delete monitor of apiserver because apiserver of Azure AKS does not allow to connect apiserver directry
+    * https://github.com/coreos/prometheus-operator/issues/1522
+
+```bash
+mac:$ kubectl -n monitoring delete servicemonitor kube-prometheus-exporter-kubernetes
 ```
