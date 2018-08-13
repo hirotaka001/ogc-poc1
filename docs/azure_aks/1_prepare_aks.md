@@ -2,10 +2,20 @@
 
 Prepare [Microsoft Azure AKS](https://azure.microsoft.com/en-us/services/container-service/) by following steps:
 
+1. [login Azure](#login-azure)
 1. [create DNS zone](#create-dns-zone-of-examplecom)
+1. [create resource group](#create-resource-group)
 1. [start private registry](#start-private-registry-on-azure-container-registry)
+1. [start face API service](#start-face-api-service)
 1. [start kubernetes](#start-kubernetes-on-azure-aks)
 1. [install helm](#install-helm)
+
+
+## login Azure
+
+```bash
+mac:$ az login --tenant tenant.onmicrosoft.com
+```
 
 ## create DNS zone of "tech-sketch.jp"
 
@@ -27,15 +37,13 @@ mac:$ az network dns zone show --resource-group dns-zone --name "tech-sketch.jp"
 ]
 ```
 
-## start private registry on Azure Container Registry
-
-```bash
-mac:$ az login --tenant tenant.onmicrosoft.com
-```
+## create resource group
 
 ```bash
 mac:$ az group create --name ogc-poc1 --location japaneast
 ```
+
+## start private registry on Azure Container Registry
 
 ```bash
 mac:$ az acr create --resource-group ogc-poc1 --name ogcacr --sku Basic
@@ -44,6 +52,40 @@ mac:$ export REPOSITORY=$(az acr show --resource-group ogc-poc1 --name ogcacr | 
 
 ```bash
 mac:$ az acr login --name ogcacr
+```
+
+## start Face API service
+
+```bash
+mac:$ az cognitiveservices account create --kind Face --location japaneast --name faceapi --resource-group ogc-poc1 --sku S0 --yes
+```
+```bash
+mac:$ az cognitiveservices account show --name faceapi --resource-group ogc-poc1
+{
+  "endpoint": "https://japaneast.api.cognitive.microsoft.com/face/v1.0",
+  "etag": "\"00002f1f-0000-0000-0000-5b70cc430000\"",
+  "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/ogc-poc1/providers/Microsoft.CognitiveServices/accounts/faceapi",
+  "internalId": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "kind": "Face",
+  "location": "japaneast",
+  "name": "faceapi",
+  "provisioningState": "Succeeded",
+  "resourceGroup": "ogc-poc1",
+  "sku": {
+    "name": "S0",
+    "tier": null
+  },
+  "tags": null,
+  "type": "Microsoft.CognitiveServices/accounts"
+}
+```
+```bash
+mac:$ export FACE_API_BASEURL=$(az cognitiveservices account show --name faceapi --resource-group ogc-poc1 | jq .endpoint -r);echo ${FACE_API_BASEURL}
+https://japaneast.api.cognitive.microsoft.com/face/v1.0
+```
+```bash
+mac:$ export FACE_API_KEY=$(az cognitiveservices account keys list --name faceapi --resource-group ogc-poc1 | jq .key1 -r);echo ${FACE_API_KEY}
+ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
 ```
 
 ## start kubernetes on Azure AKS
