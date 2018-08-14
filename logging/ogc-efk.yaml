@@ -1,0 +1,23 @@
+kibana:
+  env:
+    ELASTICSEARCH_URL: http://elasticsearch-ogc-efk-cluster:9200
+    SERVER_PORT: 5601
+elasticsearch:
+  clientReplicas: 1
+  masterReplicas: 1
+  dataReplicas: 1
+  dataVolumeSize: 10Gi
+  javaOpts: "-Xms1024m -Xmx1024m"
+  resources:
+    requests:
+      memory: 1024Mi
+      cpu: 200m
+    limits:
+      memory: 2048Mi
+      cpu: '1'
+fluent-bit:
+  backend:
+    type: es
+    es:
+      host: elasticsearch-ogc-efk-cluster
+      port: 9200

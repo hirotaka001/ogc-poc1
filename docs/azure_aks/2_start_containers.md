@@ -826,3 +826,78 @@ mac:$ kubectl -n monitoring get servicemonitor ogc-kube-prometheus-exporter-kube
 ```bash
 mac:$ kubectl -n monitoring delete servicemonitor ogc-kube-prometheus-exporter-kubernetes
 ```
+
+## start elasticsearch, fluent-bit, kibana
+
+```bash
+mac:$ helm repo add akomljen-charts https://raw.githubusercontent.com/komljen/helm-charts/master/charts/
+```
+
+* install akomljen/elasticsearch-operator
+
+```bash
+mac:$ helm install akomljen-charts/elasticsearch-operator --name ogc-es-operator --namespace logging
+```
+```bash
+mac:$ kubectl get deployments --namespace logging
+NAME                                     DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+ogc-es-operator-elasticsearch-operator   1         1         1            1           1m
+```
+```bash
+mac:$ kubectl get pods --namespace logging
+NAME                                                     READY     STATUS    RESTARTS   AGE
+ogc-es-operator-elasticsearch-operator-dd4769cc5-75cqc   1/1       Running   0          2m
+```
+
+* install akomljen/efk
+
+```bash
+mac:$ helm install akomljen-charts/efk --name ogc-efk --namespace logging -f logging/ogc-efk.yaml
+```
+```bash
+mac:$ kubectl get daemonset --namespace logging
+NAME         DESIRED   CURRENT   READY     UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
+fluent-bit   4         4         4         4            4           <none>          7m
+```
+```bash
+mac:$ kubectl get deployments --namespace logging
+NAME                                     DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+es-client-ogc-efk-cluster                1         1         1            1           6m
+ogc-efk-kibana                           1         1         1            1           7m
+ogc-es-operator-elasticsearch-operator   1         1         1            1           17m
+```
+```bash
+mac:$ kubectl get statefulsets --namespace logging
+NAME                                DESIRED   CURRENT   AGE
+es-data-ogc-efk-cluster-default     1         1         6m
+es-master-ogc-efk-cluster-default   1         1         6m
+```
+```bash
+mac:$ kubectl get pods --namespace logging
+NAME                                                     READY     STATUS    RESTARTS   AGE
+es-client-ogc-efk-cluster-9549744cb-swdmc                1/1       Running   0          7m
+es-data-ogc-efk-cluster-default-0                        1/1       Running   0          6m
+es-master-ogc-efk-cluster-default-0                      1/1       Running   0          7m
+fluent-bit-bdhkk                                         1/1       Running   0          8m
+fluent-bit-cjzdv                                         1/1       Running   0          8m
+fluent-bit-dsrgt                                         1/1       Running   0          8m
+fluent-bit-wwm4b                                         1/1       Running   0          8m
+ogc-efk-kibana-54866d47bf-wb4kz                          1/1       Running   0          8m
+ogc-es-operator-elasticsearch-operator-dd4769cc5-75cqc   1/1       Running   0          18m
+```
+```bash
+mac:$ kubectl get services --namespace logging
+NAME                                      TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
+cerebro-ogc-efk-cluster                   ClusterIP   10.0.51.157    <none>        80/TCP     8m
+elasticsearch-discovery-ogc-efk-cluster   ClusterIP   10.0.106.245   <none>        9300/TCP   8m
+elasticsearch-ogc-efk-cluster             ClusterIP   10.0.242.192   <none>        9200/TCP   8m
+es-data-svc-ogc-efk-cluster               ClusterIP   10.0.127.105   <none>        9300/TCP   8m
+kibana-ogc-efk-cluster                    ClusterIP   10.0.135.63    <none>        80/TCP     8m
+ogc-efk-kibana                            ClusterIP   10.0.49.225    <none>        443/TCP    9m
+```
+```bash
+mac:$ kubectl get persistentvolumeclaims --namespace logging
+NAME                                          STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+es-data-es-data-ogc-efk-cluster-default-0     Bound     pvc-55cf566d-9ec6-11e8-8646-02af8659316c   1Gi        RWO            default        1h
+es-data-es-master-ogc-efk-cluster-default-0   Bound     pvc-55bdd8ff-9ec6-11e8-8646-02af8659316c   1Gi        RWO            default        1h
+```
