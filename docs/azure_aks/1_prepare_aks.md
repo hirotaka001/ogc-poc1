@@ -109,20 +109,11 @@ Registered
 ```
 
 ```bash
-mac:$ az aks create --resource-group ogc-poc1 --name ogc-poc1-aks --node-count 4 --ssh-key-value $HOME/.ssh/azure.pub
+mac:$ az aks create --resource-group ogc-poc1 --name ogc-poc1-aks --node-count 4 --ssh-key-value $HOME/.ssh/azure.pub --enable-rbac --node-vm-size Standard_D2s_v3 --kubernetes-version 1.11.1
 ```
 
 ```bash
 mac:$ az aks get-credentials --resource-group ogc-poc1 --name ogc-poc1-aks
-```
-
-```bash
-mac:$ kubectl get nodes
-NAME                       STATUS    ROLES     AGE       VERSION
-aks-nodepool1-23249322-0   Ready     agent     24m       v1.9.6
-aks-nodepool1-23249322-1   Ready     agent     24m       v1.9.6
-aks-nodepool1-23249322-2   Ready     agent     24m       v1.9.6
-aks-nodepool1-23249322-3   Ready     agent     24m       v1.9.6
 ```
 
 ```bash
@@ -131,25 +122,59 @@ mac:$ ACR_ID=$(az acr show --name ogcacr --resource-group ogc-poc1 --query "id" 
 mac:$ az role assignment create --assignee ${CLIENT_ID} --role Reader --scope ${ACR_ID}
 ```
 
-## install helm
 ```bash
-mac:$ curl --output ~/Downloads/helm-v2.8.2-darwin-amd64.tar.gz https://storage.googleapis.com/kubernetes-helm/helm-v2.8.2-darwin-amd64.tar.gz
-mac:$ tar xfz ~/Downloads/helm-v2.8.2-darwin-amd64.tar.gz -C /tmp
-mac:$ sudo mv /tmp/darwin-amd64/helm /usr/local/bin
+mac:$ kubectl get nodes
+NAME                       STATUS    ROLES     AGE       VERSION
+aks-nodepool1-23249322-0   Ready     agent     8m        v1.11.1
+aks-nodepool1-23249322-1   Ready     agent     8m        v1.11.1
+aks-nodepool1-23249322-2   Ready     agent     8m        v1.11.1
+aks-nodepool1-23249322-3   Ready     agent     8m        v1.11.1
+```
+
+## setup rbac
+
+```bash
+mac:$ kubectl apply -f rbac/dashboard-rbac.yaml
+```
+```bash
+mac:$ kubectl get serviceaccounts -n kube-system | grep kubernetes-dashboard
+kubernetes-dashboard                 1         12m
 ```
 
 ```bash
-mac:$ helm update
-mac:$ helm init
+mac:$ kubectl apply -f rbac/tiller-rbac.yaml
+```
+```bash
+mac:$ kubectl get serviceaccounts -n kube-system | grep tiller
+tiller                               1         19s
+```
+
+```bash
+mac:$ kubectl apply -f rbac/default-rbac.yaml
+```
+```bash
+mac:$ kubectl get clusterroles | grep default-read
+default-read                                                           1m
+```
+
+## install helm
+```bash
+mac:$ helm version --client
+Client: &version.Version{SemVer:"v2.9.1", GitCommit:"20adb27c7c5868466912eebdf6664e7390ebe710", GitTreeState:"clean"}
+```
+
+```bash
+mac:$ helm init --service-account tiller
+mac:$ helm repo update
 ```
 
 ```bash
 mac:$ kubectl get pods --all-namespaces | grep tiller
-kube-system   tiller-deploy-865dd6c794-cdzd9          1/1       Running   0          6m
+kube-system   tiller-deploy-759cb9df9-88gmw           1/1       Running   0          1m
 ```
 
 ```bash
 mac:$ helm version
-Client: &version.Version{SemVer:"v2.8.2", GitCommit:"a80231648a1473929271764b920a8e346f6de844", GitTreeState:"clean"}
-Server: &version.Version{SemVer:"v2.8.2", GitCommit:"a80231648a1473929271764b920a8e346f6de844", GitTreeState:"clean"}
+Client: &version.Version{SemVer:"v2.9.1", GitCommit:"20adb27c7c5868466912eebdf6664e7390ebe710", GitTreeState:"clean"}
+Server: &version.Version{SemVer:"v2.9.1", GitCommit:"20adb27c7c5868466912eebdf6664e7390ebe710", GitTreeState:"clean"}
 ```

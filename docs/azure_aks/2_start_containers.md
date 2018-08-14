@@ -24,14 +24,14 @@ Start pods & services on AKS by following steps:
 [etcd](https://github.com/coreos/etcd)
 
 ```bash
-mac:$ helm install stable/etcd-operator --name fiware-etcd --set rbac.create=false
+mac:$ helm install stable/etcd-operator --name fiware-etcd
 ```
 
 ```bash
 mac:$ kubectl get pods | grep fiware-etcd
-fiware-etcd-etcd-operator-etcd-backup-operator-d49598cb6-v92zl    1/1       Running   0          51s
-fiware-etcd-etcd-operator-etcd-operator-d69bdfb64-m6bjz           1/1       Running   0          51s
-fiware-etcd-etcd-operator-etcd-restore-operator-5c65cd4469t9xrp   1/1       Running   0          51s
+fiware-etcd-etcd-operator-etcd-backup-operator-547599b5-chjqc     1/1       Running   0          58s
+fiware-etcd-etcd-operator-etcd-operator-7d768d5f6c-lnjjv          1/1       Running   0          57s
+fiware-etcd-etcd-operator-etcd-restore-operator-7cf99c5f6-xk5hn   1/1       Running   0          57s
 ```
 
 ```bash
@@ -45,24 +45,25 @@ mac:$ kubectl apply -f etcd/etcd-cluster.yaml
 
 ```bash
 mac:$ kubectl get pods -l app=etcd
-NAME                READY     STATUS    RESTARTS   AGE
-etcd-cluster-0000   1/1       Running   0          2m
-etcd-cluster-0001   1/1       Running   0          2m
-etcd-cluster-0002   1/1       Running   0          2m
+NAME                      READY     STATUS    RESTARTS   AGE
+etcd-cluster-4bt6k5f67q   1/1       Running   0          1m
+etcd-cluster-jxdqvfzcnc   1/1       Running   0          2m
+etcd-cluster-lzlkcs6dk7   1/1       Running   0          1m
 ```
 
 ```bash
 mac:$ kubectl get services -l app=etcd
-NAME                  TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)             AGE
-etcd-cluster          ClusterIP   None           <none>        2379/TCP,2380/TCP   3m
-etcd-cluster-client   ClusterIP   10.0.228.101   <none>        2379/TCP            3m
+NAME                  TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)             AGE
+etcd-cluster          ClusterIP   None          <none>        2379/TCP,2380/TCP   2m
+etcd-cluster-client   ClusterIP   10.0.242.24   <none>        2379/TCP            2m
 ```
 
 ```bash
 mac:$ kubectl run --rm -it etcdclient --image quay.io/coreos/etcd --restart=Never -- etcdctl --peers http://etcd-cluster-client:2379 member list
-ab42ec96726a2edc: name=etcd-cluster-0001 peerURLs=http://etcd-cluster-0001.etcd-cluster.default.svc:2380 clientURLs=http://etcd-cluster-0001.etcd-cluster.default.svc:2379 isLeader=false
-d3dfab2ca43ad0a7: name=etcd-cluster-0000 peerURLs=http://etcd-cluster-0000.etcd-cluster.default.svc:2380 clientURLs=http://etcd-cluster-0000.etcd-cluster.default.svc:2379 isLeader=true
-d7c603bd213157b2: name=etcd-cluster-0002 peerURLs=http://etcd-cluster-0002.etcd-cluster.default.svc:2380 clientURLs=http://etcd-cluster-0002.etcd-cluster.default.svc:2379 isLeader=false
+2f6ea94eace6a667: name=etcd-cluster-4bt6k5f67q peerURLs=http://etcd-cluster-4bt6k5f67q.etcd-cluster.default.svc:2380 clientURLs=http://etcd-cluster-4bt6k5f67q.etcd-cluster.default.svc:2379 isLeader=false
+90b714769416c903: name=etcd-cluster-jxdqvfzcnc peerURLs=http://etcd-cluster-jxdqvfzcnc.etcd-cluster.default.svc:2380 clientURLs=http://etcd-cluster-jxdqvfzcnc.etcd-cluster.default.svc:2379 isLeader=true
+dc3797664175b5da: name=etcd-cluster-lzlkcs6dk7 peerURLs=http://etcd-cluster-lzlkcs6dk7.etcd-cluster.default.svc:2380 clientURLs=http://etcd-cluster-lzlkcs6dk7.etcd-cluster.default.svc:2379 isLeader=false
+pod "etcdclient" deleted
 ```
 
 ## start vernemq cluster on AKS
@@ -124,12 +125,12 @@ mac:$ kubectl create secret generic vernemq-certifications --from-file=./secrets
 ```bash
 mac:$ kubectl get secrets
 NAME                                                          TYPE                                  DATA      AGE
-default-token-2klq6                                           kubernetes.io/service-account-token   3         19m
-fiware-etcd-etcd-operator-etcd-backup-operator-token-ghsq2    kubernetes.io/service-account-token   3         5m
-fiware-etcd-etcd-operator-etcd-operator-token-qm2xp           kubernetes.io/service-account-token   3         5m
-fiware-etcd-etcd-operator-etcd-restore-operator-token-4wzkm   kubernetes.io/service-account-token   3         5m
-vernemq-certifications                                        Opaque                                3         3s
-vernemq-passwd                                                Opaque                                1         11s
+default-token-gdql9                                           kubernetes.io/service-account-token   3         41m
+fiware-etcd-etcd-operator-etcd-backup-operator-token-ztqfd    kubernetes.io/service-account-token   3         8m
+fiware-etcd-etcd-operator-etcd-operator-token-jw724           kubernetes.io/service-account-token   3         8m
+fiware-etcd-etcd-operator-etcd-restore-operator-token-xq6rl   kubernetes.io/service-account-token   3         8m
+vernemq-certifications                                        Opaque                                3         29s
+vernemq-passwd                                                Opaque                                1         35s
 ```
 
 ```bash
@@ -266,13 +267,13 @@ mac:$ kubectl create secret tls ambassador-certs --cert=$(pwd)/secrets/live/api.
 ```bash
 mac:$ kubectl get secrets
 NAME                                                          TYPE                                  DATA      AGE
-ambassador-certs                                              kubernetes.io/tls                     2         29s
-default-token-rkrts                                           kubernetes.io/service-account-token   3         1h
-fiware-etcd-etcd-operator-etcd-backup-operator-token-42pgm    kubernetes.io/service-account-token   3         1h
-fiware-etcd-etcd-operator-etcd-operator-token-7v4dq           kubernetes.io/service-account-token   3         1h
-fiware-etcd-etcd-operator-etcd-restore-operator-token-wb6pg   kubernetes.io/service-account-token   3         1h
-vernemq-certifications                                        Opaque                                3         19m
-vernemq-passwd                                                Opaque                                1         19m
+ambassador-certs                                              kubernetes.io/tls                     2         8s
+default-token-gdql9                                           kubernetes.io/service-account-token   3         1h
+fiware-etcd-etcd-operator-etcd-backup-operator-token-ztqfd    kubernetes.io/service-account-token   3         29m
+fiware-etcd-etcd-operator-etcd-operator-token-jw724           kubernetes.io/service-account-token   3         29m
+fiware-etcd-etcd-operator-etcd-restore-operator-token-xq6rl   kubernetes.io/service-account-token   3         29m
+vernemq-certifications                                        Opaque                                3         20m
+vernemq-passwd                                                Opaque                                1         21m
 ```
 
 ```bash
@@ -337,14 +338,15 @@ mac:$ kubectl create secret generic auth-tokens --from-file=./secrets/auth-token
 ```bash
 mac:$ kubectl get secrets
 NAME                                                          TYPE                                  DATA      AGE
-ambassador-certs                                              kubernetes.io/tls                     2         4m
-auth-tokens                                                   Opaque                                1         1s
-default-token-2klq6                                           kubernetes.io/service-account-token   3         28m
-fiware-etcd-etcd-operator-etcd-backup-operator-token-ghsq2    kubernetes.io/service-account-token   3         14m
-fiware-etcd-etcd-operator-etcd-operator-token-qm2xp           kubernetes.io/service-account-token   3         14m
-fiware-etcd-etcd-operator-etcd-restore-operator-token-4wzkm   kubernetes.io/service-account-token   3         14m
-vernemq-certifications                                        Opaque                                3         8m
-vernemq-passwd                                                Opaque                                1         8m
+ambassador-certs                                              kubernetes.io/tls                     2         1h
+ambassador-token-69r9s                                        kubernetes.io/service-account-token   3         1h
+auth-tokens                                                   Opaque                                1         29s
+default-token-gdql9                                           kubernetes.io/service-account-token   3         2h
+fiware-etcd-etcd-operator-etcd-backup-operator-token-ztqfd    kubernetes.io/service-account-token   3         2h
+fiware-etcd-etcd-operator-etcd-operator-token-jw724           kubernetes.io/service-account-token   3         2h
+fiware-etcd-etcd-operator-etcd-restore-operator-token-xq6rl   kubernetes.io/service-account-token   3         2h
+vernemq-certifications                                        Opaque                                3         2h
+vernemq-passwd                                                Opaque                                1         2h
 ```
 
 ```bash
@@ -363,6 +365,19 @@ ambassador-auth-6fffdbd9c9-sdn5b   1/1       Running   0          56s
 mac:$ kubectl get services -l service=ambassador-auth
 NAME          TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
 ambassador-auth   ClusterIP   10.0.129.102   <none>        3000/TCP   2m
+```
+
+```bash
+mac:$ curl -i https://api.tech-sketch.jp
+HTTP/1.1 401 Unauthorized
+content-type: application/json; charset=utf-8
+www-authenticate: Bearer realm="token_required"
+date: Tue, 14 Aug 2018 00:43:54 GMT
+content-length: 60
+x-envoy-upstream-service-time: 2
+server: envoy
+
+{"authorized":false,"error":"missing Header: authorization"}
 ```
 
 ## start fiware orion on AKS
@@ -605,6 +620,11 @@ mac:$ export MANAGED_CLUSTER=$(az resource show --resource-group ogc-poc1 --name
 mac:$ az storage account create --resource-group ${MANAGED_CLUSTER} --name fiwareaksstorageaccount --location japaneast --sku Standard_LRS
 ```
 ```bash
+mac:$ kubectl create clusterrole system:azure-cloud-provider --verb=get,create --resource=secrets
+mac:$ kubectl create clusterrolebinding system:azure-cloud-provider --clusterrole=system:azure-cloud-provider --serviceaccount=kube-system:persistent-volume-binder
+```
+
+```bash
 mac:$ kubectl apply -f controller/shared-storage-azure.yaml
 ```
 ```bash
@@ -630,6 +650,19 @@ mac:$ docker push ${REPOSITORY}/tech-sketch/storage:0.1.0
 ```bash
 mac:$ envsubst < controller/storage.yaml | kubectl apply -f -
 ```
+```bash
+mac:$ kubectl get pods -l pod=storage
+NAME                       READY     STATUS    RESTARTS   AGE
+storage-6956d9b5ff-87ws5   1/1       Running   0          37s
+storage-6956d9b5ff-f9ztr   1/1       Running   0          37s
+storage-6956d9b5ff-wc2xq   1/1       Running   0          37s
+```
+```bash
+mac:$ kubectl get services -l service=storage
+NAME      TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)    AGE
+storage   ClusterIP   10.0.91.62   <none>        8888/TCP   1m
+```
+
 ```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Content-Type: multipart/form-data" https://api.tech-sketch.jp/storage/faces/ -X POST -F face=@face.jpg | jq .
 {
