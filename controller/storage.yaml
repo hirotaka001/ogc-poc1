@@ -40,7 +40,7 @@ spec:
         - name: LISTEN_PORT
           value: "8888"
         - name: LOG_LEVEL
-          value: "DEBUG"
+          value: "INFO"
         - name: FACE_UPLOAD_DIR_FULLPATH
           value: "/shared/faces"
         ports:
