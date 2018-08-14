@@ -732,12 +732,23 @@ mac:$ helm repo add coreos https://s3-eu-west-1.amazonaws.com/coreos-charts/stab
 * install coreos/prometheus-operator
 
 ```bash
-mac:$ helm install coreos/prometheus-operator --name ogc-prometheus-operator --namespace monitoring --set rbacEnable=false
+mac:$ helm install coreos/prometheus-operator --name ogc-prometheus-operator --namespace monitoring
+```
+```bash
+mac:$ kubectl get deployments --namespace monitoring
+NAME                      DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+ogc-prometheus-operator   1         1         1            1           6m
+```
+```bash
 mac:$ kubectl get pods --namespace monitoring
-NAME                                       READY     STATUS    RESTARTS   AGE
-ogc-prometheus-operator-74d768444d-7g2lt   1/1       Running   0          6m
+NAME                                          READY     STATUS      RESTARTS   AGE
+ogc-prometheus-operator-6574f68ff9-498hk      1/1       Running     0          5m
+ogc-prometheus-operator-create-sm-job-bbz9n   0/1       Completed   0          5m
+```
+```bash
 mac:$ kubectl get jobs --namespace monitoring
-No resources found.
+NAME                                    DESIRED   SUCCESSFUL   AGE
+ogc-prometheus-operator-create-sm-job   1         1            6m
 ```
 
 * install coreos/kube-prometheus
@@ -751,19 +762,6 @@ NAME                                DESIRED   CURRENT   READY     UP-TO-DATE   A
 ogc-kube-prometheus-exporter-node   4         4         4         4            4           <none>          4m
 ```
 ```bash
-mac:$ kubectl get pods --namespace monitoring
-NAME                                                      READY     STATUS    RESTARTS   AGE
-alertmanager-ogc-kube-prometheus-0                        2/2       Running   0          5m
-ogc-kube-prometheus-exporter-kube-state-59cb7c6b7-25z9h   2/2       Running   0          4m
-ogc-kube-prometheus-exporter-node-4fh9v                   1/1       Running   0          5m
-ogc-kube-prometheus-exporter-node-72f68                   1/1       Running   0          5m
-ogc-kube-prometheus-exporter-node-hnb89                   1/1       Running   0          5m
-ogc-kube-prometheus-exporter-node-m4sct                   1/1       Running   0          5m
-ogc-kube-prometheus-grafana-778b7d7784-k9kc9              2/2       Running   0          5m
-ogc-prometheus-operator-74d768444d-7g2lt                  1/1       Running   0          27m
-prometheus-ogc-kube-prometheus-0                          3/3       Running   1          5m
-```
-```bash
 mac:$ kubectl get deployments --namespace monitoring
 NAME                                      DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
 ogc-kube-prometheus-exporter-kube-state   1         1         1            1           6m
@@ -775,6 +773,20 @@ mac:$ kubectl get statefulsets --namespace monitoring
 NAME                               DESIRED   CURRENT   AGE
 alertmanager-ogc-kube-prometheus   1         1         6m
 prometheus-ogc-kube-prometheus     1         1         6m
+```
+```bash
+mac:$ kubectl get pods --namespace monitoring
+NAME                                                       READY     STATUS      RESTARTS   AGE
+alertmanager-ogc-kube-prometheus-0                         2/2       Running     0          3m
+ogc-kube-prometheus-exporter-kube-state-6b47d67cf6-jj69r   2/2       Running     0          3m
+ogc-kube-prometheus-exporter-node-7vq6x                    1/1       Running     0          3m
+ogc-kube-prometheus-exporter-node-cwc7d                    1/1       Running     0          3m
+ogc-kube-prometheus-exporter-node-lstm6                    1/1       Running     0          3m
+ogc-kube-prometheus-exporter-node-xtb6h                    1/1       Running     0          3m
+ogc-kube-prometheus-grafana-78d984b4f5-59j4r               2/2       Running     0          3m
+ogc-prometheus-operator-6574f68ff9-498hk                   1/1       Running     0          12m
+ogc-prometheus-operator-create-sm-job-bbz9n                0/1       Completed   0          12m
+prometheus-ogc-kube-prometheus-0                           3/3       Running     1          3m
 ```
 ```bash
 mac:$ kubectl get services --namespace monitoring
@@ -794,15 +806,23 @@ alertmanager-ogc-kube-prometheus-db-alertmanager-ogc-kube-prometheus-0   Bound  
 prometheus-ogc-kube-prometheus-db-prometheus-ogc-kube-prometheus-0       Bound     pvc-94d234c0-9e98-11e8-8646-02af8659316c   30Gi       RWO            managed-premium   9m
 ```
 
-* patch kube-dns-v20 because Azure AKS does not export dns metrics
+* patch `kube-dns-v20` because Azure AKS does not export dns metrics
+    * https://github.com/Azure/AKS/issues/345
 
 ```bash
 mac:$ kubectl patch deployment -n kube-system kube-dns-v20 --patch "$(cat monitoring/kube-dns-metrics-patch.yaml)"
+```
+
+* patch `kube-prometheus-exporter-kubelets`
+    * https://github.com/coreos/prometheus-operator/issues/926
+
+```bash
+mac:$ kubectl -n monitoring get servicemonitor ogc-kube-prometheus-exporter-kubelets -o yaml | sed 's/https/http/' | kubectl replace -f -
 ```
 
 * delete monitor of apiserver because apiserver of Azure AKS does not allow to connect apiserver directry
     * https://github.com/coreos/prometheus-operator/issues/1522
 
 ```bash
-mac:$ kubectl -n monitoring delete servicemonitor kube-prometheus-exporter-kubernetes
+mac:$ kubectl -n monitoring delete servicemonitor ogc-kube-prometheus-exporter-kubernetes
 ```

@@ -1,5 +1,5 @@
 global:
-  rbacEnable: false
+  rbacEnable: true
 
 alertmanager:
   storageSpec:
