@@ -18,4 +18,5 @@ mac:$ kubectl --namespace monitoring port-forward $(kubectl get pod --namespace 
 mac:$ open http://localhost:3000/
 ```
 
-* login grafana as `admin/${GRAFANA_ADMIN_PASSWORD}`
+1. login grafana as `admin/${GRAFANA_ADMIN_PASSWORD}`
+2. import `dashboard_persistent_volumes.json`
