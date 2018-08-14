@@ -2013,7 +2013,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 ```
 ```bash
-$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /external_camera/external_camera/cmdexe -u iotagent -P XXXXXXXX -m "external_camera_0000000000000011@external_camera_request|result,success/time,2018-08-01 08:34:32/c_cmd,Monitor"
+mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /external_camera/external_camera_0000000000000011/cmdexe -u iotagent -P XXXXXXXX -m "external_camera_0000000000000011@external_camera_request|result,success/time,2018-08-01 08:34:32/c_cmd,Monitor"
 Client mosqpub|81501-Nobuyukin sending CONNECT
 Client mosqpub|81501-Nobuyukin received CONNACK
 Client mosqpub|81501-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/external_camera/external_camera_0000000000000011/cmdexe', ... (110 bytes))
