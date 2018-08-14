@@ -1,0 +1,34 @@
+global:
+  rbacEnable: true
+
+alertmanager:
+  storageSpec:
+    volumeClaimTemplate:
+      metadata:
+        name: prometheus-alertmanager-storage-claim
+        annotations:
+          volume.beta.kubernetes.io/storage-class: managed-premium
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 30Gi
+
+prometheus:
+  storageSpec:
+    volumeClaimTemplate:
+      metadata:
+        name: prometheus-prometheus-storage-claim
+        annotations:
+          volume.beta.kubernetes.io/storage-class: managed-premium
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 30Gi
+
+grafana:
+  auth:
+    anonymous:
+      enabled: "false"
+  adminPassword: "${GRAFANA_ADMIN_PASSWORD}"
