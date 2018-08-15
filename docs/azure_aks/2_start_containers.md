@@ -911,3 +911,31 @@ mac:$ kubectl get services -n logging -l k8s-app=kibana-logging
 NAME             TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
 kibana-logging   ClusterIP   10.0.187.100   <none>        5601/TCP   3m
 ```
+
+* register curator job
+```bash
+mac:$ kubectl apply -f logging/curator-configmap.yaml
+```
+```bash
+mac:$ kubectl get configmaps -n logging
+NAME                       DATA      AGE
+curator-config             2         1m
+fluentd-es-config-v0.1.4   6         1h
+```
+
+```bash
+mac:$ kubectl apply -f logging/curator-cronjob.yaml
+```
+```bash
+$ kubectl get cronjobs -n logging -l k8s-app=elasticsearch-curator
+NAME                    SCHEDULE     SUSPEND   ACTIVE    LAST SCHEDULE   AGE
+elasticsearch-curator   0 18 * * *   False     0         7m              11m
+```
+
+after cronjob triggered
+
+```bash
+mac:$ kubectl get jobs -n logging
+NAME                               DESIRED   SUCCESSFUL   AGE
+elasticsearch-curator-1534311000   1         1            1m
+```
