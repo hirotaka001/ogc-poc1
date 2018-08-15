@@ -18,7 +18,7 @@ Start pods & services on AKS by following steps:
 1. [start ledger service](#start-ledger-service-on-aks)
 1. [start guidance service](#start-guidance-service-on-aks)
 1. [start monitoring](#start-monitoring)
-
+1. [start logging](#start-logging)
 
 ## start etcd cluster on AKS
 
@@ -827,77 +827,87 @@ mac:$ kubectl -n monitoring get servicemonitor ogc-kube-prometheus-exporter-kube
 mac:$ kubectl -n monitoring delete servicemonitor ogc-kube-prometheus-exporter-kubernetes
 ```
 
-## start elasticsearch, fluent-bit, kibana
+## start logging
 
+* create `logging` namespace
 ```bash
-mac:$ helm repo add akomljen-charts https://raw.githubusercontent.com/komljen/helm-charts/master/charts/
-```
-
-* install akomljen/elasticsearch-operator
-
-```bash
-mac:$ helm install akomljen-charts/elasticsearch-operator --name ogc-es-operator --namespace logging
-```
-```bash
-mac:$ kubectl get deployments --namespace logging
-NAME                                     DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
-ogc-es-operator-elasticsearch-operator   1         1         1            1           1m
-```
-```bash
-mac:$ kubectl get pods --namespace logging
-NAME                                                     READY     STATUS    RESTARTS   AGE
-ogc-es-operator-elasticsearch-operator-dd4769cc5-75cqc   1/1       Running   0          2m
+mac:$ kubectl apply -f logging/namespace.yaml
 ```
 
-* install akomljen/efk
+* start elasticsearch
+```bash
+mac:$ kubectl apply -f logging/elasticsearch.yaml
+```
+```bash
+mac:$ kubectl get statefulsets -n logging -l k8s-app=elasticsearch-logging
+NAME                    DESIRED   CURRENT   AGE
+elasticsearch-logging   2         2         16m
+```
+```bash
+mac:$ kubectl get pods -n logging -l k8s-app=elasticsearch-logging
+NAME                      READY     STATUS    RESTARTS   AGE
+elasticsearch-logging-0   1/1       Running   0          16m
+elasticsearch-logging-1   1/1       Running   0          14m
+```
+```bash
+mac:$ kubectl get services -n logging -l k8s-app=elasticsearch-logging
+NAME                    TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
+elasticsearch-logging   ClusterIP   10.0.204.122   <none>        9200/TCP   16m
+```
+```bash
+mac:$ kubectl get persistentvolumeclaims -n logging -l k8s-app=elasticsearch-logging
+NAME                                            STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS      AGE
+elasticsearch-logging-elasticsearch-logging-0   Bound     pvc-568875fa-a03a-11e8-9995-467fb626d835   64Gi       RWO            managed-premium   22m
+elasticsearch-logging-elasticsearch-logging-1   Bound     pvc-4aa6e308-a03b-11e8-9995-467fb626d835   64Gi       RWO            managed-premium   15m
+```
 
 ```bash
-mac:$ helm install akomljen-charts/efk --name ogc-efk --namespace logging -f logging/ogc-efk.yaml
+mac:$ kubectl exec -it elasticsearch-logging-0 -n logging -- curl -H "Content-Type: application/json" -X PUT http://elasticsearch-logging:9200/_cluster/settings -d '{"transient": {"cluster.routing.allocation.enable":"all"}}'
+{"acknowledged":true,"persistent":{},"transient":{"cluster":{"routing":{"allocation":{"enable":"all"}}}}
+```
+
+* stert fluentd
+```bash
+mac:$ kubectl apply -f logging/fluentd-es-configmap.yaml
 ```
 ```bash
-mac:$ kubectl get daemonset --namespace logging
-NAME         DESIRED   CURRENT   READY     UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
-fluent-bit   4         4         4         4            4           <none>          7m
+mac:$ kubectl get configmap -n logging
+NAME                       DATA      AGE
+fluentd-es-config-v0.1.4   6         9s
 ```
 ```bash
-mac:$ kubectl get deployments --namespace logging
-NAME                                     DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
-es-client-ogc-efk-cluster                1         1         1            1           6m
-ogc-efk-kibana                           1         1         1            1           7m
-ogc-es-operator-elasticsearch-operator   1         1         1            1           17m
+mac:$ kubectl apply -f logging/fluentd-es-ds.yaml
 ```
 ```bash
-mac:$ kubectl get statefulsets --namespace logging
-NAME                                DESIRED   CURRENT   AGE
-es-data-ogc-efk-cluster-default     1         1         6m
-es-master-ogc-efk-cluster-default   1         1         6m
+mac:$ kubectl get daemonsets -n logging -l k8s-app=fluentd-es
+NAME                DESIRED   CURRENT   READY     UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
+fluentd-es-v2.2.0   4         4         4         4            4           <none>          27m
 ```
 ```bash
-mac:$ kubectl get pods --namespace logging
-NAME                                                     READY     STATUS    RESTARTS   AGE
-es-client-ogc-efk-cluster-9549744cb-swdmc                1/1       Running   0          7m
-es-data-ogc-efk-cluster-default-0                        1/1       Running   0          6m
-es-master-ogc-efk-cluster-default-0                      1/1       Running   0          7m
-fluent-bit-bdhkk                                         1/1       Running   0          8m
-fluent-bit-cjzdv                                         1/1       Running   0          8m
-fluent-bit-dsrgt                                         1/1       Running   0          8m
-fluent-bit-wwm4b                                         1/1       Running   0          8m
-ogc-efk-kibana-54866d47bf-wb4kz                          1/1       Running   0          8m
-ogc-es-operator-elasticsearch-operator-dd4769cc5-75cqc   1/1       Running   0          18m
+mac:$ kubectl get pods -n logging -l k8s-app=fluentd-es
+NAME                      READY     STATUS    RESTARTS   AGE
+fluentd-es-v2.2.0-4cvl9   1/1       Running   0          6m
+fluentd-es-v2.2.0-5v6mz   1/1       Running   0          6m
+fluentd-es-v2.2.0-chvdk   1/1       Running   0          6m
+fluentd-es-v2.2.0-lptz9   1/1       Running   0          6m
+```
+
+* start kibana
+```bash
+mac:$ kubectl apply -f logging/kibana.yaml
 ```
 ```bash
-mac:$ kubectl get services --namespace logging
-NAME                                      TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
-cerebro-ogc-efk-cluster                   ClusterIP   10.0.51.157    <none>        80/TCP     8m
-elasticsearch-discovery-ogc-efk-cluster   ClusterIP   10.0.106.245   <none>        9300/TCP   8m
-elasticsearch-ogc-efk-cluster             ClusterIP   10.0.242.192   <none>        9200/TCP   8m
-es-data-svc-ogc-efk-cluster               ClusterIP   10.0.127.105   <none>        9300/TCP   8m
-kibana-ogc-efk-cluster                    ClusterIP   10.0.135.63    <none>        80/TCP     8m
-ogc-efk-kibana                            ClusterIP   10.0.49.225    <none>        443/TCP    9m
+mac:$ kubectl get deployments -n logging -l k8s-app=kibana-logging
+NAME             DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+kibana-logging   1         1         1            1           2m
 ```
 ```bash
-mac:$ kubectl get persistentvolumeclaims --namespace logging
-NAME                                          STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
-es-data-es-data-ogc-efk-cluster-default-0     Bound     pvc-55cf566d-9ec6-11e8-8646-02af8659316c   1Gi        RWO            default        1h
-es-data-es-master-ogc-efk-cluster-default-0   Bound     pvc-55bdd8ff-9ec6-11e8-8646-02af8659316c   1Gi        RWO            default        1h
+mac:$ kubectl get pods -n logging -l k8s-app=kibana-logging
+NAME                             READY     STATUS    RESTARTS   AGE
+kibana-logging-86b5665bb-7kcn4   1/1       Running   0          2m
+```
+```bash
+mac:$ kubectl get services -n logging -l k8s-app=kibana-logging
+NAME             TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
+kibana-logging   ClusterIP   10.0.187.100   <none>        5601/TCP   3m
 ```

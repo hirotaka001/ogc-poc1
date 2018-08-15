@@ -28,11 +28,11 @@ mac:$ open http://localhost:3000/
 
 ### open kibana
 ```bash
-mac:$ kubectl --namespace logging port-forward $(kubectl get pod -l app=kibana --namespace logging -o template --template "{{(index .items 0).metadata.name}}") 5601:5601
+mac:$ kubectl --namespace logging port-forward $(kubectl get pod -l k8s-app=kibana-logging --namespace logging -o template --template "{{(index .items 0).metadata.name}}") 5601:5601
 ```
 ```bash
 mac:$ open http://localhost:5601/
 ```
 
-1. configure `Index Pattern` as `kubernetes_cluster*`
+1. configure `Index Pattern` as `logstash-*`
 1. configure `Time Filter field name` as `@timestamp`
