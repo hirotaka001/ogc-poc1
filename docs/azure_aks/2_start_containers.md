@@ -18,7 +18,7 @@ Start pods & services on AKS by following steps:
 1. [start ledger service](#start-ledger-service-on-aks)
 1. [start guidance service](#start-guidance-service-on-aks)
 1. [start monitoring](#start-monitoring)
-1. [start logging](#start-logging)
+1. [start logging](#start-logging-on-aks)
 
 ## start etcd cluster on AKS
 
@@ -722,7 +722,8 @@ guidance   ClusterIP   10.0.222.146   <none>        8888/TCP   58s
 
 ## start monitoring on AKS
 
-[prometheus](https://prometheus.io/)
+[prometheus](https://prometheus.io/)  
+[grafana](https://grafana.com/)
 
 * enable coreos helm
 ```bash
@@ -827,7 +828,11 @@ mac:$ kubectl -n monitoring get servicemonitor ogc-kube-prometheus-exporter-kube
 mac:$ kubectl -n monitoring delete servicemonitor ogc-kube-prometheus-exporter-kubernetes
 ```
 
-## start logging
+## start logging on AKS
+
+[ElasticSearch](https://www.elastic.co/products/elasticsearch)  
+[fluentd](https://www.fluentd.org/)  
+[Kibana](https://www.elastic.co/products/kibana)
 
 * create `logging` namespace
 ```bash
@@ -839,30 +844,30 @@ mac:$ kubectl apply -f logging/namespace.yaml
 mac:$ kubectl apply -f logging/elasticsearch.yaml
 ```
 ```bash
-mac:$ kubectl get statefulsets -n logging -l k8s-app=elasticsearch-logging
+mac:$ kubectl get statefulsets -n monitoring -l k8s-app=elasticsearch-logging
 NAME                    DESIRED   CURRENT   AGE
 elasticsearch-logging   2         2         16m
 ```
 ```bash
-mac:$ kubectl get pods -n logging -l k8s-app=elasticsearch-logging
+mac:$ kubectl get pods -n monitoring -l k8s-app=elasticsearch-logging
 NAME                      READY     STATUS    RESTARTS   AGE
 elasticsearch-logging-0   1/1       Running   0          16m
 elasticsearch-logging-1   1/1       Running   0          14m
 ```
 ```bash
-mac:$ kubectl get services -n logging -l k8s-app=elasticsearch-logging
+mac:$ kubectl get services -n monitoring -l k8s-app=elasticsearch-logging
 NAME                    TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
 elasticsearch-logging   ClusterIP   10.0.204.122   <none>        9200/TCP   16m
 ```
 ```bash
-mac:$ kubectl get persistentvolumeclaims -n logging -l k8s-app=elasticsearch-logging
+mac:$ kubectl get persistentvolumeclaims -n monitoring -l k8s-app=elasticsearch-logging
 NAME                                            STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS      AGE
 elasticsearch-logging-elasticsearch-logging-0   Bound     pvc-568875fa-a03a-11e8-9995-467fb626d835   64Gi       RWO            managed-premium   22m
 elasticsearch-logging-elasticsearch-logging-1   Bound     pvc-4aa6e308-a03b-11e8-9995-467fb626d835   64Gi       RWO            managed-premium   15m
 ```
 
 ```bash
-mac:$ kubectl exec -it elasticsearch-logging-0 -n logging -- curl -H "Content-Type: application/json" -X PUT http://elasticsearch-logging:9200/_cluster/settings -d '{"transient": {"cluster.routing.allocation.enable":"all"}}'
+mac:$ kubectl exec -it elasticsearch-logging-0 -n monitoring -- curl -H "Content-Type: application/json" -X PUT http://elasticsearch-logging:9200/_cluster/settings -d '{"transient": {"cluster.routing.allocation.enable":"all"}}'
 {"acknowledged":true,"persistent":{},"transient":{"cluster":{"routing":{"allocation":{"enable":"all"}}}}
 ```
 
@@ -871,20 +876,23 @@ mac:$ kubectl exec -it elasticsearch-logging-0 -n logging -- curl -H "Content-Ty
 mac:$ kubectl apply -f logging/fluentd-es-configmap.yaml
 ```
 ```bash
-mac:$ kubectl get configmap -n logging
-NAME                       DATA      AGE
-fluentd-es-config-v0.1.4   6         9s
+mac:$ kubectl get configmap -n monitoring
+NAME                                       DATA      AGE
+fluentd-es-config-v0.1.4                   6         8s
+ogc-kube-prometheus-grafana                10        36m
+ogc-prometheus-operator                    1         40m
+prometheus-ogc-kube-prometheus-rulefiles   10        36m
 ```
 ```bash
 mac:$ kubectl apply -f logging/fluentd-es-ds.yaml
 ```
 ```bash
-mac:$ kubectl get daemonsets -n logging -l k8s-app=fluentd-es
+mac:$ kubectl get daemonsets -n monitoring -l k8s-app=fluentd-es
 NAME                DESIRED   CURRENT   READY     UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
 fluentd-es-v2.2.0   4         4         4         4            4           <none>          27m
 ```
 ```bash
-mac:$ kubectl get pods -n logging -l k8s-app=fluentd-es
+mac:$ kubectl get pods -n monitoring -l k8s-app=fluentd-es
 NAME                      READY     STATUS    RESTARTS   AGE
 fluentd-es-v2.2.0-4cvl9   1/1       Running   0          6m
 fluentd-es-v2.2.0-5v6mz   1/1       Running   0          6m
@@ -897,17 +905,17 @@ fluentd-es-v2.2.0-lptz9   1/1       Running   0          6m
 mac:$ kubectl apply -f logging/kibana.yaml
 ```
 ```bash
-mac:$ kubectl get deployments -n logging -l k8s-app=kibana-logging
+mac:$ kubectl get deployments -n monitoring -l k8s-app=kibana-logging
 NAME             DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
 kibana-logging   1         1         1            1           2m
 ```
 ```bash
-mac:$ kubectl get pods -n logging -l k8s-app=kibana-logging
+mac:$ kubectl get pods -n monitoring -l k8s-app=kibana-logging
 NAME                             READY     STATUS    RESTARTS   AGE
 kibana-logging-86b5665bb-7kcn4   1/1       Running   0          2m
 ```
 ```bash
-mac:$ kubectl get services -n logging -l k8s-app=kibana-logging
+mac:$ kubectl get services -n monitoring -l k8s-app=kibana-logging
 NAME             TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
 kibana-logging   ClusterIP   10.0.187.100   <none>        5601/TCP   3m
 ```
@@ -917,17 +925,19 @@ kibana-logging   ClusterIP   10.0.187.100   <none>        5601/TCP   3m
 mac:$ kubectl apply -f logging/curator-configmap.yaml
 ```
 ```bash
-mac:$ kubectl get configmaps -n logging
-NAME                       DATA      AGE
-curator-config             2         1m
-fluentd-es-config-v0.1.4   6         1h
+mac:$ kubectl get configmaps -n monitoring
+NAME                                       DATA      AGE
+curator-config                             2         32s
+fluentd-es-config-v0.1.4                   6         3m
+ogc-kube-prometheus-grafana                10        40m
+ogc-prometheus-operator                    1         43m
+prometheus-ogc-kube-prometheus-rulefiles   10        39m
 ```
-
 ```bash
 mac:$ kubectl apply -f logging/curator-cronjob.yaml
 ```
 ```bash
-$ kubectl get cronjobs -n logging -l k8s-app=elasticsearch-curator
+$ kubectl get cronjobs -n monitoring -l k8s-app=elasticsearch-curator
 NAME                    SCHEDULE     SUSPEND   ACTIVE    LAST SCHEDULE   AGE
 elasticsearch-curator   0 18 * * *   False     0         7m              11m
 ```
@@ -935,7 +945,7 @@ elasticsearch-curator   0 18 * * *   False     0         7m              11m
 after cronjob triggered
 
 ```bash
-mac:$ kubectl get jobs -n logging
+mac:$ kubectl get jobs -n monitoring
 NAME                               DESIRED   SUCCESSFUL   AGE
 elasticsearch-curator-1534311000   1         1            1m
 ```

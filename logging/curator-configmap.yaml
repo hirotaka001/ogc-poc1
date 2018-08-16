@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: curator-config
-  namespace: logging
+  namespace: monitoring
 data:
   action_file.yml: |-
     ---
