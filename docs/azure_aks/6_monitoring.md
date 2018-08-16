@@ -9,6 +9,8 @@ mac:$ kubectl --namespace monitoring port-forward $(kubectl get pod --namespace 
 mac:$ open http://localhost:9090/
 ```
 
+1. wait until all state is up
+
 ## open grafana
 
 ```bash
