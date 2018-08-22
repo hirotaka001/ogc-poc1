@@ -1,4 +1,4 @@
-# 2. start containers for container-centric fiware demonstration on AKS
+# 2. start containers on AKS
 
 Start pods & services on AKS by following steps:
 
@@ -831,7 +831,7 @@ mac:$ kubectl -n monitoring delete servicemonitor ogc-kube-prometheus-exporter-k
 ```bash
 $ kubectl edit prometheusrules ogc-kube-prometheus --namespace monitoring
 ```
-```diff:ogc-kube-prometheus
+```diff
        for: 10m
        labels:
          severity: warning
@@ -850,7 +850,7 @@ $ kubectl edit prometheusrules ogc-kube-prometheus --namespace monitoring
 ```bash
 $ kubectl edit prometheusrules ogc-kube-prometheus-exporter-kubernetes --namespace monitoring
 ```
-```diff:ogc-kube-prometheus-exporter-kubernetes
+```diff
        for: 10m
        labels:
          severity: critical
@@ -870,7 +870,7 @@ $ kubectl edit prometheusrules ogc-kube-prometheus-exporter-kubernetes --namespa
 ```bash
 $ kubectl edit prometheusrules ogc-kube-prometheus-exporter-kube-controller-manager --namespace monitoring
 ```
-```diff:ogc-kube-prometheus-exporter-kube-controller-manager
+```diff
  spec:
    groups:
    - name: kube-controller-manager.rules
@@ -890,7 +890,7 @@ $ kubectl edit prometheusrules ogc-kube-prometheus-exporter-kube-controller-mana
 ```bash
 $ kubectl edit prometheusrules ogc-kube-prometheus-exporter-kube-scheduler --namespace monitoring
 ```
-```diff:ogc-kube-prometheus-exporter-kube-scheduler
+```diff
        labels:
          quantile: "0.5"
        record: cluster:scheduler_binding_latency_seconds:quantile
