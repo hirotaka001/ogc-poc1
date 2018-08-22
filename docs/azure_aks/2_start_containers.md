@@ -826,3 +826,80 @@ mac:$ kubectl -n monitoring get servicemonitor ogc-kube-prometheus-exporter-kube
 ```bash
 mac:$ kubectl -n monitoring delete servicemonitor ogc-kube-prometheus-exporter-kubernetes
 ```
+```bash
+$ kubectl edit prometheusrules ogc-kube-prometheus --namespace monitoring
+```
+```diff:ogc-kube-prometheus
+       for: 10m
+       labels:
+         severity: warning
+-    - alert: DeadMansSwitch
+-      annotations:
+-        description: This is a DeadMansSwitch meant to ensure that the entire Alerting
+-          pipeline is functional.
+-        summary: Alerting DeadMansSwitch
+-      expr: vector(1)
+-      labels:
+-        severity: none
+     - expr: process_open_fds / process_max_fds
+       record: fd_utilization
+     - alert: FdExhaustionClose
+```
+```bash
+$ kubectl edit prometheusrules ogc-kube-prometheus-exporter-kubernetes --namespace monitoring
+```
+```diff:ogc-kube-prometheus-exporter-kubernetes
+       for: 10m
+       labels:
+         severity: critical
+-    - alert: K8SApiserverDown
+-      annotations:
+-        description: No API servers are reachable or all have disappeared from service
+-          discovery
+-        summary: No API servers are reachable
+-      expr: absent(up{job="apiserver"} == 1)
+-      for: 20m
+-      labels:
+-        severity: critical
+     - alert: K8sCertificateExpirationNotice
+       annotations:
+         description: Kubernetes API Certificate is expiring soon (less than 7 days)
+```
+```bash
+$ kubectl edit prometheusrules ogc-kube-prometheus-exporter-kube-controller-manager --namespace monitoring
+```
+```diff:ogc-kube-prometheus-exporter-kube-controller-manager
+ spec:
+   groups:
+   - name: kube-controller-manager.rules
+-    rules:
+-    - alert: K8SControllerManagerDown
+-      annotations:
+-        description: There is no running K8S controller manager. Deployments and replication
+-          controllers are not making progress.
+-        runbook: https://coreos.com/tectonic/docs/latest/troubleshooting/controller-recovery.html#recovering-a-controller-manager
+-        summary: Controller manager is down
+-      expr: absent(up{job="kube-controller-manager"} == 1)
+-      for: 5m
+-      labels:
+-        severity: critical
++    rules: []
+```
+```bash
+$ kubectl edit prometheusrules ogc-kube-prometheus-exporter-kube-scheduler --namespace monitoring
+```
+```diff:ogc-kube-prometheus-exporter-kube-scheduler
+       labels:
+         quantile: "0.5"
+       record: cluster:scheduler_binding_latency_seconds:quantile
+-    - alert: K8SSchedulerDown
+-      annotations:
+-        description: There is no running K8S scheduler. New pods are not being assigned
+-          to nodes.
+-        runbook: https://coreos.com/tectonic/docs/latest/troubleshooting/controller-recovery.html#recovering-a-scheduler
+-        summary: Scheduler is down
+-      expr: absent(up{job="kube-scheduler"} == 1)
+-      for: 5m
+-      labels:
+-        severity: critical
+```
