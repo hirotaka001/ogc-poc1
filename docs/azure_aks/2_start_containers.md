@@ -19,6 +19,7 @@ Start pods & services on AKS by following steps:
 1. [start guidance service](#start-guidance-service-on-aks)
 1. [start monitoring](#start-monitoring-on-aks)
 1. [start logging](#start-logging-on-aks)
+1. [start cronjob](#start-cronjob-on-aks)
 
 ## start etcd cluster on AKS
 
@@ -948,4 +949,34 @@ after cronjob triggered
 mac:$ kubectl get jobs -n monitoring
 NAME                               DESIRED   SUCCESSFUL   AGE
 elasticsearch-curator-1534311000   1         1            1m
+```
+
+## start cronjob on AKS
+
+```bash
+$ docker build -t ${REPOSITORY}/tech-sketch/iotagent-ul-restarter:0.1.0 idas/restarter/
+$ az acr login --name ogcacr
+$ docker push ${REPOSITORY}/tech-sketch/iotagent-ul-restarter:0.1.0
+```
+```bash
+$ az acr repository list --name ogcacr --output table
+Result
+---------------------------------
+tech-sketch/cygnus-ngsi
+tech-sketch/destination
+tech-sketch/guidance
+tech-sketch/iotagent-ul
+tech-sketch/iotagent-ul-restarter
+tech-sketch/ledger
+tech-sketch/reception
+tech-sketch/storage
+```
+
+```bash
+$ envsubst < idas/restart-iotagent-ul-cronjob.yaml | kubectl apply -f -
+```
+```bash
+$ kubectl get cronjobs
+NAME                    SCHEDULE     SUSPEND   ACTIVE    LAST SCHEDULE   AGE
+iotagent-ul-resterter   0 17 * * *   False     0         <none>          23s
 ```
