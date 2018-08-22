@@ -462,8 +462,8 @@ mac:$ env IOTAGENT_PASSWORD=XXXXXXXXXXXX envsubst < idas/iotagent-ul/config.js.t
 
 ```bash
 mac:$ az acr login --name ogcacr
-mac:$ docker build -t ${REPOSITORY}/tech-sketch/iotagent-ul:1.6.0 idas/iotagent-ul/
-mac:$ docker push ${REPOSITORY}/tech-sketch/iotagent-ul:1.6.0
+mac:$ docker build -t ${REPOSITORY}/tech-sketch/iotagent-ul:1.7.0.plus idas/iotagent-ul/
+mac:$ docker push ${REPOSITORY}/tech-sketch/iotagent-ul:1.7.0.plus
 ```
 
 ```bash
