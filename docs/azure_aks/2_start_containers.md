@@ -953,6 +953,8 @@ elasticsearch-curator-1534311000   1         1            1m
 
 ## start cronjob on AKS
 
+* start cronjob to restart `iotagent-ul` on each day (02:00 JST).
+
 ```bash
 $ docker build -t ${REPOSITORY}/tech-sketch/iotagent-ul-restarter:0.1.0 idas/restarter/
 $ az acr login --name ogcacr
@@ -979,4 +981,44 @@ $ envsubst < idas/restart-iotagent-ul-cronjob.yaml | kubectl apply -f -
 $ kubectl get cronjobs
 NAME                    SCHEDULE     SUSPEND   ACTIVE    LAST SCHEDULE   AGE
 iotagent-ul-resterter   0 17 * * *   False     0         <none>          23s
+```
+
+* after the job to restart `iotagent-ul` fired
+
+```bash
+$ kubectl get cronjobs
+NAME                    SCHEDULE     SUSPEND   ACTIVE    LAST SCHEDULE   AGE
+iotagent-ul-resterter   0 17 * * *   False     0         5h              17h
+```
+```bash
+$ kubectl get jobs
+NAME                               DESIRED   SUCCESSFUL   AGE
+iotagent-ul-resterter-1534957200   1         1            5h
+```
+```bash
+$ kubectl describe deployments iotagent-ul
+Name:                   iotagent-ul
+Namespace:              default
+CreationTimestamp:      Fri, 17 Aug 2018 19:12:25 +0900
+#...(snip)...
+Pod Template:
+  Labels:       app=iotagent-ul
+  Annotations:  lastUpdate=2018-08-22T17:00:10.1534957210Z
+  Containers:
+   iotagent-ul:
+    Image:        ogcacr.azurecr.io/tech-sketch/iotagent-ul:1.7.0.plus
+#...(snip)...
+```
+```bash
+$ kubectl get replicasets -l app=iotagent-ul
+NAME                     DESIRED   CURRENT   READY     AGE
+iotagent-ul-7d5d4fdc67   0         0         0         5d
+iotagent-ul-7fbd59976    3         3         3         5h
+```
+```bash
+$ kubectl get pods -l app=iotagent-ul
+NAME                          READY     STATUS    RESTARTS   AGE
+iotagent-ul-7fbd59976-g9djb   1/1       Running   0          5h
+iotagent-ul-7fbd59976-ltcd2   1/1       Running   0          5h
+iotagent-ul-7fbd59976-rgk6g   1/1       Running   0          5h
 ```
