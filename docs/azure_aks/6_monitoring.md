@@ -7,10 +7,16 @@
 mac:$ kubectl --namespace monitoring port-forward $(kubectl get pod --namespace monitoring -l prometheus=kube-prometheus -l app=prometheus -o template --template "{{(index .items 0).metadata.name}}") 9090:9090
 ```
 ```bash
-mac:$ open http://localhost:9090/
+mac:$ open http://localhost:9090/targets
 ```
 
-1. wait until all state is up
+* wait until 'down' state will not exist
+
+```bash
+mac:$ open http://localhost:9090/alerts
+```
+
+* wait until 'fired' alert will not exist
 
 ## view log
 
