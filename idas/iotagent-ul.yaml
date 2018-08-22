@@ -41,6 +41,8 @@ spec:
     metadata:
       labels:
         app: iotagent-ul
+      annotations:
+        lastUpdate: "manual deploy"
     spec:
       containers:
       - name: iotagent-ul
