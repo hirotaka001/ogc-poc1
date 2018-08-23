@@ -133,7 +133,7 @@ class CheckDestinationAPI(RobotFloorMapMixin, MethodView):
             current_state = self.robot_orion.get_attrs(deviceid, 'r_state')['r_state']['value'].strip()
 
             if posx is not None and posy is not None and floor is not None and current_state == const.GUIDING:
-                destination = Destination().get_destination_by_pos(posx, posy, floor)
+                destination = Destination().get_destination_by_dest_led_pos(posx, posy, floor)
                 if destination is not None and const.DEST_LED_ID in destination and destination[const.DEST_LED_ID] is not None:
                     dest_led_id = destination[const.DEST_LED_ID]
                     message = self.dest_led_orion.send_cmd(dest_led_id, self.dest_led_type, 'action', 'on')

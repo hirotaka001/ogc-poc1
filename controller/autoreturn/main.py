@@ -39,7 +39,11 @@ def main():
     returner = AutoReturner(suspending_sec_max)
     while not STOP_FLAG:
         for floor in const.TARGET_FLOOR:
-            returner.check_robot(floor)
+            try:
+                returner.check_robot(floor)
+            except Exception as e:
+                logger.exception(e)
+                pass
         time.sleep(interval_sec)
     logger.info('stop main loop')
 

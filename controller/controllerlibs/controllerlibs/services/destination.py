@@ -38,6 +38,15 @@ class Destination:
                                                    DESTINATION_LIST_PATH)
         return cls.DESTINATION_LIST_URL
 
+    def get_destinations(self, params=None):
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        try:
+            return requests.get(Destination.get_destination_list_url(), headers=headers, params=params).json()
+        except json.JSONDecodeError as e:
+            raise DestinationFormatError(str(e))
+
     def get_destination_by_name(self, name):
         headers = {
             'Content-Type': 'application/json'
@@ -53,7 +62,7 @@ class Destination:
         except json.JSONDecodeError as e:
             raise DestinationFormatError(str(e))
 
-    def get_destination_by_pos(self, posx, posy, floor):
+    def get_destination_by_dest_led_pos(self, posx, posy, floor):
         headers = {
             'Content-Type': 'application/json'
         }
