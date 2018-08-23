@@ -195,18 +195,25 @@ class DestinationListAPI(MongoMixin, MethodView):
                     v = m.group('v')
                     if k not in UPDATE_SCHEMA['properties'] or k == 'initial':
                         continue
-                    if UPDATE_SCHEMA['properties'][k]['type'] == 'integer':
+
+                    if 'type' in UPDATE_SCHEMA['properties'][k]:
+                        ktypes = (UPDATE_SCHEMA['properties'][k]['type'], )
+                    elif 'anyOf' in UPDATE_SCHEMA['properties'][k]:
+                        ktypes = tuple([a['type'] for a in UPDATE_SCHEMA['properties'][k]['anyOf']])
+                    else:
+                        continue
+
+                    if 'integer' in ktypes:
                         try:
                             v = int(v)
                         except (TypeError, ValueError):
                             pass
-                    elif UPDATE_SCHEMA['properties'][k]['type'] == 'number':
+                    elif 'number' in ktypes:
                         try:
                             v = float(v)
                         except (TypeError, ValueError):
                             pass
                     filter_dict[k] = v
-
             result = [utils.bson2dict(r) for r in self._collection.find(filter_dict)]
         else:
             result = [utils.bson2dict(r) for r in self._collection.find(filter_dict)]
