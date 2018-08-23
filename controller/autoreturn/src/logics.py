@@ -61,6 +61,9 @@ class AutoReturner(RobotFloorMapMixin):
                 }, {
                     'name': 'desty',
                     'value': '',
+                }, {
+                    'name': 'visitor',
+                    'value': '',
                 }
             ]
             self.robot_orion.update_attributes(robot_id, self.robot_type, attributes)
