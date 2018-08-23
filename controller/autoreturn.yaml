@@ -1,0 +1,34 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: autoreturn
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        pod: autoreturn
+    spec:
+      containers:
+      - name: autoreturn
+        image: ${REPOSITORY}/tech-sketch/autoreturn:0.1.0
+        imagePullPolicy: Always
+        env:
+        - name: ORION_ENDPOINT
+          value: "http://orion:1026"
+        - name: DESTINATION_ENDPOINT
+          value: "http://destination:8888"
+        - name: LOG_LEVEL
+          value: "INFO"
+        - name: INTERVAL_SEC
+          value: "1"
+        - name: SUSPENDING_SEC_MAX
+          value: "15"
+        - name: ROBOT_SERVICE
+          value: "${ROBOT_SERVICE}"
+        - name: ROBOT_SERVICEPATH
+          value: "${ROBOT_SERVICEPATH}"
+        - name: ROBOT_TYPE
+          value: "${ROBOT_TYPE}"
+        - name: ROBOT_FLOOR_MAP
+          value: '${ROBOT_FLOOR_MAP}'
