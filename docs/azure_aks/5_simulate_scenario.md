@@ -4038,7 +4038,7 @@
     Client mosqpub|48779-Nobuyukin sending DISCONNECT
     ```
 
-## auto-return (floor 1): navigating a visitor & auto-return
+## auto-return (floor 2): navigating a visitor & auto-return
 1. simulate to receive robot state (Standby)
     * publish ros message to `/robot_2f_1/state`
 
