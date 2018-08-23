@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-import json
 import datetime
 from logging import getLogger
 
@@ -11,20 +10,9 @@ from src import const
 
 from controllerlibs.services.orion import Orion
 from controllerlibs.services.destination import Destination, DestinationFormatError
+from controllerlibs.services.mixins import RobotFloorMapMixin
 
 logger = getLogger(__name__)
-
-
-class RobotFloorMapMixin:
-    def __init__(self):
-        super().__init__()
-        self.robot_floor_map = json.loads(os.environ.get(const.ROBOT_FLOOR_MAP, '{}'))
-
-    def get_floor_by_robot(self, robot_id):
-        return self.robot_floor_map[robot_id]
-
-    def get_available_robot_from_floor(self, floor):
-        return [r_id for r_id, f in self.robot_floor_map.items() if f == floor][0]
 
 
 class AutoReturner(RobotFloorMapMixin):
