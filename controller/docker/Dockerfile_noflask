@@ -1,0 +1,23 @@
+FROM python:3.6.5-alpine
+MAINTAINER Nobuyuki Matsui <nobuyuki.matsui@gmail.com>
+
+ARG SERVICE_PATH
+
+ENV LOGGING_JSON /opt/logging.json
+
+COPY ${SERVICE_PATH} /opt/app
+COPY ./controller/controllerlibs/dist/ /opt/wheel
+
+WORKDIR /opt/app
+
+RUN apk update && \
+    apk add --no-cache --virtual .build python3-dev build-base linux-headers pcre-dev && \
+    pip install -r requirements/common.txt && \
+    pip install -r requirements/production.txt && \
+    pip install --find-links=/opt/wheel -r requirements/wheel.txt && \
+    apk del --purge .build && \
+    rm -r /root/.cache
+
+COPY ./controller/docker/logging.json /opt/logging.json
+
+ENTRYPOINT ["python", "/opt/app/main.py"]

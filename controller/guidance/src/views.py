@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-import json
 from logging import getLogger
 
 from flask import request, jsonify
@@ -11,20 +10,9 @@ from src import const
 
 from controllerlibs.services.orion import Orion, get_id, get_attr_value, NGSIPayloadError, AttrDoesNotExist
 from controllerlibs.services.destination import Destination, DestinationFormatError
+from controllerlibs.services.mixins import RobotFloorMapMixin
 
 logger = getLogger(__name__)
-
-
-class RobotFloorMapMixin:
-    def __init__(self):
-        super().__init__()
-        self.robot_floor_map = json.loads(os.environ.get(const.ROBOT_FLOOR_MAP, '{}'))
-
-    def get_floor_by_robot(self, robot_id):
-        return self.robot_floor_map[robot_id]
-
-    def get_available_robot_from_floor(self, floor):
-        return [r_id for r_id, f in self.robot_floor_map.items() if f == floor][0]
 
 
 class StartMovementAPI(RobotFloorMapMixin, MethodView):
@@ -133,7 +121,7 @@ class CheckDestinationAPI(RobotFloorMapMixin, MethodView):
             current_state = self.robot_orion.get_attrs(deviceid, 'r_state')['r_state']['value'].strip()
 
             if posx is not None and posy is not None and floor is not None and current_state == const.GUIDING:
-                destination = Destination().get_destination_by_pos(posx, posy, floor)
+                destination = Destination().get_destination_by_dest_led_pos(posx, posy, floor)
                 if destination is not None and const.DEST_LED_ID in destination and destination[const.DEST_LED_ID] is not None:
                     dest_led_id = destination[const.DEST_LED_ID]
                     message = self.dest_led_orion.send_cmd(dest_led_id, self.dest_led_type, 'action', 'on')

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-import json
 import datetime
 from logging import getLogger
 
@@ -20,6 +19,7 @@ from src import const, utils
 from controllerlibs import DEST_NAME, DEST_FLOOR
 from controllerlibs.services.orion import Orion, get_id, get_attr_value, NGSIPayloadError, AttrDoesNotExist
 from controllerlibs.services.destination import Destination, DestinationDoesNotExist, DestinationFormatError
+from controllerlibs.services.mixins import RobotFloorMapMixin
 from controllerlibs.utils.start_movement import notify_start_movement
 
 if const.FACE_API_KEY in os.environ:
@@ -41,15 +41,6 @@ class MongoMixin:
         else:
             client = MongoClient(url)
         self._collection = client[const.MONGODB_DATABASE][const.MONGODB_COLLECTION]
-
-
-class RobotFloorMapMixin:
-    def __init__(self):
-        super().__init__()
-        self.robot_floor_map = json.loads(os.environ.get(const.ROBOT_FLOOR_MAP, '{}'))
-
-    def get_available_robot_from_floor(self, floor):
-        return [r_id for r_id, f in self.robot_floor_map.items() if f == floor][0]
 
 
 class RecordReceptionAPI(RobotFloorMapMixin, MongoMixin, MethodView):
