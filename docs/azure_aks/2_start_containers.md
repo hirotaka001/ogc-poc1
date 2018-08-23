@@ -17,6 +17,7 @@ Start pods & services on AKS by following steps:
 1. [start storage service](#start-storage-service-on-aks)
 1. [start ledger service](#start-ledger-service-on-aks)
 1. [start guidance service](#start-guidance-service-on-aks)
+1. [start autoreturn service](#start-autoreturn-service-on-aks)
 1. [start monitoring](#start-monitoring-on-aks)
 1. [start logging](#start-logging-on-aks)
 1. [start cronjob](#start-cronjob-on-aks)
@@ -719,6 +720,21 @@ guidance-644f7f6755-sc5m8   1/1       Running   0          21s
 mac:$ kubectl get services -l service=guidance
 NAME       TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
 guidance   ClusterIP   10.0.222.146   <none>        8888/TCP   58s
+```
+
+## start autoreturn service on AKS
+```bash
+mac:$ az acr login --name ogcacr
+mac:$ docker build --build-arg SERVICE_PATH="./controller/autoreturn" -t ${REPOSITORY}/tech-sketch/autoreturn:0.1.0 -f ./controller/docker/Dockerfile_noflask .
+mac:$ docker push ${REPOSITORY}/tech-sketch/autoreturn:0.1.0
+```
+```bash
+mac:$ env ROBOT_SERVICE="robot" ROBOT_SERVICEPATH="/" ROBOT_TYPE="guide_robot" ROBOT_FLOOR_MAP="{\"guide_robot_0000000000000001\": 1, \"guide_robot_0000000000000002\": 2}" DEST_LED_SERVICE="dest_led" DEST_LED_SERVICEPATH="/" DEST_LED_TYPE="dest_led" envsubst < controller/autoreturn.yaml | kubectl apply -f -
+```
+```bash
+mac:$ kubectl get pods -l pod=autoreturn
+NAME                          READY     STATUS    RESTARTS   AGE
+autoreturn-84648989c9-9v8tc   1/1       Running   0          16s
 ```
 
 ## start monitoring on AKS
