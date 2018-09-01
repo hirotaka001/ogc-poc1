@@ -7,7 +7,6 @@ Start pods & services on AKS by following steps:
 1. [start ambassador](#start-ambassador-on-aks)
 1. [start authorization & authentication servie](#start-authorization--authentication-service-on-aks)
 1. [start fiware orion](#start-fiware-orion-on-aks)
-1. [start duplicate message filter service for idas](#start-duplicate-message-filter-service-for-idas)
 1. [start fiware IDAS(iotagent-ul)](#start-fiware-idasiotagent-ul-on-aks)
 1. [start fiware cygnus](#start-fiware-cygnus-on-aks)
 1. [build libraries for controller services](#build-libraries-for-controller-services)
@@ -419,41 +418,19 @@ server: envoy
 []
 ```
 
-## start duplicate message filter service for idas
-
-```bash
-mac:$ kubectl apply -f idas/fiware-mqtt-msgfilter.yaml
-```
-
-```bash
-mac:$ kubectl get pods -l pod=mqtt-msgfilter
-NAME                              READY     STATUS    RESTARTS   AGE
-mqtt-msgfilter-6f76445596-cmbqz   1/1       Running   0          26s
-mqtt-msgfilter-6f76445596-wrhzb   1/1       Running   0          26s
-mqtt-msgfilter-6f76445596-znnvg   1/1       Running   0          26s
-```
-
-```bash
-mac:$ kubectl get services -l service=mqtt-msgfilter
-NAME             TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)    AGE
-mqtt-msgfilter   ClusterIP   10.0.133.42   <none>        5001/TCP   43s
-```
-
 ## start fiware idas(iotagent-ul) on AKS
 
 [fiware IDAS(iotagent-ul)](https://catalogue-server.fiware.org/enablers/backend-device-management-idas)
 
-**In this demonstration, we use customized iotagent-ul in order to ignore duplicate MQTT messages.**
-
 * XXXXXXXXXXXX is the password of "iotagent"
 ```bash
-mac:$ env IOTAGENT_PASSWORD=XXXXXXXXXXXX envsubst < idas/iotagent-ul/config.js.template > idas/iotagent-ul/config.js
+mac:$ docker build -t ${REPOSITORY}/tech-sketch/iotagent-ul:290a1fa idas/iotagent-ul/
 ```
-
 ```bash
 mac:$ az acr login --name ogcacr
-mac:$ docker build -t ${REPOSITORY}/tech-sketch/iotagent-ul:1.7.0.plus idas/iotagent-ul/
-mac:$ docker push ${REPOSITORY}/tech-sketch/iotagent-ul:1.7.0.plus
+```
+```bash
+mac:$ docker push ${REPOSITORY}/tech-sketch/iotagent-ul:290a1fa
 ```
 
 ```bash
@@ -463,6 +440,9 @@ Result
 tech-sketch/iotagent-ul
 ```
 
+```bash
+mac:$ kubectl create configmap iotagent-config --from-file ./idas/config.js
+```
 ```bash
 mac:$ envsubst < idas/iotagent-ul.yaml | kubectl apply -f -
 ```
