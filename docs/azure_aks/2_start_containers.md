@@ -2,13 +2,11 @@
 
 Start pods & services on AKS by following steps:
 
-1. [start etcd cluster](#start-etcd-cluster-on-aks)
-1. [start vernemq cluster](#start-vernemq-cluster-on-aks)
+1. [start rabbitmq cluster](#start-rabbitmq-cluster-on-aks)
 1. [start mongodb cluster](#start-mondodb-cluster-on-aks)
 1. [start ambassador](#start-ambassador-on-aks)
 1. [start authorization & authentication servie](#start-authorization--authentication-service-on-aks)
 1. [start fiware orion](#start-fiware-orion-on-aks)
-1. [start duplicate message filter service for idas](#start-duplicate-message-filter-service-for-idas)
 1. [start fiware IDAS(iotagent-ul)](#start-fiware-idasiotagent-ul-on-aks)
 1. [start fiware cygnus](#start-fiware-cygnus-on-aks)
 1. [build libraries for controller services](#build-libraries-for-controller-services)
@@ -22,68 +20,9 @@ Start pods & services on AKS by following steps:
 1. [start logging](#start-logging-on-aks)
 1. [start cronjob](#start-cronjob-on-aks)
 
-## start etcd cluster on AKS
+## start rabbitmq cluster on AKS
 
-[etcd](https://github.com/coreos/etcd)
-
-```bash
-mac:$ helm install stable/etcd-operator --name fiware-etcd
-```
-
-```bash
-mac:$ kubectl get pods | grep fiware-etcd
-fiware-etcd-etcd-operator-etcd-backup-operator-547599b5-chjqc     1/1       Running   0          58s
-fiware-etcd-etcd-operator-etcd-operator-7d768d5f6c-lnjjv          1/1       Running   0          57s
-fiware-etcd-etcd-operator-etcd-restore-operator-7cf99c5f6-xk5hn   1/1       Running   0          57s
-```
-
-```bash
-mac:$ export POD=$(kubectl get pods -l app=fiware-etcd-etcd-operator-etcd-operator --namespace default --output name)
-mac:$ kubectl logs $POD --namespace=default
-```
-
-```bash
-mac:$ kubectl apply -f etcd/etcd-cluster.yaml
-```
-
-```bash
-mac:$ kubectl get pods -l app=etcd
-NAME                      READY     STATUS    RESTARTS   AGE
-etcd-cluster-4bt6k5f67q   1/1       Running   0          1m
-etcd-cluster-jxdqvfzcnc   1/1       Running   0          2m
-etcd-cluster-lzlkcs6dk7   1/1       Running   0          1m
-```
-
-```bash
-mac:$ kubectl get services -l app=etcd
-NAME                  TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)             AGE
-etcd-cluster          ClusterIP   None          <none>        2379/TCP,2380/TCP   2m
-etcd-cluster-client   ClusterIP   10.0.242.24   <none>        2379/TCP            2m
-```
-
-```bash
-mac:$ kubectl run --rm -it etcdclient --image quay.io/coreos/etcd --restart=Never -- etcdctl --peers http://etcd-cluster-client:2379 member list
-2f6ea94eace6a667: name=etcd-cluster-4bt6k5f67q peerURLs=http://etcd-cluster-4bt6k5f67q.etcd-cluster.default.svc:2380 clientURLs=http://etcd-cluster-4bt6k5f67q.etcd-cluster.default.svc:2379 isLeader=false
-90b714769416c903: name=etcd-cluster-jxdqvfzcnc peerURLs=http://etcd-cluster-jxdqvfzcnc.etcd-cluster.default.svc:2380 clientURLs=http://etcd-cluster-jxdqvfzcnc.etcd-cluster.default.svc:2379 isLeader=true
-dc3797664175b5da: name=etcd-cluster-lzlkcs6dk7 peerURLs=http://etcd-cluster-lzlkcs6dk7.etcd-cluster.default.svc:2380 clientURLs=http://etcd-cluster-lzlkcs6dk7.etcd-cluster.default.svc:2379 isLeader=false
-pod "etcdclient" deleted
-```
-
-## start vernemq cluster on AKS
-
-[vernemq](https://vernemq.com/)
-
-* create usernames & passwords of vernemq
-```bash
-mac:$ mkdir -p secrets
-mac:$ touch secrets/vmq.passwd
-mac:$ docker run --rm -v $(pwd)/secrets:/mnt -it erlio/docker-vernemq vmq-passwd /mnt/vmq.passwd iotagent
-mac:$ docker run --rm -v $(pwd)/secrets:/mnt -it erlio/docker-vernemq vmq-passwd /mnt/vmq.passwd button_sensor
-mac:$ docker run --rm -v $(pwd)/secrets:/mnt -it erlio/docker-vernemq vmq-passwd /mnt/vmq.passwd pepper
-mac:$ docker run --rm -v $(pwd)/secrets:/mnt -it erlio/docker-vernemq vmq-passwd /mnt/vmq.passwd dest_led
-mac:$ docker run --rm -v $(pwd)/secrets:/mnt -it erlio/docker-vernemq vmq-passwd /mnt/vmq.passwd dest_human_sensor
-mac:$ docker run --rm -v $(pwd)/secrets:/mnt -it erlio/docker-vernemq vmq-passwd /mnt/vmq.passwd ros
-```
+[RabbitMQ](https://www.rabbitmq.com/)
 
 ```bash
 mac:$ docker run -it -v $(pwd)/secrets:/etc/letsencrypt certbot/certbot certonly --manual --domain mqtt.tech-sketch.jp --email nobuyuki.matsui@gmail.com --agree-tos --manual-public-ip-logging-ok --preferred-challenges dns
@@ -115,14 +54,7 @@ mac-another:$ az network dns record-set txt remove-record --resource-group dns-z
 ```
 
 ```bash
-mac:$ cat secrets/DST_Root_CA_X3.pem secrets/archive/mqtt.tech-sketch.jp/chain1.pem > secrets/ca.crt
-mac:$ cp secrets/archive/mqtt.tech-sketch.jp/fullchain1.pem secrets/server.crt
-mac:$ cp secrets/archive/mqtt.tech-sketch.jp/privkey1.pem secrets/server.key
-```
-
-```bash
-mac:$ kubectl create secret generic vernemq-passwd --from-file=./secrets/vmq.passwd
-mac:$ kubectl create secret generic vernemq-certifications --from-file=./secrets/ca.crt --from-file=./secrets/server.crt --from-file=./secrets/server.key
+mac:$ kubectl create secret generic rabbitmq-certifications --from-file=./secrets/live/mqtt.tech-sketch.jp/fullchain.pem --from-file=./secrets/live/mqtt.tech-sketch.jp/cert.pem --from-file=./secrets/live/mqtt.tech-sketch.jp/privkey.pem
 ```
 
 ```bash
@@ -132,48 +64,91 @@ default-token-gdql9                                           kubernetes.io/serv
 fiware-etcd-etcd-operator-etcd-backup-operator-token-ztqfd    kubernetes.io/service-account-token   3         8m
 fiware-etcd-etcd-operator-etcd-operator-token-jw724           kubernetes.io/service-account-token   3         8m
 fiware-etcd-etcd-operator-etcd-restore-operator-token-xq6rl   kubernetes.io/service-account-token   3         8m
-vernemq-certifications                                        Opaque                                3         29s
-vernemq-passwd                                                Opaque                                1         35s
+rabbitmq-certifications                                       Opaque                                3         7s
 ```
 
 ```bash
-mac:$ kubectl apply -f vernemq/vernemq-cluster-azure.yaml
+mac:$ kubectl apply -f rabbitmq/rabbitmq-rbac.yaml
+```
+```bash
+mac:$ kubectl apply -f rabbitmq/rabbitmq-azure-services.yaml
+```
+```bash
+mac:$ kubectl get services -l app=rabbitmq
+NAME             TYPE           CLUSTER-IP     EXTERNAL-IP   PORT(S)              AGE
+rabbitmq-amqp    ClusterIP      10.0.190.158   <none>        15672/TCP,5672/TCP   9s
+rabbitmq-mqtt    ClusterIP      10.0.101.206   <none>        1883/TCP             9s
+rabbitmq-mqtts   LoadBalancer   10.0.131.94    <pending>     8883:30271/TCP       9s
+```
+```bash
+mac:$ kubectl apply -f rabbitmq/rabbitmq-azure-statefulset.yaml
+```
+```bash
+mac:$ $ kubectl get pods -l app=rabbitmq
+NAME         READY     STATUS    RESTARTS   AGE
+rabbitmq-0   1/1       Running   0          4m
+rabbitmq-1   1/1       Running   0          3m
+rabbitmq-2   1/1       Running   0          1m
 ```
 
 ```bash
-mac:$ kubectl get pods -l app=vernemq
-NAME        READY     STATUS    RESTARTS   AGE
-vernemq-0   1/1       Running   0          1m
-vernemq-1   1/1       Running   0          1m
-vernemq-2   1/1       Running   0          33s
+mac:$ kubectl exec rabbitmq-0 -- rabbitmqctl cluster_status
+Cluster status of node rabbit@10.244.0.97 ...
+[{nodes,[{disc,['rabbit@10.244.0.97','rabbit@10.244.1.85',
+                'rabbit@10.244.2.86']}]},
+ {running_nodes,['rabbit@10.244.1.85','rabbit@10.244.2.86',
+                 'rabbit@10.244.0.97']},
+ {cluster_name,<<"rabbit@rabbitmq-0.rabbitmq.default.svc.cluster.local">>},
+ {partitions,[]},
+ {alarms,[{'rabbit@10.244.1.85',[]},
+          {'rabbit@10.244.2.86',[]},
+          {'rabbit@10.244.0.97',[]}]}]
+```
+```bash
+mac:$ kubectl exec rabbitmq-0 -- rabbitmqctl add_user iotagent <<password_of_iotagent>>
+mac:$ kubectl exec rabbitmq-0 -- rabbitmqctl set_permissions -p / iotagent ".*" ".*" ".*"
+mac:$ kubectl exec rabbitmq-0 -- rabbitmqctl add_user button_sensor <<password_of_button_sensor>>
+mac:$ kubectl exec rabbitmq-0 -- rabbitmqctl set_permissions -p / button_sensor ".*" ".*" ".*"
+mac:$ kubectl exec rabbitmq-0 -- rabbitmqctl add_user pepper <<password_of_pepper>>
+mac:$ kubectl exec rabbitmq-0 -- rabbitmqctl set_permissions -p / pepper ".*" ".*" ".*"
+mac:$ kubectl exec rabbitmq-0 -- rabbitmqctl add_user dest_led <<password_of_dest_led>>
+mac:$ kubectl exec rabbitmq-0 -- rabbitmqctl set_permissions -p / dest_led ".*" ".*" ".*"
+mac:$ kubectl exec rabbitmq-0 -- rabbitmqctl add_user dest_human_sensor <<password_of_dest_human_sensor>>
+mac:$ kubectl exec rabbitmq-0 -- rabbitmqctl set_permissions -p / dest_human_sensor ".*" ".*" ".*"
+mac:$ kubectl exec rabbitmq-0 -- rabbitmqctl add_user ros <<password_of_ros>>
+mac:$ kubectl exec rabbitmq-0 -- rabbitmqctl set_permissions -p / ros ".*" ".*" ".*"
+```
+```bash
+mac:$ kubectl exec rabbitmq-0 -- rabbitmqctl list_users
+Listing users ...
+ros	[]
+dest_led	[]
+button_sensor	[]
+guest	[administrator]
+dest_human_sensor	[]
+pepper	[]
+iotagent	[]
 ```
 
 ```bash
-mac:$ kubectl get services -l app=mqtts
-NAME      TYPE           CLUSTER-IP     EXTERNAL-IP       PORT(S)          AGE
-mqtts     LoadBalancer   10.0.170.212   WWW.XXX.YYY.ZZZ   8883:30187/TCP   3m
+mac:$ kubectl get services -l app=rabbitmq -l service=mqtts
+NAME             TYPE           CLUSTER-IP    EXTERNAL-IP   PORT(S)          AGE
+rabbitmq-mqtts   LoadBalancer   10.0.131.94   WW.XX.YY.ZZ   8883:30271/TCP   21m
 ```
-
 ```bash
-mac:$ kubectl exec vernemq-0 -- vmq-admin cluster show
-+---------------------------------------------------+-------+
-|                       Node                        |Running|
-+---------------------------------------------------+-------+
-|VerneMQ@vernemq-0.vernemq.default.svc.cluster.local| true  |
-|VerneMQ@vernemq-1.vernemq.default.svc.cluster.local| true  |
-|VerneMQ@vernemq-2.vernemq.default.svc.cluster.local| true  |
-+---------------------------------------------------+-------+
+mac:$ export MQTTS_IPADDR=$(kubectl get services -l app=rabbitmq -l service=mqtts -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}');echo ${MQTTS_IPADDR}
+mac:$ az network dns record-set a add-record --resource-group dns-zone --zone-name "tech-sketch.jp" --record-set-name "mqtt" --ipv4-address "${MQTTS_IPADDR}"
 ```
-
 ```bash
-mac:$ az network dns record-set a add-record --resource-group dns-zone --zone-name "tech-sketch.jp" --record-set-name "mqtt" --ipv4-address "WWW.XXX.YYY.ZZZ"
+mac:$ nslookup mqtt.tech-sketch.jp
 ```
 
-* XXXXXXXXXXXX is the password of "iotagent"
+* XXXXXXXXXXXX is the password of `iotagent`
 ```text
-mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXXXXXX
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXXXXXX
 ...
 ```
+* check the authentication of `button_sensor`, `pepper`, `dest_led`, `dest_human_sensor` and `ros` using a command like above
 
 ## start mondodb cluster on AKS
 
@@ -275,12 +250,20 @@ default-token-gdql9                                           kubernetes.io/serv
 fiware-etcd-etcd-operator-etcd-backup-operator-token-ztqfd    kubernetes.io/service-account-token   3         29m
 fiware-etcd-etcd-operator-etcd-operator-token-jw724           kubernetes.io/service-account-token   3         29m
 fiware-etcd-etcd-operator-etcd-restore-operator-token-xq6rl   kubernetes.io/service-account-token   3         29m
-vernemq-certifications                                        Opaque                                3         20m
-vernemq-passwd                                                Opaque                                1         21m
+rabbitmq-certifications                                       Opaque                                3         7s
 ```
 
 ```bash
-mac:$ kubectl apply -f ambassador/ambassador-azure.yaml
+mac:$ kubectl apply -f ambassador/ambassador-azure-services.yaml
+```
+```bash
+mac:$ kubectl get services -l service=ambassador
+NAME         TYPE           CLUSTER-IP    EXTERNAL-IP   PORT(S)                      AGE
+ambassador   LoadBalancer   10.0.159.92   <pending>     443:31954/TCP,80:31958/TCP   29s
+```
+
+```bash
+mac:$ kubectl apply -f ambassador/ambassador-deployment.yaml
 ```
 
 ```bash
@@ -293,12 +276,16 @@ ambassador-79768bd968-h2ct2   2/2       Running   0          50s
 
 ```bash
 mac:$ kubectl get services -l service=ambassador
-NAME         TYPE           CLUSTER-IP    EXTERNAL-IP       PORT(S)                      AGE
-ambassador   LoadBalancer   10.0.191.59   www.xxx.yyy.zzz   443:30357/TCP,80:32755/TCP   4m
+NAME         TYPE           CLUSTER-IP    EXTERNAL-IP   PORT(S)                      AGE
+ambassador   LoadBalancer   10.0.159.92   ww.xx.yy.zz   443:31954/TCP,80:31958/TCP   3m
 ```
 
 ```bash
-mac:$ az network dns record-set a add-record --resource-group dns-zone --zone-name "tech-sketch.jp" --record-set-name "api" --ipv4-address "www.xxx.yyy.zzz"
+mac:$ export HTTPS_IPADDR=$(kubectl get services -l service=ambassador -o json | jq '.items[0].status.loadBalancer.ingress[0].ip' -r);echo ${HTTPS_IPADDR}
+mac:$ az network dns record-set a add-record --resource-group dns-zone --zone-name "tech-sketch.jp" --record-set-name "api" --ipv4-address "${HTTPS_IPADDR}"
+```
+```bash
+mac:$ nslookup api.tech-sketch.jp
 ```
 
 ```bash
@@ -431,41 +418,19 @@ server: envoy
 []
 ```
 
-## start duplicate message filter service for idas
-
-```bash
-mac:$ kubectl apply -f idas/fiware-mqtt-msgfilter.yaml
-```
-
-```bash
-mac:$ kubectl get pods -l pod=mqtt-msgfilter
-NAME                              READY     STATUS    RESTARTS   AGE
-mqtt-msgfilter-6f76445596-cmbqz   1/1       Running   0          26s
-mqtt-msgfilter-6f76445596-wrhzb   1/1       Running   0          26s
-mqtt-msgfilter-6f76445596-znnvg   1/1       Running   0          26s
-```
-
-```bash
-mac:$ kubectl get services -l service=mqtt-msgfilter
-NAME             TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)    AGE
-mqtt-msgfilter   ClusterIP   10.0.133.42   <none>        5001/TCP   43s
-```
-
 ## start fiware idas(iotagent-ul) on AKS
 
 [fiware IDAS(iotagent-ul)](https://catalogue-server.fiware.org/enablers/backend-device-management-idas)
 
-**In this demonstration, we use customized iotagent-ul in order to ignore duplicate MQTT messages.**
-
 * XXXXXXXXXXXX is the password of "iotagent"
 ```bash
-mac:$ env IOTAGENT_PASSWORD=XXXXXXXXXXXX envsubst < idas/iotagent-ul/config.js.template > idas/iotagent-ul/config.js
+mac:$ docker build -t ${REPOSITORY}/tech-sketch/iotagent-ul:290a1fa idas/iotagent-ul/
 ```
-
 ```bash
 mac:$ az acr login --name ogcacr
-mac:$ docker build -t ${REPOSITORY}/tech-sketch/iotagent-ul:1.7.0.plus idas/iotagent-ul/
-mac:$ docker push ${REPOSITORY}/tech-sketch/iotagent-ul:1.7.0.plus
+```
+```bash
+mac:$ docker push ${REPOSITORY}/tech-sketch/iotagent-ul:290a1fa
 ```
 
 ```bash
@@ -475,6 +440,9 @@ Result
 tech-sketch/iotagent-ul
 ```
 
+```bash
+mac:$ kubectl create configmap iotagent-config --from-file ./idas/config.js
+```
 ```bash
 mac:$ envsubst < idas/iotagent-ul.yaml | kubectl apply -f -
 ```

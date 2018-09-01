@@ -79,7 +79,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
           "type": "string"
         }
       ],
-      "transport": "MQTT"
+      "transport": "AMQP"
     }
   ]
 }
@@ -93,7 +93,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
   "service_path": "/",
   "entity_name": "button_sensor_0000000000000001",
   "entity_type": "button_sensor",
-  "transport": "MQTT",
+  "transport": "AMQP",
   "attributes": [
     {
       "object_id": "state",
@@ -127,17 +127,17 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 
 ## test BUTTON-SENSOR attribute
 ```bash
-mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
 ```
 ```bash
-mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /button_sensor/button_sensor_0000000000000001/attrs -u iotagent -P XXXXXXXX -m "$d|state|on"
+mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /button_sensor/button_sensor_0000000000000001/attrs -u iotagent -P XXXXXXXX -m "$d|state|on"
 Client mosqpub|92108-Nobuyukin sending CONNECT
 Client mosqpub|92108-Nobuyukin received CONNACK
 Client mosqpub|92108-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/button_sensor/button_sensor_0000000000000001/attrs', ... (44 bytes))
 Client mosqpub|92108-Nobuyukin sending DISCONNECT
 ```
 ```bash
-mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
 ...
 Client mosqsub|18252-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/button_sensor/button_sensor_0000000000000001/attrs', ... (44 bytes))
 2018-06-29T10:34:30.1530236070+0900|state|on
@@ -238,7 +238,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
           "type": "string"
         }
       ],
-      "transport": "MQTT"
+      "transport": "AMQP"
     }
   ]
 }
@@ -278,7 +278,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
           "type": "string"
         }
       ],
-      "transport": "MQTT"
+      "transport": "AMQP"
     }
   ]
 }
@@ -295,7 +295,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "service_path": "/",
       "entity_name": "pepper_0000000000000001",
       "entity_type": "pepper",
-      "transport": "MQTT",
+      "transport": "AMQP",
       "attributes": [
         {
           "object_id": "face",
@@ -340,7 +340,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "service_path": "/",
       "entity_name": "pepper_0000000000000002",
       "entity_type": "pepper",
-      "transport": "MQTT",
+      "transport": "AMQP",
       "attributes": [
         {
           "object_id": "face",
@@ -548,7 +548,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 
 ## test PEPPER command
 ```bash
-mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
 ```
 ```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-Servicepath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v1/updateContext -d @-<<__EOS__ | jq .
@@ -571,7 +571,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 __EOS__
 ```
 ```bash
-mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
 ...
 Client mosqsub|18252-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/cmd', ... (37 bytes))
 pepper_0000000000000001@welcome|start
@@ -664,14 +664,14 @@ $ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -
 }
 ```
 ```bash
-mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000001/cmdexe -u iotagent -P XXXXXXXX -m "pepper_0000000000000001@welcome|start exec"
+mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /pepper/pepper_0000000000000001/cmdexe -u iotagent -P XXXXXXXX -m "pepper_0000000000000001@welcome|start exec"
 Client mosqpub|92385-Nobuyukin sending CONNECT
 Client mosqpub|92385-Nobuyukin received CONNACK
 Client mosqpub|92385-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/cmdexe', ... (42 bytes))
 Client mosqpub|92385-Nobuyukin sending DISCONNECT
 ```
 ```bash
-mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
 ...
 Client mosqsub|18252-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/cmdexe', ... (42 bytes))
 pepper_0000000000000001@welcome|start exec
@@ -771,17 +771,17 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 
 ## test PEPPER attribute
 ```bash
-mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
 ```
 ```bash
-mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /pepper/pepper_0000000000000001/attrs -u iotagent -P XXXXXXXX -m "$d|face|/path/to/face.jpg|dest|destination room"
+mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /pepper/pepper_0000000000000001/attrs -u iotagent -P XXXXXXXX -m "$d|face|/path/to/face.jpg|dest|destination room"
 Client mosqpub|78924-Nobuyukin sending CONNECT
 Client mosqpub|78924-Nobuyukin received CONNACK
 Client mosqpub|78924-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/attrs', ... (80 bytes))
 Client mosqpub|78924-Nobuyukin sending DISCONNECT
 ```
 ```bash
-mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
 ...
 Client mosqsub|77879-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000001/attrs', ... (80 bytes))
 2018-07-04T09:30:32.1530664232+0900|face|/path/to/face.jpg|dest|destination room
@@ -974,7 +974,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
           "type": "string"
         }
       ],
-      "transport": "MQTT"
+      "transport": "AMQP"
     }
   ]
 }
@@ -1026,7 +1026,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
           "type": "string"
         }
       ],
-      "transport": "MQTT"
+      "transport": "AMQP"
     }
   ]
 }
@@ -1040,7 +1040,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
   "service_path": "/",
   "entity_name": "guide_robot_0000000000000001",
   "entity_type": "guide_robot",
-  "transport": "MQTT",
+  "transport": "AMQP",
   "attributes": [
     {
       "object_id": "time",
@@ -1177,7 +1177,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 
 ## test ROBOT command
 ```bash
-mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
 ```
 ```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v1/updateContext -d @-<<__EOS__ | jq .
@@ -1200,7 +1200,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 __EOS__
 ```
 ```bash
-mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
 ...
 Client mosqsub|15957-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/cmd', ... (78 bytes))
 guide_robot_0000000000000001@robot_request|r_cmd|Navi|pos.x|123.4|pos.y|-987.6
@@ -1283,14 +1283,14 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 ```
 ```bash
-mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /guide_robot/guide_robot_0000000000000001/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000001@robot_request|result,success/time,2018-08-01 11:21:07/r_cmd,Navi/x,123.4/y,-987.6"
+mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000001/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000001@robot_request|result,success/time,2018-08-01 11:21:07/r_cmd,Navi/x,123.4/y,-987.6"
 Client mosqpub|80036-Nobuyukin sending CONNECT
 Client mosqpub|80036-Nobuyukin received CONNACK
 Client mosqpub|80036-Nobuyukin sending PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/cmdexe', ... (118 bytes))
 Client mosqpub|80036-Nobuyukin sending DISCONNECT
 ```
 ```bash
-mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
 ...
 Client mosqsub|15957-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/cmdexe', ... (118 bytes))
 guide_robot_0000000000000001@robot_request|result,success/time,2018-08-01 11:21:07/r_cmd,Navi/pos.x,123.4/pos.y,-987.6
@@ -1542,17 +1542,17 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 ```
 
 ```bash
-mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
 ```
 ```bash
-mac$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /guide_robot/guide_robot_0000000000000001/attrs -u iotagent -P XXXXXXXX -m "$d|time|2018-09-08 07:06:05|r_mode|Navi|x|0.1|y|0.2|theta|0.3"
+mac$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000001/attrs -u iotagent -P XXXXXXXX -m "$d|time|2018-09-08 07:06:05|r_mode|Navi|x|0.1|y|0.2|theta|0.3"
 Client mosqpub|80236-Nobuyukin sending CONNECT
 Client mosqpub|80236-Nobuyukin received CONNACK
 Client mosqpub|80236-Nobuyukin sending PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/attrs', ... (90 bytes))
 Client mosqpub|80236-Nobuyukin sending DISCONNECT
 ```
 ```bash
-mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
 ...
 Client mosqsub|90377-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/attrs', ... (94 bytes))
 2018-08-07T14:06:50.1533618410+0900|time|2018-09-08 07:06:05|r_mode|Navi|x|0.1|y|0.2|theta|0.3
@@ -1757,7 +1757,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
           "type": "string"
         }
       ],
-      "transport": "MQTT"
+      "transport": "AMQP"
     }
   ]
 }
@@ -1794,7 +1794,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
           "type": "string"
         }
       ],
-      "transport": "MQTT"
+      "transport": "AMQP"
     }
   ]
 }
@@ -1831,7 +1831,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
           "type": "string"
         }
       ],
-      "transport": "MQTT"
+      "transport": "AMQP"
     }
   ]
 }
@@ -1845,7 +1845,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
   "service_path": "/",
   "entity_name": "external_camera_0000000000000011",
   "entity_type": "external_camera",
-  "transport": "MQTT",
+  "transport": "AMQP",
   "attributes": [
     {
       "object_id": "time",
@@ -1932,7 +1932,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 
 ## test CAMERA command
 ```bash
-mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
 ```
 ```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: camera" -H "Fiware-Servicepath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v1/updateContext -d @-<<__EOS__ | jq .
@@ -1955,7 +1955,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 __EOS__
 ```
 ```bash
-mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
 ...
 Client mosqsub|77879-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/external_camera/external_camera/cmd', ... (65 bytes))
 external_camera_0000000000000011@external_camera_request|c_cmd|Monitor
@@ -2013,14 +2013,14 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 ```
 ```bash
-mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /external_camera/external_camera_0000000000000011/cmdexe -u iotagent -P XXXXXXXX -m "external_camera_0000000000000011@external_camera_request|result,success/time,2018-08-01 08:34:32/c_cmd,Monitor"
+mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /external_camera/external_camera_0000000000000011/cmdexe -u iotagent -P XXXXXXXX -m "external_camera_0000000000000011@external_camera_request|result,success/time,2018-08-01 08:34:32/c_cmd,Monitor"
 Client mosqpub|81501-Nobuyukin sending CONNECT
 Client mosqpub|81501-Nobuyukin received CONNACK
 Client mosqpub|81501-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/external_camera/external_camera_0000000000000011/cmdexe', ... (110 bytes))
 Client mosqpub|81501-Nobuyukin sending DISCONNECT
 ```
 ```bash
-mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
 ...
 Client mosqsub|6747-Nobuyukino received PUBLISH (d0, q0, r0, m0, '/external_camera/external_camera_0000000000000011/cmdexe', ... (110 bytes))
 external_camera_0000000000000011@external_camera_request|result,success/time,2018-08-01 08:34:32/c_cmd,Monitor
@@ -2088,17 +2088,17 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 
 ## test CAMERA attribute
 ```bash
-mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
 ```
 ```bash
-$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /external_camera/external_camera_0000000000000011/attrs -u iotagent -P XXXXXXXX -m "$d|time|2018-01-02 03:04:05|c_mode|Monitor|num_p|1|position|x[0],1.12/y[0],-95.1"
+$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /external_camera/external_camera_0000000000000011/attrs -u iotagent -P XXXXXXXX -m "$d|time|2018-01-02 03:04:05|c_mode|Monitor|num_p|1|position|x[0],1.12/y[0],-95.1"
 Client mosqpub|82032-Nobuyukin sending CONNECT
 Client mosqpub|82032-Nobuyukin received CONNACK
 Client mosqpub|82032-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/external_camera/external_camera_0000000000000011/attrs', ... (109 bytes))
 Client mosqpub|82032-Nobuyukin sending DISCONNECT
 ```
 ```bash
-mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
 ...
 Client mosqsub|7354-Nobuyukino received PUBLISH (d0, q0, r0, m0, '/external_camera/external_camera_0000000000000011/attrs', ... (109 bytes))
 2018-08-01T09:07:17.010090+0900|time|2018-01-02 03:04:05|c_mode|Monitor|num_p|1|position|x[0],1.12/y[0],-95.1
@@ -2238,7 +2238,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
           "type": "string"
         }
       ],
-      "transport": "MQTT"
+      "transport": "AMQP"
     }
   ]
 }
@@ -2260,7 +2260,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
           "type": "string"
         }
       ],
-      "transport": "MQTT"
+      "transport": "AMQP"
     }
   ]
 }
@@ -2274,7 +2274,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
   "service_path": "/",
   "entity_name": "dest_led_0000000000000001",
   "entity_type": "dest_led",
-  "transport": "MQTT",
+  "transport": "AMQP",
   "attributes": [],
   "lazy": [],
   "commands": [
@@ -2320,7 +2320,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 
 ## test DEST-LED command
 ```bash
-mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
 ```
 ```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: dest_led" -H "Fiware-Servicepath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v1/updateContext -d @-<<__EOS__ | jq .
@@ -2343,7 +2343,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 __EOS__
 ```
 ```bash
-mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
 ...
 Client mosqsub|90898-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/dest_led/dest_led_0000000000000001/cmd', ... (35 bytes))
 dest_led_0000000000000001@action|on
@@ -2381,14 +2381,14 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 ```
 ```bash
-mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /dest_led/dest_led_0000000000000001/cmdexe -u iotagent -P XXXXXXXX -m "dest_led_0000000000000001@action|success"
+mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /dest_led/dest_led_0000000000000001/cmdexe -u iotagent -P XXXXXXXX -m "dest_led_0000000000000001@action|success"
 Client mosqpub|43968-Nobuyukin sending CONNECT
 Client mosqpub|43968-Nobuyukin received CONNACK
 Client mosqpub|43968-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/dest_led/dest_led_0000000000000001/cmdexe', ... (40 bytes))
 Client mosqpub|43968-Nobuyukin sending DISCONNECT
 ```
 ```bash
-mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
 ...
 Client mosqsub|90898-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/dest_led/dest_led_0000000000000001/cmdexe', ... (40 bytes))
 dest_led_0000000000000001@action|success
@@ -2488,7 +2488,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
           "type": "string"
         }
       ],
-      "transport": "MQTT"
+      "transport": "AMQP"
     }
   ]
 }
@@ -2510,7 +2510,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
           "type": "string"
         }
       ],
-      "transport": "MQTT"
+      "transport": "AMQP"
     }
   ]
 }
@@ -2524,7 +2524,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
   "service_path": "/",
   "entity_name": "dest_human_sensor_0000000000000001",
   "entity_type": "dest_human_sensor",
-  "transport": "MQTT",
+  "transport": "AMQP",
   "attributes": [
     {
       "object_id": "arrival",
@@ -2560,17 +2560,17 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 
 ## test DEST-HUMAN-SENSOR attribute
 ```bash
-mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
 ```
 ```bash
-mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /dest_human_sensor/dest_human_sensor_0000000000000001/attrs -u iotagent -P XXXXXXXX -m "$d|arrival|$d"
+mac:$ d=$(date '+%Y-%m-%dT%H:%M:%S.%s+0900');mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /dest_human_sensor/dest_human_sensor_0000000000000001/attrs -u iotagent -P XXXXXXXX -m "$d|arrival|$d"
 Client mosqpub|59075-Nobuyukin sending CONNECT
 Client mosqpub|59075-Nobuyukin received CONNACK
 Client mosqpub|59075-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/dest_human_sensor/dest_human_sensor_0000000000000001/attrs', ... (79 bytes))
 Client mosqpub|59075-Nobuyukin sending DISCONNECT
 ```
 ```bash
-mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/ca.crt -d -t /# -u iotagent -P XXXXXXXX
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
 ...
 lient mosqsub|58138-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/dest_human_sensor/dest_human_sensor_0000000000000001/attrs', ... (79 bytes))
 2018-07-05T10:41:52.1530754912+0900|arrival|2018-07-05T10:41:52.1530754912+0900
