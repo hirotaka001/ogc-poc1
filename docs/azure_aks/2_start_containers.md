@@ -251,12 +251,20 @@ default-token-gdql9                                           kubernetes.io/serv
 fiware-etcd-etcd-operator-etcd-backup-operator-token-ztqfd    kubernetes.io/service-account-token   3         29m
 fiware-etcd-etcd-operator-etcd-operator-token-jw724           kubernetes.io/service-account-token   3         29m
 fiware-etcd-etcd-operator-etcd-restore-operator-token-xq6rl   kubernetes.io/service-account-token   3         29m
-vernemq-certifications                                        Opaque                                3         20m
-vernemq-passwd                                                Opaque                                1         21m
+rabbitmq-certifications                                       Opaque                                3         7s
 ```
 
 ```bash
-mac:$ kubectl apply -f ambassador/ambassador-azure.yaml
+mac:$ kubectl apply -f ambassador/ambassador-azure-services.yaml
+```
+```bash
+mac:$ kubectl get services -l service=ambassador
+NAME         TYPE           CLUSTER-IP    EXTERNAL-IP   PORT(S)                      AGE
+ambassador   LoadBalancer   10.0.159.92   <pending>     443:31954/TCP,80:31958/TCP   29s
+```
+
+```bash
+mac:$ kubectl apply -f ambassador/ambassador-deployment.yaml
 ```
 
 ```bash
@@ -269,12 +277,16 @@ ambassador-79768bd968-h2ct2   2/2       Running   0          50s
 
 ```bash
 mac:$ kubectl get services -l service=ambassador
-NAME         TYPE           CLUSTER-IP    EXTERNAL-IP       PORT(S)                      AGE
-ambassador   LoadBalancer   10.0.191.59   www.xxx.yyy.zzz   443:30357/TCP,80:32755/TCP   4m
+NAME         TYPE           CLUSTER-IP    EXTERNAL-IP   PORT(S)                      AGE
+ambassador   LoadBalancer   10.0.159.92   ww.xx.yy.zz   443:31954/TCP,80:31958/TCP   3m
 ```
 
 ```bash
-mac:$ az network dns record-set a add-record --resource-group dns-zone --zone-name "tech-sketch.jp" --record-set-name "api" --ipv4-address "www.xxx.yyy.zzz"
+mac:$ export HTTPS_IPADDR=$(kubectl get services -l service=ambassador -o json | jq '.items[0].status.loadBalancer.ingress[0].ip' -r);echo ${HTTPS_IPADDR}
+mac:$ az network dns record-set a add-record --resource-group dns-zone --zone-name "tech-sketch.jp" --record-set-name "api" --ipv4-address "${HTTPS_IPADDR}"
+```
+```bash
+mac:$ nslookup api.tech-sketch.jp
 ```
 
 ```bash
