@@ -76,6 +76,7 @@ mac:$ kubectl apply -f rabbitmq/rabbitmq-azure-services.yaml
 ```bash
 mac:$ kubectl get services -l app=rabbitmq
 NAME             TYPE           CLUSTER-IP     EXTERNAL-IP   PORT(S)              AGE
+rabbitmq         ClusterIP      None           <none>        5672/TCP             9s
 rabbitmq-amqp    ClusterIP      10.0.190.158   <none>        15672/TCP,5672/TCP   9s
 rabbitmq-mqtt    ClusterIP      10.0.101.206   <none>        1883/TCP             9s
 rabbitmq-mqtts   LoadBalancer   10.0.131.94    <pending>     8883:30271/TCP       9s
@@ -93,18 +94,21 @@ rabbitmq-2   1/1       Running   0          1m
 
 ```bash
 mac:$ kubectl exec rabbitmq-0 -- rabbitmqctl cluster_status
-Cluster status of node rabbit@10.244.0.97 ...
-[{nodes,[{disc,['rabbit@10.244.0.97','rabbit@10.244.1.85',
-                'rabbit@10.244.2.86']}]},
- {running_nodes,['rabbit@10.244.1.85','rabbit@10.244.2.86',
-                 'rabbit@10.244.0.97']},
+Cluster status of node rabbit@rabbitmq-0.rabbitmq.default.svc.cluster.local ...
+[{nodes,[{disc,['rabbit@rabbitmq-0.rabbitmq.default.svc.cluster.local',
+                'rabbit@rabbitmq-1.rabbitmq.default.svc.cluster.local',
+                'rabbit@rabbitmq-2.rabbitmq.default.svc.cluster.local']}]},
+ {running_nodes,['rabbit@rabbitmq-2.rabbitmq.default.svc.cluster.local',
+                 'rabbit@rabbitmq-1.rabbitmq.default.svc.cluster.local',
+                 'rabbit@rabbitmq-0.rabbitmq.default.svc.cluster.local']},
  {cluster_name,<<"rabbit@rabbitmq-0.rabbitmq.default.svc.cluster.local">>},
  {partitions,[]},
- {alarms,[{'rabbit@10.244.1.85',[]},
-          {'rabbit@10.244.2.86',[]},
-          {'rabbit@10.244.0.97',[]}]}]
+ {alarms,[{'rabbit@rabbitmq-2.rabbitmq.default.svc.cluster.local',[]},
+          {'rabbit@rabbitmq-1.rabbitmq.default.svc.cluster.local',[]},
+          {'rabbit@rabbitmq-0.rabbitmq.default.svc.cluster.local',[]}]}]
 ```
 ```bash
+mac:$ kubectl exec rabbitmq-0 -- rabbitmqctl change_password guest $(cat /dev/urandom | LC_CTYPE=C tr -dc 'a-zA-Z0-9' | head -c 32)
 mac:$ kubectl exec rabbitmq-0 -- rabbitmqctl add_user iotagent <<password_of_iotagent>>
 mac:$ kubectl exec rabbitmq-0 -- rabbitmqctl set_permissions -p / iotagent ".*" ".*" ".*"
 mac:$ kubectl exec rabbitmq-0 -- rabbitmqctl add_user button_sensor <<password_of_button_sensor>>
@@ -422,7 +426,6 @@ server: envoy
 
 [fiware IDAS(iotagent-ul)](https://catalogue-server.fiware.org/enablers/backend-device-management-idas)
 
-* XXXXXXXXXXXX is the password of "iotagent"
 ```bash
 mac:$ docker build -t ${REPOSITORY}/tech-sketch/iotagent-ul:290a1fa idas/iotagent-ul/
 ```
@@ -440,8 +443,11 @@ Result
 tech-sketch/iotagent-ul
 ```
 
+* XXXXXXXXXXXX is the password of "iotagent"
 ```bash
-mac:$ kubectl create configmap iotagent-config --from-file ./idas/config.js
+mac:$ env IOTA_PASSWORD=XXXXXXXXXXXX envsubst < idas/config.js > /tmp/config.js
+mac:$ kubectl create secret generic iotagent-config --from-file /tmp/config.js
+mac:$ rm /tmp/config.js
 ```
 ```bash
 mac:$ envsubst < idas/iotagent-ul.yaml | kubectl apply -f -
