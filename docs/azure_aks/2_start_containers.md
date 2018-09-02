@@ -108,6 +108,7 @@ Cluster status of node rabbit@rabbitmq-0.rabbitmq.default.svc.cluster.local ...
           {'rabbit@rabbitmq-0.rabbitmq.default.svc.cluster.local',[]}]}]
 ```
 ```bash
+mac:$ kubectl exec rabbitmq-0 -- rabbitmqctl change_password guest $(cat /dev/urandom | LC_CTYPE=C tr -dc 'a-zA-Z0-9' | head -c 32)
 mac:$ kubectl exec rabbitmq-0 -- rabbitmqctl add_user iotagent <<password_of_iotagent>>
 mac:$ kubectl exec rabbitmq-0 -- rabbitmqctl set_permissions -p / iotagent ".*" ".*" ".*"
 mac:$ kubectl exec rabbitmq-0 -- rabbitmqctl add_user button_sensor <<password_of_button_sensor>>
@@ -425,7 +426,6 @@ server: envoy
 
 [fiware IDAS(iotagent-ul)](https://catalogue-server.fiware.org/enablers/backend-device-management-idas)
 
-* XXXXXXXXXXXX is the password of "iotagent"
 ```bash
 mac:$ docker build -t ${REPOSITORY}/tech-sketch/iotagent-ul:290a1fa idas/iotagent-ul/
 ```
@@ -443,8 +443,11 @@ Result
 tech-sketch/iotagent-ul
 ```
 
+* XXXXXXXXXXXX is the password of "iotagent"
 ```bash
-mac:$ kubectl create configmap iotagent-config --from-file ./idas/config.js
+mac:$ env IOTA_PASSWORD=XXXXXXXXXXXX envsubst < idas/config.js > /tmp/config.js
+mac:$ kubectl create secret generic iotagent-config --from-file /tmp/config.js
+mac:$ rm /tmp/config.js
 ```
 ```bash
 mac:$ envsubst < idas/iotagent-ul.yaml | kubectl apply -f -
