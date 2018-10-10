@@ -188,7 +188,7 @@ class StopMovementAPI(RobotFloorMapMixin, MethodView):
                 if current_state not in (const.GUIDING, const.RETURNING) or delta_sec < self.robot_state_check_wait_sec:
                     message = f'cannot accept command at StopMovmentAPI, current_state={current_state}, deviceid={deviceid} '\
                         f'r_mode={r_mode}, posx={posx}, posy={posy}, floor={floor}, delta_sec={delta_sec}'
-                    logger.info(message)
+                    logger.debug(message)
                     result['result'] = 'not acceptable'
                     result['message'] = message
                 else:
