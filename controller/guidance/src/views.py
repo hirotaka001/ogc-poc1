@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 import os
+import datetime
 from logging import getLogger
 
-from flask import request, jsonify
+from pytz import timezone
+from dateutil import parser
+
+from flask import request, jsonify, current_app
 from flask.views import MethodView
 from werkzeug.exceptions import BadRequest
 
@@ -151,6 +155,13 @@ class StopMovementAPI(RobotFloorMapMixin, MethodView):
         service = os.environ.get(const.ROBOT_SERVICE, '')
         service_path = os.environ.get(const.ROBOT_SERVICEPATH, '')
         self.type = os.environ.get(const.ROBOT_TYPE, '')
+        if const.ROBOT_STATE_CHECK_WAIT_SEC in os.environ:
+            try:
+                self.robot_state_check_wait_sec = int(os.environ[const.ROBOT_STATE_CHECK_WAIT_SEC])
+            except (TypeError, ValueError):
+                self.robot_state_check_wait_sec = current_app.config[const.DEFAULT_ROBOT_STATE_CHECK_WAIT_SEC]
+        else:
+            self.robot_state_check_wait_sec = current_app.config[const.DEFAULT_ROBOT_STATE_CHECK_WAIT_SEC]
 
         self.orion = Orion(service, service_path)
 
@@ -168,11 +179,16 @@ class StopMovementAPI(RobotFloorMapMixin, MethodView):
             logger.info(f'received position: r_mode={r_mode}, posx={posx}, posy={posy}, robot_id={deviceid}, floor={floor}')
 
             if r_mode == 'Standby':
-                current_state = self.orion.get_attrs(deviceid, 'r_state')['r_state']['value'].strip()
-                if current_state not in (const.GUIDING, const.RETURNING):
+                content = self.orion.get_attrs(deviceid, 'r_state')['r_state']
+                current_state = content['value'].strip()
+                state_datetime = parser.parse(content['metadata']['TimeInstant']['value'].strip())
+                now = datetime.datetime.now(timezone('Asia/Tokyo'))
+                delta_sec = (now - state_datetime).total_seconds()
+
+                if current_state not in (const.GUIDING, const.RETURNING) or delta_sec < self.robot_state_check_wait_sec:
                     message = f'cannot accept command at StopMovmentAPI, current_state={current_state}, deviceid={deviceid} '\
-                        f'r_mode={r_mode}, posx={posx}, posy={posy}, floor={floor}'
-                    logger.warning(message)
+                        f'r_mode={r_mode}, posx={posx}, posy={posy}, floor={floor}, delta_sec={delta_sec}'
+                    logger.debug(message)
                     result['result'] = 'not acceptable'
                     result['message'] = message
                 else:
@@ -233,6 +249,7 @@ class ArrivalAPI(RobotFloorMapMixin, MethodView):
                 id = get_id(content)
                 destService = Destination()
                 destination = destService.get_destination_by_dest_human_sensor_id(id)
+
                 if destination is not None and const.DEST_FLOOR in destination:
                     try:
                         floor = int(destination[const.DEST_FLOOR])
@@ -284,6 +301,7 @@ class ArrivalAPI(RobotFloorMapMixin, MethodView):
 
                         value = f'r_cmd|Navi|x|{initial_pos_x}|y|{initial_pos_y}'
                         message = self.robot_orion.send_cmd(robot_id, self.robot_type, 'robot_request', value)
+                        logger.info(f'guide_robot({robot_id}) return to the initial position of floor({floor})')
                         result['result'] = 'success'
                         result['message'] = message
         except AttrDoesNotExist as e:

@@ -5,7 +5,7 @@ from logging import getLogger
 
 import pytz
 
-from flask import request, jsonify
+from flask import request, jsonify, current_app
 from flask.views import MethodView
 from werkzeug.exceptions import BadRequest
 
@@ -217,6 +217,14 @@ class DetectVisitorAPI(RobotFloorMapMixin, MongoMixin, MethodView):
 
         self.robot_orion = Orion(robot_service, robot_service_path)
 
+        if const.FACE_VERIFY_DELTA_MIN in os.environ:
+            try:
+                self.face_verify_delta_min = int(os.environ[const.FACE_VERIFY_DELTA_MIN])
+            except (TypeError, ValueError):
+                self.face_verify_delta_min = current_app.config[const.DEFAULT_FACE_VERIFY_DELTA_MIN]
+        else:
+            self.face_verify_delta_min = current_app.config[const.DEFAULT_FACE_VERIFY_DELTA_MIN]
+
     def post(self):
         content = request.data.decode('utf-8')
         logger.info(f'request content={content}')
@@ -234,7 +242,7 @@ class DetectVisitorAPI(RobotFloorMapMixin, MongoMixin, MethodView):
             visitors = [utils.bson2dict(d) for d in self._collection.find({
                 'status': 'reception',
                 'dest.floor': 2,
-                'receptionDatetime': {'$gte': now - datetime.timedelta(minutes=const.FACE_VERIFY_DELTA_MIN)},
+                'receptionDatetime': {'$gte': now - datetime.timedelta(minutes=self.face_verify_delta_min)},
             }).sort([('receptionDatetime', -1), ])]
 
             def verify(visitors):
