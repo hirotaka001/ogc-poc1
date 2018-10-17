@@ -75,14 +75,14 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 ]
 ```
 ```bash
-mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_button_sensor --eval 'db.getCollection("sth_/_button_sensor_0000000000000001_button_sensor").find()'
-MongoDB shell version v3.6.5
+mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_button_sensor --eval 'db.getCollection("sth_/_button_sensor_0000000000000001_button_sensor").find().sort({recvTime: -1})'
+MongoDB shell version v3.6.6
 connecting to: mongodb://127.0.0.1:27017/sth_button_sensor
-MongoDB server version: 3.6.5
-{ "_id" : ObjectId("5b3c41f223b570000ae53ba3"), "recvTime" : ISODate("2018-07-04T03:41:36.668Z"), "attrName" : "state", "attrType" : "string", "attrValue" : "on" }
+MongoDB server version: 3.6.6
+{ "_id" : ObjectId("5bc5204501cf4c000b1c0951"), "recvTime" : ISODate("2018-10-15T23:18:29.046Z"), "state" : "on" }
 ```
 
-## register PEPPER to cygnus
+# #register PEPPER to cygnus
 ```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
 {
@@ -140,12 +140,12 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 ]
 ```
 ```bash
-$ kubectl exec mongodb-0 -c mongodb -- mongo sth_pepper --eval 'db.getCollection("sth_/_pepper_0000000000000001_pepper").find({"attrName": "welcome_status"})'
-MongoDB shell version v3.6.5
+$ kubectl exec mongodb-0 -c mongodb -- mongo sth_pepper --eval 'db.getCollection("sth_/_pepper_0000000000000001_pepper").find().sort({recvTime: -1})'
+MongoDB shell version v3.6.6
 connecting to: mongodb://127.0.0.1:27017/sth_pepper
-MongoDB server version: 3.6.5
-{ "_id" : ObjectId("5b359209169675000a7aebcd"), "recvTime" : ISODate("2018-06-29T01:57:29.219Z"), "attrName" : "welcome_status", "attrType" : "commandStatus", "attrValue" : "PENDING" }
-{ "_id" : ObjectId("5b359250169675000a7aebd1"), "recvTime" : ISODate("2018-06-29T01:58:40.946Z"), "attrName" : "welcome_status", "attrType" : "commandStatus", "attrValue" : "OK" }
+MongoDB server version: 3.6.6
+{ "_id" : ObjectId("5bc52508bcaa26000d22854e"), "recvTime" : ISODate("2018-10-15T23:38:46.374Z"), "dest" : "dest 1-1", "face" : "null", "facedetect_status" : "UNKNOWN", "handover_status" : "UNKNOWN", "reask_status" : "UNKNOWN", "welcome_status" : "OK" }
+{ "_id" : ObjectId("5bc5249fbcaa26000d22854b"), "recvTime" : ISODate("2018-10-15T23:37:02.918Z"), "dest" : "dest 1-1", "face" : "null", "facedetect_status" : "UNKNOWN", "handover_status" : "UNKNOWN", "reask_status" : "UNKNOWN", "welcome_status" : "PENDING" }
 ```
 
 ## register ROBOT to cygnus
@@ -223,38 +223,18 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 ]
 ```
 ```bash
-mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_robot --eval 'db.getCollection("sth_/_guide_robot_0000000000000001_guide_robot").find()'
-MongoDB shell version v3.6.5
+mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_robot --eval 'db.getCollection("sth_/_guide_robot_0000000000000001_guide_robot").find().sort({recvTime: -1})'
+MongoDB shell version v3.6.6
 connecting to: mongodb://127.0.0.1:27017/sth_robot
-MongoDB server version: 3.6.5
-{ "_id" : ObjectId("5b692f2fc22929000a6a0494"), "recvTime" : ISODate("2018-08-07T05:33:34.224Z"), "attrName" : "destx", "attrType" : "float", "attrValue" : "20.0" }
-{ "_id" : ObjectId("5b692f2fc22929000a6a0495"), "recvTime" : ISODate("2018-08-07T05:33:34.224Z"), "attrName" : "desty", "attrType" : "float", "attrValue" : "-10.8" }
-{ "_id" : ObjectId("5b692f2fc22929000a6a0496"), "recvTime" : ISODate("2018-08-07T05:33:34.224Z"), "attrName" : "r_mode", "attrType" : "string", "attrValue" : "Navi" }
-{ "_id" : ObjectId("5b692f2fc22929000a6a0497"), "recvTime" : ISODate("2018-08-07T05:33:34.224Z"), "attrName" : "r_state", "attrType" : "string", "attrValue" : "Guiding" }
-{ "_id" : ObjectId("5b692f2fc22929000a6a049a"), "recvTime" : ISODate("2018-08-07T05:33:34.224Z"), "attrName" : "theta", "attrType" : "float", "attrValue" : "0.3" }
-{ "_id" : ObjectId("5b692f2fc22929000a6a049b"), "recvTime" : ISODate("2018-08-07T05:33:34.224Z"), "attrName" : "time", "attrType" : "string", "attrValue" : "2018-09-08 07:06:05" }
-{ "_id" : ObjectId("5b692f2fc22929000a6a049c"), "recvTime" : ISODate("2018-08-07T05:33:34.224Z"), "attrName" : "visitor", "attrType" : "string", "attrValue" : "bxA21JOPcNhyQr0YqylCaqXV" }
-{ "_id" : ObjectId("5b692f2fc22929000a6a049d"), "recvTime" : ISODate("2018-08-07T05:33:34.224Z"), "attrName" : "x", "attrType" : "float", "attrValue" : "0.1" }
-{ "_id" : ObjectId("5b692f2fc22929000a6a049e"), "recvTime" : ISODate("2018-08-07T05:33:34.224Z"), "attrName" : "y", "attrType" : "float", "attrValue" : "0.2" }
+MongoDB server version: 3.6.6
+d" : ObjectId("5bc5259301cf4c000b1c0956"), "recvTime" : ISODate("2018-10-15T23:41:07.753Z"), "destx" : "20.0", "desty" : "-10.8", "r_mode" : "Navi", "r_state" : "Guiding", "robot_request_info" : "result,success/time,2018-10-16 08:37:02/r_cmd,Navi/x,20.0/y,-10.8", "robot_request_status" : "OK", "theta" : "0.3", "time" : "2018-09-08 07:06:05", "visitor" : "bxA21JOPcNhyQr0YqylCaqXV", "x" : "0.1", "y" : "0.2" }
 ```
 ```bash
-mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_robot --eval 'db.getCollection("sth_/_guide_robot_0000000000000002_guide_robot").find()'
-MongoDB shell version v3.6.5
+mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_robot --eval 'db.getCollection("sth_/_guide_robot_0000000000000002_guide_robot").find().sort({recvTime: -1})'
+MongoDB shell version v3.6.6
 connecting to: mongodb://127.0.0.1:27017/sth_robot
-MongoDB server version: 3.6.5
-{ "_id" : ObjectId("5b692f8bf8a94e000a6eb428"), "recvTime" : ISODate("2018-08-07T05:35:07.844Z"), "attrName" : "destx", "attrType" : "float", "attrValue" : "20.0" }
-{ "_id" : ObjectId("5b692f8bf8a94e000a6eb429"), "recvTime" : ISODate("2018-08-07T05:35:07.844Z"), "attrName" : "desty", "attrType" : "float", "attrValue" : "-10.8" }
-{ "_id" : ObjectId("5b692f8bf8a94e000a6eb42a"), "recvTime" : ISODate("2018-08-07T05:35:07.844Z"), "attrName" : "r_state", "attrType" : "string", "attrValue" : "Guiding" }
-{ "_id" : ObjectId("5b692f8bf8a94e000a6eb42d"), "recvTime" : ISODate("2018-08-07T05:35:07.844Z"), "attrName" : "visitor", "attrType" : "string", "attrValue" : "bxA21JOPcNhyQr0YqylCaqXV" }
-{ "_id" : ObjectId("5b692fb3f8a94e000a6eb42e"), "recvTime" : ISODate("2018-08-07T05:35:47.759Z"), "attrName" : "destx", "attrType" : "float", "attrValue" : "20.0" }
-{ "_id" : ObjectId("5b692fb3f8a94e000a6eb42f"), "recvTime" : ISODate("2018-08-07T05:35:47.759Z"), "attrName" : "desty", "attrType" : "float", "attrValue" : "-10.8" }
-{ "_id" : ObjectId("5b692fb3f8a94e000a6eb430"), "recvTime" : ISODate("2018-08-07T05:35:47.759Z"), "attrName" : "r_mode", "attrType" : "string", "attrValue" : "Navi" }
-{ "_id" : ObjectId("5b692fb3f8a94e000a6eb431"), "recvTime" : ISODate("2018-08-07T05:35:47.759Z"), "attrName" : "r_state", "attrType" : "string", "attrValue" : "Guiding" }
-{ "_id" : ObjectId("5b692fb3f8a94e000a6eb434"), "recvTime" : ISODate("2018-08-07T05:35:47.759Z"), "attrName" : "theta", "attrType" : "float", "attrValue" : "0.3" }
-{ "_id" : ObjectId("5b692fb3f8a94e000a6eb435"), "recvTime" : ISODate("2018-08-07T05:35:47.759Z"), "attrName" : "time", "attrType" : "string", "attrValue" : "2018-09-08 07:06:05" }
-{ "_id" : ObjectId("5b692fb3f8a94e000a6eb436"), "recvTime" : ISODate("2018-08-07T05:35:47.759Z"), "attrName" : "visitor", "attrType" : "string", "attrValue" : "bxA21JOPcNhyQr0YqylCaqXV" }
-{ "_id" : ObjectId("5b692fb3f8a94e000a6eb437"), "recvTime" : ISODate("2018-08-07T05:35:47.759Z"), "attrName" : "x", "attrType" : "float", "attrValue" : "0.1" }
-{ "_id" : ObjectId("5b692fb3f8a94e000a6eb438"), "recvTime" : ISODate("2018-08-07T05:35:47.759Z"), "attrName" : "y", "attrType" : "float", "attrValue" : "0.2" }
+MongoDB server version: 3.6.6
+{ "_id" : ObjectId("5bc52b0f8e39fa000e14fae8"), "recvTime" : ISODate("2018-10-16T00:04:27.063Z"), "destx" : "20.0", "desty" : "20.0", "r_mode" : "Navi", "r_state" : "Guiding", "robot_request_info" : "result,success/time,2018-10-16 09:04:27/r_cmd,Navi/x,20.0/y,20.0", "robot_request_status" : "OK", "theta" : "0.3", "time" : "2018-Oct-10 12:47:04.098249", "visitor" : "5bc52a9469104a0016f66dac", "x" : "0.1", "y" : "0.2" }
 ```
 
 ## register CAMERA to cygnus
@@ -323,40 +303,25 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 ]
 ```
 ```bash
-mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_camera --eval 'db.getCollection("sth_/_external_camera_0000000000000011_external_camera").find()'
-MongoDB shell version v3.6.5
+mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_camera --eval 'db.getCollection("sth_/_external_camera_0000000000000011_external_camera").find().sort({recvTime: -1})'
+MongoDB shell version v3.6.6
 connecting to: mongodb://127.0.0.1:27017/sth_camera
-MongoDB server version: 3.6.5
-{ "_id" : ObjectId("5b60fbfbf8a94e000a6eae83"), "recvTime" : ISODate("2018-08-01T00:16:58.930Z"), "attrName" : "c_mode", "attrType" : "string", "attrValue" : "Monitor" }
-{ "_id" : ObjectId("5b60fbfbf8a94e000a6eae84"), "recvTime" : ISODate("2018-07-31T23:34:35.231Z"), "attrName" : "external_camera_request_info", "attrType" : "commandResult", "attrValue" : "result,success/time,2018-08-01 08:34:32/c_cmd,Monitor" }
-{ "_id" : ObjectId("5b60fbfbf8a94e000a6eae85"), "recvTime" : ISODate("2018-07-31T23:34:35.231Z"), "attrName" : "external_camera_request_status", "attrType" : "commandStatus", "attrValue" : "OK" }
-{ "_id" : ObjectId("5b60fbfbf8a94e000a6eae86"), "recvTime" : ISODate("2018-08-01T00:16:58.930Z"), "attrName" : "num_p", "attrType" : "int", "attrValue" : "1" }
-{ "_id" : ObjectId("5b60fbfbf8a94e000a6eae87"), "recvTime" : ISODate("2018-08-01T00:16:58.930Z"), "attrName" : "position", "attrType" : "string", "attrValue" : "x[0],1.12/y[0],-95.1" }
-{ "_id" : ObjectId("5b60fbfbf8a94e000a6eae88"), "recvTime" : ISODate("2018-08-01T00:16:58.930Z"), "attrName" : "time", "attrType" : "string", "attrValue" : "2018-01-02 03:04:05" }
+MongoDB server version: 3.6.6
+{ "_id" : ObjectId("5bbc5dbebcaa26000d22797f"), "recvTime" : ISODate("2018-10-09T07:50:22.630Z"), "c_mode" : "Monitor", "external_camera_request_info" : "result,success/time,2018-10-09 15:30:59/c_cmd,Monitor", "external_camera_request_status" : "OK", "num_p" : "1", "position" : "x[0],1.12/y[0],-95.1", "time" : "2018-01-02 03:04:05" }
 ```
 ```bash
-mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_camera --eval 'db.getCollection("sth_/_external_camera_0000000000000012_external_camera").find()'
-MongoDB shell version v3.6.5
+mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_camera --eval 'db.getCollection("sth_/_external_camera_0000000000000012_external_camera").find().sort({recvTime: -1})'
+MongoDB shell version v3.6.6
 connecting to: mongodb://127.0.0.1:27017/sth_camera
-MongoDB server version: 3.6.5
-{ "_id" : ObjectId("5b60fc92c22929000a69fe7e"), "recvTime" : ISODate("2018-08-01T00:19:30.639Z"), "attrName" : "c_mode", "attrType" : "string", "attrValue" : "Monitor" }
-{ "_id" : ObjectId("5b60fc92c22929000a69fe7f"), "recvTime" : ISODate("2018-07-31T23:44:31.386Z"), "attrName" : "external_camera_request_info", "attrType" : "commandResult", "attrValue" : "result,success/time,2018-08-01 08:44:28/c_cmd,Monitor" }
-{ "_id" : ObjectId("5b60fc92c22929000a69fe80"), "recvTime" : ISODate("2018-07-31T23:44:31.386Z"), "attrName" : "external_camera_request_status", "attrType" : "commandStatus", "attrValue" : "OK" }
-{ "_id" : ObjectId("5b60fc92c22929000a69fe81"), "recvTime" : ISODate("2018-08-01T00:19:30.639Z"), "attrName" : "num_p", "attrType" : "int", "attrValue" : "1" }
-{ "_id" : ObjectId("5b60fc92c22929000a69fe82"), "recvTime" : ISODate("2018-08-01T00:19:30.639Z"), "attrName" : "position", "attrType" : "string", "attrValue" : "x[0],-0.1/y[0],-15.1" }
-{ "_id" : ObjectId("5b60fc92c22929000a69fe83"), "recvTime" : ISODate("2018-08-01T00:19:30.639Z"), "attrName" : "time", "attrType" : "string", "attrValue" : "2018-01-02 03:04:05" }
+MongoDB server version: 3.6.6
+{ "_id" : ObjectId("5bbc5dbf01cf4c000b1bfd3d"), "recvTime" : ISODate("2018-10-09T07:50:23.772Z"), "c_mode" : "Monitor", "external_camera_request_info" : "result,success/time,2018-10-09 15:31:31/c_cmd,Monitor", "external_camera_request_status" : "OK", "num_p" : "0", "position" : "-", "time" : "2018-01-02 03:04:05" }
 ```
 ```bash
-mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_camera --eval 'db.getCollection("sth_/_external_camera_0000000000000021_external_camera").find()'
-MongoDB shell version v3.6.5
+mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_camera --eval 'db.getCollection("sth_/_external_camera_0000000000000021_external_camera").find().sort({recvTime: -1})'
+MongoDB shell version v3.6.6
 connecting to: mongodb://127.0.0.1:27017/sth_camera
-MongoDB server version: 3.6.5
-{ "_id" : ObjectId("5b60fca2c22929000a69fe84"), "recvTime" : ISODate("2018-08-01T00:19:46.793Z"), "attrName" : "c_mode", "attrType" : "string", "attrValue" : "Monitor" }
-{ "_id" : ObjectId("5b60fca2c22929000a69fe85"), "recvTime" : ISODate("2018-07-31T23:44:55.554Z"), "attrName" : "external_camera_request_info", "attrType" : "commandResult", "attrValue" : "result,success/time,2018-08-01 08:44:53/c_cmd,Monitor" }
-{ "_id" : ObjectId("5b60fca2c22929000a69fe86"), "recvTime" : ISODate("2018-07-31T23:44:55.554Z"), "attrName" : "external_camera_request_status", "attrType" : "commandStatus", "attrValue" : "OK" }
-{ "_id" : ObjectId("5b60fca2c22929000a69fe87"), "recvTime" : ISODate("2018-08-01T00:19:46.793Z"), "attrName" : "num_p", "attrType" : "int", "attrValue" : "1" }
-{ "_id" : ObjectId("5b60fca2c22929000a69fe88"), "recvTime" : ISODate("2018-08-01T00:19:46.793Z"), "attrName" : "position", "attrType" : "string", "attrValue" : "x[0],-0.111111/y[0],105.1" }
-{ "_id" : ObjectId("5b60fca2c22929000a69fe89"), "recvTime" : ISODate("2018-08-01T00:19:46.793Z"), "attrName" : "time", "attrType" : "string", "attrValue" : "2018-01-02 03:04:05" }
+MongoDB server version: 3.6.6
+{ "_id" : ObjectId("5bbc5dc2bcaa26000d227982"), "recvTime" : ISODate("2018-10-09T07:50:26.602Z"), "c_mode" : "Monitor", "external_camera_request_info" : "result,success/time,2018-10-09 15:31:42/c_cmd,Monitor", "external_camera_request_status" : "OK", "num_p" : "0", "position" : "-", "time" : "2018-01-02 03:04:05" }
 ```
 
 ## register DEST-LED to cygnus
@@ -413,14 +378,12 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 ]
 ```
 ```bash
-mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_dest_led --eval 'db.getCollection("sth_/_dest_led_0000000000000001_dest_led").find()'
-MongoDB shell version v3.6.5
+mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_dest_led --eval 'db.getCollection("sth_/_dest_led_0000000000000001_dest_led").find().sort({recvTime: -1})'
+MongoDB shell version v3.6.6
 connecting to: mongodb://127.0.0.1:27017/sth_dest_led
-MongoDB server version: 3.6.5
-{ "_id" : ObjectId("5b3c847ac22929000a69f8b5"), "recvTime" : ISODate("2018-07-04T07:40:04.779Z"), "attrName" : "action_info", "attrType" : "commandResult", "attrValue" : "success" }
-{ "_id" : ObjectId("5b3c847ac22929000a69f8b6"), "recvTime" : ISODate("2018-07-04T08:25:30.289Z"), "attrName" : "action_status", "attrType" : "commandStatus", "attrValue" : "PENDING" }
-{ "_id" : ObjectId("5b3c8499f8a94e000a6ea93a"), "recvTime" : ISODate("2018-07-04T08:25:57.960Z"), "attrName" : "action_info", "attrType" : "commandResult", "attrValue" : "success" }
-{ "_id" : ObjectId("5b3c8499f8a94e000a6ea93b"), "recvTime" : ISODate("2018-07-04T08:25:57.960Z"), "attrName" : "action_status", "attrType" : "commandStatus", "attrValue" : "OK" }
+MongoDB server version: 3.6.6
+{ "_id" : ObjectId("5bc5267c8e39fa000e14fae5"), "recvTime" : ISODate("2018-10-15T23:45:00.920Z"), "action_info" : "success", "action_status" : "OK" }
+{ "_id" : ObjectId("5bc5264cbcaa26000d228550"), "recvTime" : ISODate("2018-10-15T23:44:12.182Z"), "action_info" : "success", "action_status" : "PENDING" }
 ```
 
 ## register DEST-HUMAN-SENSOR to cygnus
@@ -476,11 +439,11 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 ]
 ```
 ```bash
-mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_dest_human_sensor --eval 'db.getCollection("sth_/_dest_human_sensor_0000000000000001_dest_human_sensor").find()'
-MongoDB shell version v3.6.5
+mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_dest_human_sensor --eval 'db.getCollection("sth_/_dest_human_sensor_0000000000000001_dest_human_sensor").find().sort({recvTime: -1})'
+MongoDB shell version v3.6.6
 connecting to: mongodb://127.0.0.1:27017/sth_dest_human_sensor
-MongoDB server version: 3.6.5
-{ "_id" : ObjectId("5b3d786b23b570000ae53c6e"), "recvTime" : ISODate("2018-07-05T01:46:19.603Z"), "attrName" : "arrival", "attrType" : "string", "attrValue" : "2018-07-05T10:41:52.1530754912+0900" }
+MongoDB server version: 3.6.6
+{ "_id" : ObjectId("5bc5264c01cf4c000b1c095a"), "recvTime" : ISODate("2018-10-15T23:44:12.133Z"), "arrival" : "2018-10-16T08:44:11.1539647051+0900" }
 ```
 
 ## register `start-reception` of reception as a subscriber of BUTTON-SENSOR
@@ -1543,6 +1506,186 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
       "http": {
         "url": "http://guidance:8888/notify/stop-movement/"
       }
+    }
+  }
+]
+```
+
+## register `change-robot-state` of guidance as a subscriber of ROBOT
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
+{
+  "subject": {
+    "entities": [{
+      "idPattern": "guide_robot.*",
+      "type": "guide_robot"
+    }],
+    "condition": {
+      "attrs": ["r_state"]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://guidance:8888/notify/change-robot-state/"
+    },
+    "attrs": ["r_state"]
+  }
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-ServicePath: /" https://api.tech-sketch.jp/orion/v2/subscriptions/ | jq .
+[
+  {
+    "id": "5b723fc3cce8da6ea14fd67f",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "guide_robot.*",
+          "type": "guide_robot"
+        }
+      ],
+      "condition": {
+        "attrs": []
+      }
+    },
+    "notification": {
+      "timesSent": 14544,
+      "lastNotification": "2018-10-16T00:46:40.00Z",
+      "attrs": [
+        "time",
+        "r_mode",
+        "x",
+        "y",
+        "theta",
+        "r_state",
+        "destx",
+        "desty",
+        "visitor",
+        "robot_request_status",
+        "robot_request_info"
+      ],
+      "attrsFormat": "legacy",
+      "http": {
+        "url": "http://cygnus:5050/notify"
+      },
+      "lastSuccess": "2018-10-16T00:46:40.00Z"
+    }
+  },
+  {
+    "id": "5b7240e3cce8da6ea14fd683",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "guide_robot.*",
+          "type": "guide_robot"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "r_mode",
+          "x",
+          "y",
+          "theta"
+        ],
+        "expression": {
+          "q": "r_mode==Navi"
+        }
+      }
+    },
+    "notification": {
+      "timesSent": 2788,
+      "lastNotification": "2018-10-15T23:41:07.00Z",
+      "attrs": [
+        "r_mode",
+        "x",
+        "y",
+        "theta",
+        "r_state",
+        "destx",
+        "desty",
+        "visitor"
+      ],
+      "attrsFormat": "normalized",
+      "http": {
+        "url": "http://guidance:8888/notify/check-destination/"
+      },
+      "lastFailure": "2018-10-10T01:30:58.00Z",
+      "lastSuccess": "2018-10-15T23:41:07.00Z"
+    }
+  },
+  {
+    "id": "5b7240f5cce8da6ea14fd684",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "guide_robot.*",
+          "type": "guide_robot"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "r_mode",
+          "x",
+          "y",
+          "theta"
+        ],
+        "expression": {
+          "q": "r_mode==Standby"
+        }
+      }
+    },
+    "notification": {
+      "timesSent": 11244,
+      "lastNotification": "2018-10-16T00:11:48.00Z",
+      "attrs": [
+        "r_mode",
+        "x",
+        "y",
+        "theta",
+        "r_state",
+        "destx",
+        "desty",
+        "visitor"
+      ],
+      "attrsFormat": "normalized",
+      "http": {
+        "url": "http://guidance:8888/notify/stop-movement/"
+      },
+      "lastFailure": "2018-10-10T01:33:23.00Z",
+      "lastSuccess": "2018-10-16T00:11:48.00Z"
+    }
+  },
+  {
+    "id": "5bc535fa1797ff091b693505",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "guide_robot.*",
+          "type": "guide_robot"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "r_state"
+        ]
+      }
+    },
+    "notification": {
+      "timesSent": 1,
+      "lastNotification": "2018-10-16T00:51:06.00Z",
+      "attrs": [
+        "r_state"
+      ],
+      "attrsFormat": "normalized",
+      "http": {
+        "url": "http://guidance:8888/notify/change-robot-state/"
+      },
+      "lastSuccess": "2018-10-16T00:51:06.00Z"
     }
   }
 ]

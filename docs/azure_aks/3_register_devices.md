@@ -11,8 +11,10 @@ Configure fiware on AKS by following steps:
 1. [test "PEPPER" attribute](#test-pepper-attribute)
 1. [register "ROBOT" service](#register-robot-service)
 1. [register "ROBOT" device](#register-robot-device)
+1. [register "ROBOT-TABLET" device](#register-robot-tablet-device)
 1. [test "ROBOT" command](#test-robot-command)
 1. [test "ROBOT" attribute](#test-robot-attribute)
+1. [test "ROBOT-TABLET" command](#test-robot-tablet-command)
 1. [register "CAMERA" service](#register-camera-service)
 1. [register "CAMERA" device](#register-camera-device)
 1. [test "CAMERA" command](#test-camera-command)
@@ -1175,6 +1177,106 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 
 * check `guide_robot_0000000000000002` by the same procedure.
 
+## register ROBOT-TABLET device
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/ -X POST -d @- <<__EOS__
+{
+  "devices": [
+    {
+      "device_id": "guide_robot_0000000000000001_tablet",
+      "entity_name": "guide_robot_0000000000000001_tablet",
+      "entity_type": "guide_robot",
+      "timezone": "Asia/Tokyo",
+      "protocol": "UL20",
+      "attributes": [],
+      "commands": [
+        {
+          "name": "state",
+          "type": "string"
+        }
+      ],
+      "transport": "AMQP"
+    }
+  ]
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/ -X POST -d @- <<__EOS__
+{
+  "devices": [
+    {
+      "device_id": "guide_robot_0000000000000002_tablet",
+      "entity_name": "guide_robot_0000000000000002_tablet",
+      "entity_type": "guide_robot",
+      "timezone": "Asia/Tokyo",
+      "protocol": "UL20",
+      "attributes": [],
+      "commands": [
+        {
+          "name": "state",
+          "type": "string"
+        }
+      ],
+      "transport": "AMQP"
+    }
+  ]
+}
+__EOS__
+```
+
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/guide_robot_0000000000000001_tablet/ | jq .
+{
+  "device_id": "guide_robot_0000000000000001_tablet",
+  "service": "robot",
+  "service_path": "/",
+  "entity_name": "guide_robot_0000000000000001_tablet",
+  "entity_type": "guide_robot",
+  "transport": "AMQP",
+  "attributes": [],
+  "lazy": [],
+  "commands": [
+    {
+      "object_id": "state",
+      "name": "state",
+      "type": "string"
+    }
+  ],
+  "static_attributes": [],
+  "protocol": "UL20"
+}
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000001_tablet/ | jq .
+{
+  "id": "guide_robot_0000000000000001_tablet",
+  "type": "guide_robot",
+  "TimeInstant": {
+    "type": "ISO8601",
+    "value": " ",
+    "metadata": {}
+  },
+  "state_info": {
+    "type": "commandResult",
+    "value": " ",
+    "metadata": {}
+  },
+  "state_status": {
+    "type": "commandStatus",
+    "value": "UNKNOWN",
+    "metadata": {}
+  },
+  "state": {
+    "type": "string",
+    "value": "",
+    "metadata": {}
+  }
+}
+```
+
+* check `guide_robot_0000000000000002_tablet` by the same procedure.
+
 ## test ROBOT command
 ```bash
 mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
@@ -1686,6 +1788,121 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 ```
 
 * test `guide_robot_0000000000000002` by the same procedure.
+
+## test ROBOT-TABLET command
+```bash
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v1/updateContext -d @-<<__EOS__ | jq .
+{
+  "contextElements": [
+    {
+      "id": "guide_robot_0000000000000001_tablet",
+      "isPattern": "false",
+      "type": "guide_robot",
+      "attributes": [
+        {
+          "name": "state",
+          "value": "Guiding"
+        }
+      ]
+    }
+  ],
+  "updateAction": "UPDATE"
+}
+__EOS__
+```
+```bash
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
+...
+Client mosqsub|43690-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001_tablet/cmd', ... (49 bytes))
+guide_robot_0000000000000001_tablet@state|Guiding
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000001_tablet/ | jq .
+{
+  "id": "guide_robot_0000000000000001_tablet",
+  "type": "guide_robot",
+  "TimeInstant": {
+    "type": "ISO8601",
+    "value": "2018-10-16T01:22:03.00Z",
+    "metadata": {}
+  },
+  "state_info": {
+    "type": "commandResult",
+    "value": " ",
+    "metadata": {}
+  },
+  "state_status": {
+    "type": "commandStatus",
+    "value": "PENDING",
+    "metadata": {
+      "TimeInstant": {
+        "type": "ISO8601",
+        "value": "2018-10-16T01:22:03.925Z"
+      }
+    }
+  },
+  "state": {
+    "type": "string",
+    "value": "",
+    "metadata": {}
+  }
+}
+```
+```bash
+mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000001_tablet/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000001_tablet@state|success"
+Client mosqpub|63166-Nobuyukin sending CONNECT
+Client mosqpub|63166-Nobuyukin received CONNACK (0)
+Client mosqpub|63166-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot_0000000000000001_tablet/cmdexe', ... (49 bytes))
+Client mosqpub|63166-Nobuyukin sending DISCONNECT
+```
+```bash
+mac:$ mosquitto_sub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /# -u iotagent -P XXXXXXXX
+...
+Client mosqsub|43690-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001_tablet/cmdexe', ... (49 bytes))
+guide_robot_0000000000000001_tablet@state|success
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/orion/v2/entities/guide_robot_0000000000000001_tablet/ | jq .
+{
+  "id": "guide_robot_0000000000000001_tablet",
+  "type": "guide_robot",
+  "TimeInstant": {
+    "type": "ISO8601",
+    "value": "2018-10-16T01:24:41.00Z",
+    "metadata": {}
+  },
+  "state_info": {
+    "type": "commandResult",
+    "value": "success",
+    "metadata": {
+      "TimeInstant": {
+        "type": "ISO8601",
+        "value": "2018-10-16T01:24:41.852Z"
+      }
+    }
+  },
+  "state_status": {
+    "type": "commandStatus",
+    "value": "OK",
+    "metadata": {
+      "TimeInstant": {
+        "type": "ISO8601",
+        "value": "2018-10-16T01:24:41.852Z"
+      }
+    }
+  },
+  "state": {
+    "type": "string",
+    "value": "",
+    "metadata": {}
+  }
+}
+```
+
+* test `guide_robot_0000000000000002_tablet` by the same procedure.
 
 ## register CAMERA service
 ```bash

@@ -318,3 +318,38 @@ class ArrivalAPI(RobotFloorMapMixin, MethodView):
             raise e
 
         return jsonify(result)
+
+
+class ChangeRobotStateAPI(MethodView):
+    NAME = 'change-robot-state'
+
+    def __init__(self):
+        super().__init__()
+        service = os.environ.get(const.ROBOT_SERVICE, '')
+        service_path = os.environ.get(const.ROBOT_SERVICEPATH, '')
+        self.type = os.environ.get(const.ROBOT_TYPE, '')
+
+        self.orion = Orion(service, service_path)
+
+    def post(self):
+        content = request.data.decode('utf-8')
+        logger.info(f'request content={content}')
+
+        result = {'result': 'failure'}
+        try:
+            robot_id = get_id(content)
+            state = get_attr_value(content, 'r_state')
+            message = self.orion.send_cmd(robot_id + const.TABLET_SUFFIX, self.type, 'state', state)
+            result['result'] = 'success'
+            result['message'] = message
+        except AttrDoesNotExist as e:
+            logger.error(f'AttrDoesNotExist: {str(e)}')
+            raise BadRequest(str(e))
+        except NGSIPayloadError as e:
+            logger.error(f'NGSIPayloadError: {str(e)}')
+            raise BadRequest(str(e))
+        except Exception as e:
+            logger.exception(e)
+            raise e
+
+        return jsonify(result)

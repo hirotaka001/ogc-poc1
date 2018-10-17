@@ -23,3 +23,6 @@ WAITING = 'Waiting'
 GUIDING = 'Guiding'
 SUSPENDING = 'Suspending'
 RETURNING = 'Returning'
+
+# tablet
+TABLET_SUFFIX = '_tablet'
