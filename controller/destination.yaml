@@ -46,7 +46,7 @@ spec:
         - name: MONGODB_REPLICASET
           value: "rs0"
         - name: POS_DELTA
-          value: "0.1"
+          value: "1.5"
         ports:
           - name: destination
             containerPort: 8888

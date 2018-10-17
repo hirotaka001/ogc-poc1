@@ -5,7 +5,7 @@ from flask import Flask
 from controllerlibs import CONFIG_CFG, DEFAULT_PORT
 from controllerlibs.utils import setup_logging, error_handler, get_port
 
-from src.views import StartMovementAPI, CheckDestinationAPI, StopMovementAPI, ArrivalAPI
+from src.views import StartMovementAPI, CheckDestinationAPI, StopMovementAPI, ArrivalAPI, ChangeRobotStateAPI
 
 setup_logging()
 
@@ -16,6 +16,7 @@ app.add_url_rule('/notify/start-movement/', view_func=StartMovementAPI.as_view(S
 app.add_url_rule('/notify/check-destination/', view_func=CheckDestinationAPI.as_view(CheckDestinationAPI.NAME))
 app.add_url_rule('/notify/stop-movement/', view_func=StopMovementAPI.as_view(StopMovementAPI.NAME))
 app.add_url_rule('/notify/arrival/', view_func=ArrivalAPI.as_view(ArrivalAPI.NAME))
+app.add_url_rule('/notify/change-robot-state/', view_func=ChangeRobotStateAPI.as_view(ChangeRobotStateAPI.NAME))
 
 
 if __name__ == '__main__':

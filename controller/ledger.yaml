@@ -71,6 +71,8 @@ spec:
           value: "${FACE_API_KEY}"
         - name: FACE_API_BASEURL
           value: "${FACE_API_BASEURL}"
+        - name: FACE_VERIFY_DELTA_MIN
+          value: "5"
         ports:
           - name: reception
             containerPort: 8888

@@ -251,6 +251,8 @@
         pepper_0000000000000001@handover|1
         Client mosqsub|86059-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/cmd', ... (68 bytes))
         guide_robot_0000000000000001@robot_request|r_cmd|Navi|x|-10.0|y|10.0
+        Client mosqsub|86059-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001_tablet/cmd', ... (49 bytes))
+        guide_robot_0000000000000001_tablet@state|Guiding
         Client mosqsub|86059-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/cmdexe', ... (108 bytes))
         guide_robot_0000000000000001@robot_request|result,success/time,2018-08-08 19:02:35/r_cmd,Navi/x,-10.0/y,10.0
         ```
@@ -303,9 +305,9 @@
 
         ```bash
         mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(1).pretty()'
-        MongoDB shell version v3.6.5
+        MongoDB shell version v3.6.6
         connecting to: mongodb://127.0.0.1:27017/ledger
-        MongoDB server version: 3.6.5
+        MongoDB server version: 3.6.6
         {
           "_id" : ObjectId("5b6abfbb393f5f00136ecea0"),
           "status" : "reception",
@@ -341,6 +343,15 @@
     Client mosqpub|22763-Nobuyukin sending CONNECT
     Client mosqpub|22763-Nobuyukin received CONNACK
     Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/cmdexe', ... (40 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
+1. simulate to send `state` cmd result from `tablet of guide_robot(floor 1)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000001_tablet/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000001_tablet@state|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot_0000000000000001_tablet/cmdexe', ... (49 bytes))
     Client mosqpub|22763-Nobuyukin sending DISCONNECT
     ```
 
@@ -411,6 +422,8 @@
         ```bash
         Client mosqsub|86059-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/attrs', ... (98 bytes))
         2018-08-08T19:10:40.602383+0900|time|2018-09-08 07:06:15|r_mode|Standby|x|-10.01|y|10.02|theta|9.1
+        Client mosqsub|86059-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001_tablet/cmd', ... (52 bytes))
+        guide_robot_0000000000000001_tablet@state|Suspending
         ```
     * update `r_state` to `Suspending` automatically
 
@@ -427,6 +440,15 @@
           }
         }
         ```
+1. simulate to send `state` cmd result from `tablet of guide_robot(floor 1)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000001_tablet/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000001_tablet@state|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot_0000000000000001_tablet/cmdexe', ... (49 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
 
 ## arrival (floor 1)
 1. simuate visitor arriving at the destination
@@ -447,6 +469,8 @@
         dest_led_0000000000000001@action|off
         Client mosqsub|86059-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/cmd', ... (65 bytes))
         guide_robot_0000000000000001@robot_request|r_cmd|Navi|x|0.0|y|0.0
+        Client mosqsub|86059-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001_tablet/cmd', ... (51 bytes))
+        guide_robot_0000000000000001_tablet@state|Returning
         Client mosqsub|86059-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/cmdexe', ... (105 bytes))
         guide_robot_0000000000000001@robot_request|result,success/time,2018-08-08 19:28:02/r_cmd,Navi/x,0.0/y,0.0
         ```
@@ -495,9 +519,9 @@
 
         ```bash
         mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(1).pretty()'
-        MongoDB shell version v3.6.5
+        MongoDB shell version v3.6.6
         connecting to: mongodb://127.0.0.1:27017/ledger
-        MongoDB server version: 3.6.5
+        MongoDB server version: 3.6.6
         {
           "_id" : ObjectId("5b6ac3c46a77d600136cbcb7"),
           "status" : "arrival",
@@ -525,6 +549,15 @@
     Client mosqpub|22763-Nobuyukin sending CONNECT
     Client mosqpub|22763-Nobuyukin received CONNACK
     Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/dest_led/dest_led_0000000000000001/cmdexe', ... (40 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
+1. simulate to send `state` cmd result from `tablet of guide_robot(floor 1)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000001_tablet/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000001_tablet@state|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot_0000000000000001_tablet/cmdexe', ... (49 bytes))
     Client mosqpub|22763-Nobuyukin sending DISCONNECT
     ```
 1. simulate to receive robot state (Navi)
@@ -582,6 +615,8 @@
         ```bash
         Client mosqsub|86059-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/attrs', ... (93 bytes))
         2018-08-08T19:35:42.490765+0900|time|2018-09-08 07:06:15|r_mode|Standby|x|0.0|y|0.0|theta|0.0
+        Client mosqsub|86059-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001_tablet/cmd', ... (49 bytes))
+        guide_robot_0000000000000001_tablet@state|Waiting
         ```
     * update `r_state` to `Waiting` automatically
 
@@ -598,6 +633,15 @@
           }
         }
         ```
+1. simulate to send `state` cmd result from `tablet of guide_robot(floor 1)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000001_tablet/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000001_tablet@state|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot_0000000000000001_tablet/cmdexe', ... (49 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
 
 ## guidance (floor 2)
 1. simulate to be called `/storage/faces/` REST API by pepper(floor 1)
@@ -629,9 +673,9 @@
 
         ```bash
         mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(1).pretty()'
-        MongoDB shell version v3.6.5
+        MongoDB shell version v3.6.6
         connecting to: mongodb://127.0.0.1:27017/ledger
-        MongoDB server version: 3.6.5
+        MongoDB server version: 3.6.6
         {
           "_id" : ObjectId("5b6ac98b393f5f00136ecea3"),
           "status" : "reception",
@@ -700,6 +744,8 @@
         guide_robot_0000000000000002@robot_request|r_cmd|Navi|x|20.0|y|20.0
         Client mosqsub|86059-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/cmdexe', ... (107 bytes))
         guide_robot_0000000000000002@robot_request|result,success/time,2018-08-08 19:49:53/r_cmd,Navi/x,20.0/y,20.0
+        Client mosqsub|86059-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002_tablet/cmd', ... (49 bytes))
+        guide_robot_0000000000000002_tablet@state|Guiding
         ```
     * send ros message to ros topic `/robot_2f_1/request` automatically
 
@@ -764,6 +810,15 @@
     Client mosqpub|48779-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000002/cmdexe', ... (40 bytes))
     Client mosqpub|48779-Nobuyukin sending DISCONNECT
     ```
+1. simulate to send `state` cmd result from `tablet of guide_robot(floor 2)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000002_tablet/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000002_tablet@state|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot_0000000000000002_tablet/cmdexe', ... (49 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
 
 ## navigating (floor 2)
 1. simulate to receive robot state (Navi)
@@ -827,11 +882,13 @@
       theta: 19.5
     "
     ```
-    * receive MQTT message, but don't send `action|on` message to `dest_led` authomatically
+    * receive mqtt message, but don't send `action|on` message to `dest_led` authomatically
 
         ```bash
-        Client mosqsub|86059-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/attrs', ... (96 bytes))
-        2018-08-08T19:54:22.826260+0900|time|2018-10-09 08:07:16|r_mode|Standby|x|20.0|y|20.2|theta|19.5
+        client mosqsub|86059-nobuyukin received publish (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/attrs', ... (96 bytes))
+        2018-08-08t19:54:22.826260+0900|time|2018-10-09 08:07:16|r_mode|standby|x|20.0|y|20.2|theta|19.5
+        client mosqsub|86059-nobuyukin received publish (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002_tablet/cmd', ... (52 bytes))
+        guide_robot_0000000000000002_tablet@state|suspending
         ```
     * update `r_state` to `Suspending` automatically
 
@@ -848,6 +905,15 @@
           }
         }
         ```
+1. simulate to send `state` cmd result from `tablet of guide_robot(floor 2)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000002_tablet/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000002_tablet@state|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot_0000000000000002_tablet/cmdexe', ... (49 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
 
 ## arrival (floor 2)
 1. simuate visitor arriving at the destination
@@ -870,6 +936,8 @@
         guide_robot_0000000000000002@robot_request|r_cmd|Navi|x|0.0|y|0.0
         Client mosqsub|86059-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/cmdexe', ... (105 bytes))
         guide_robot_0000000000000002@robot_request|result,success/time,2018-08-08 19:55:36/r_cmd,Navi/x,0.0/y,0.0
+        Client mosqsub|86059-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002_tablet/cmd', ... (51 bytes))
+        guide_robot_0000000000000002_tablet@state|Returning
         ```
     * send ros message to ros topic `/robot_2f_1/request` automatically
 
@@ -916,9 +984,9 @@
 
         ```bash
         mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(1).pretty()'
-        MongoDB shell version v3.6.5
+        MongoDB shell version v3.6.6
         connecting to: mongodb://127.0.0.1:27017/ledger
-        MongoDB server version: 3.6.5
+        MongoDB server version: 3.6.6
         {
           "_id" : ObjectId("5b6ac98b393f5f00136ecea3"),
           "status" : "arrival",
@@ -949,6 +1017,15 @@
     Client mosqpub|22763-Nobuyukin sending CONNECT
     Client mosqpub|22763-Nobuyukin received CONNACK
     Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/dest_led/dest_led_0000000000000002/cmdexe', ... (40 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
+1. simulate to send `state` cmd result from `tablet of guide_robot(floor 2)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000002_tablet/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000002_tablet@state|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot_0000000000000002_tablet/cmdexe', ... (49 bytes))
     Client mosqpub|22763-Nobuyukin sending DISCONNECT
     ```
 1. simulate to receive robot state (Navi)
@@ -1006,6 +1083,8 @@
         ```bash
         Client mosqsub|86059-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/attrs', ... (93 bytes))
         2018-08-08T19:59:04.933828+0900|time|2018-10-09 08:07:35|r_mode|Standby|x|0.0|y|0.0|theta|0.0
+        Client mosqsub|86059-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002_tablet/cmd', ... (49 bytes))
+        guide_robot_0000000000000002_tablet@state|Waiting
         ```
     * update `r_state` to `Waiting` automatically
 
@@ -1022,6 +1101,15 @@
           }
         }
         ```
+1. simulate to send `state` cmd result from `tablet of guide_robot(floor 2)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000002_tablet/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000002_tablet@state|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot_0000000000000002_tablet/cmdexe', ... (49 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
 
 ## guidance (floor 3)
 1. simulate to finish reception (floor 3)
@@ -1078,9 +1166,9 @@
 
         ```bash
         mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(1).pretty()'
-        MongoDB shell version v3.6.5
+        MongoDB shell version v3.6.6
         connecting to: mongodb://127.0.0.1:27017/ledger
-        MongoDB server version: 3.6.5
+        MongoDB server version: 3.6.6
         {
           "_id" : ObjectId("5b6acd4e6a77d600136cbcba"),
           "status" : "reception",
@@ -1269,13 +1357,10 @@
 
         ```bash
         mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_camera --eval 'db.getCollection("sth_/_external_camera_0000000000000011_external_camera").find({recvTime: { "$gte": new Date(ISODate().getTime() - 1000 * 60 * 1)}})'
-        MongoDB shell version v3.6.5
+        MongoDB shell version v3.6.6
         connecting to: mongodb://127.0.0.1:27017/sth_camera
-        MongoDB server version: 3.6.5
-        { "_id" : ObjectId("5b63e95723b570000ae5452c"), "recvTime" : ISODate("2018-08-03T05:34:15.846Z"), "attrName" : "c_mode", "attrType" : "string", "attrValue" : "Monitor" }
-        { "_id" : ObjectId("5b63e95723b570000ae5452f"), "recvTime" : ISODate("2018-08-03T05:34:15.846Z"), "attrName" : "num_p", "attrType" : "int", "attrValue" : "0" }
-        { "_id" : ObjectId("5b63e95723b570000ae54530"), "recvTime" : ISODate("2018-08-03T05:34:15.846Z"), "attrName" : "position", "attrType" : "string", "attrValue" : "-" }
-        { "_id" : ObjectId("5b63e95723b570000ae54531"), "recvTime" : ISODate("2018-08-03T05:34:15.846Z"), "attrName" : "time", "attrType" : "string", "attrValue" : "2018-02-03 04:05:06" }
+        MongoDB server version: 3.6.6
+        { "_id" : ObjectId("5b63e95723b570000ae5452c"), "recvTime" : ISODate("2018-10-09T07:50:22.630Z"), "c_mode" : "Monitor", "external_camera_request_info" : "result,success/time,2018-10-09 15:30:59/c_cmd,Monitor", "external_camera_request_status" : "OK", "num_p" : "0", "position" : "-", "time" : "2018-02-03 04:05:06" }
         ```
 1. simulate to receive the state of external camera 1F-2
     * publish ros message to `/external_camera_1f_2/state`
@@ -1300,13 +1385,10 @@
 
         ```bash
         mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_camera --eval 'db.getCollection("sth_/_external_camera_0000000000000012_external_camera").find({recvTime: { "$gte": new Date(ISODate().getTime() - 1000 * 60 * 1)}})'
-        MongoDB shell version v3.6.5
+        MongoDB shell version v3.6.6
         connecting to: mongodb://127.0.0.1:27017/sth_camera
-        MongoDB server version: 3.6.5
-        { "_id" : ObjectId("5b63e99923b570000ae54532"), "recvTime" : ISODate("2018-08-03T05:35:21.805Z"), "attrName" : "c_mode", "attrType" : "string", "attrValue" : "Standby" }
-        { "_id" : ObjectId("5b63e99923b570000ae54535"), "recvTime" : ISODate("2018-08-03T05:35:21.805Z"), "attrName" : "num_p", "attrType" : "int", "attrValue" : "1" }
-        { "_id" : ObjectId("5b63e99923b570000ae54536"), "recvTime" : ISODate("2018-08-03T05:35:21.805Z"), "attrName" : "position", "attrType" : "string", "attrValue" : "x[0],1.0/y[0],1.1" }
-        { "_id" : ObjectId("5b63e99923b570000ae54537"), "recvTime" : ISODate("2018-08-03T05:35:21.805Z"), "attrName" : "time", "attrType" : "string", "attrValue" : "2018-02-03 04:15:16" }
+        MongoDB server version: 3.6.6
+        { "_id" : ObjectId("5b63e99923b570000ae54532"), "recvTime" : ISODate("2018-10-09T07:50:22.630Z"), "c_mode" : "Standby", "external_camera_request_info" : "result,success/time,2018-10-09 15:30:59/c_cmd,Standby", "external_camera_request_status" : "OK", "num_p" : "1", "position" : "x[0],1.0/y[0],1.1", "time" : "2018-02-03 04:15:16" }
         ```
 1. simulate to receive the state of external camera 2F-1
     * publish ros message to `/external_camera_2f_1/state`
@@ -1333,13 +1415,10 @@
 
         ```bash
         mac:$ kubectl exec mongodb-0 -c mongodb -- mongo sth_camera --eval 'db.getCollection("sth_/_external_camera_0000000000000021_external_camera").find({recvTime: { "$gte": new Date(ISODate().getTime() - 1000 * 60 * 1)}})'
-        MongoDB shell version v3.6.5
+        MongoDB shell version v3.6.6
         connecting to: mongodb://127.0.0.1:27017/sth_camera
-        MongoDB server version: 3.6.5
-        { "_id" : ObjectId("5b63e9f2f8a94e000a6eb160"), "recvTime" : ISODate("2018-08-03T05:36:48.863Z"), "attrName" : "c_mode", "attrType" : "string", "attrValue" : "Error" }
-        { "_id" : ObjectId("5b63e9f2f8a94e000a6eb163"), "recvTime" : ISODate("2018-08-03T05:36:48.863Z"), "attrName" : "num_p", "attrType" : "int", "attrValue" : "2" }
-        { "_id" : ObjectId("5b63e9f2f8a94e000a6eb164"), "recvTime" : ISODate("2018-08-03T05:36:48.863Z"), "attrName" : "position", "attrType" : "string", "attrValue" : "x[0],1.0/y[0],1.1/x[1],2.0/y[1],2.1" }
-        { "_id" : ObjectId("5b63e9f2f8a94e000a6eb165"), "recvTime" : ISODate("2018-08-03T05:36:48.863Z"), "attrName" : "time", "attrType" : "string", "attrValue" : "2018-02-03 04:25:26" }
+        MongoDB server version: 3.6.6
+        { "_id" : ObjectId("5b63e9f2f8a94e000a6eb160"), "recvTime" : ISODate("2018-10-09T07:50:22.630Z"), "c_mode" : "Error", "external_camera_request_info" : "result,success/time,2018-10-09 15:30:59/c_cmd,Monitor", "external_camera_request_status" : "OK", "num_p" : "2", "position" : "x[0],1.0/y[0],1.1/x[1],2.0/y[1],2.1", "time" : "2018-02-03 04:25:26" }
         ```
 
 ## face verify failure: initialize robot
@@ -1432,9 +1511,9 @@
 
         ```bash
         mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(1).pretty()'
-        MongoDB shell version v3.6.5
+        MongoDB shell version v3.6.6
         connecting to: mongodb://127.0.0.1:27017/ledger
-        MongoDB server version: 3.6.5
+        MongoDB server version: 3.6.6
         {
           "_id" : ObjectId("5b6bdb16b7326200135945d2"),
           "status" : "reception",
@@ -1588,6 +1667,8 @@
         pepper_0000000000000002@handover|continue
         Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/cmd', ... (67 bytes))
         guide_robot_0000000000000002@robot_request|r_cmd|Navi|x|20.0|y|20.0
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002_tablet/cmd', ... (49 bytes))
+        guide_robot_0000000000000002_tablet@state|Guiding
         Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/cmdexe', ... (107 bytes))
         guide_robot_0000000000000002@robot_request|result,success/time,2018-08-09 15:16:39/r_cmd,Navi/x,20.0/y,20.0
         ```
@@ -1636,9 +1717,9 @@
 
         ```bash
         mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"reaskDatetime":-1}).limit(1).pretty()'
-        MongoDB shell version v3.6.5
+        MongoDB shell version v3.6.6
         connecting to: mongodb://127.0.0.1:27017/ledger
-        MongoDB server version: 3.6.5
+        MongoDB server version: 3.6.6
         {
           "_id" : ObjectId("5b6bdc472cc3eb0013ab7838"),
           "status" : "reask",
@@ -1675,6 +1756,15 @@
     Client mosqpub|48779-Nobuyukin received CONNACK
     Client mosqpub|48779-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000002/cmdexe', ... (40 bytes))
     Client mosqpub|48779-Nobuyukin sending DISCONNECT
+    ```
+1. simulate to send `state` cmd result from `tablet of guide_robot(floor 2)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000002_tablet/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000002_tablet@state|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot_0000000000000002_tablet/cmdexe', ... (49 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
     ```
 
 ## face verify failure: clean robot
@@ -1819,6 +1909,8 @@
         guide_robot_0000000000000001@robot_request|r_cmd|Navi|x|-10.0|y|10.0
         Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/cmdexe', ... (108 bytes))
         guide_robot_0000000000000001@robot_request|result,success/time,2018-08-09 17:36:40/r_cmd,Navi/x,-10.0/y,10.0
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001_tablet/cmd', ... (49 bytes))
+        guide_robot_0000000000000001_tablet@state|Guiding
         ```
     * update `r_state` to `Guiding` automatically
 
@@ -1854,9 +1946,9 @@
 
         ```bash
         mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(1).pretty()'
-        MongoDB shell version v3.6.5
+        MongoDB shell version v3.6.6
         connecting to: mongodb://127.0.0.1:27017/ledger
-        MongoDB server version: 3.6.5
+        MongoDB server version: 3.6.6
         {
           "_id" : ObjectId("5b6bfd1733d92500132faa80"),
           "status" : "reception",
@@ -1892,6 +1984,15 @@
     Client mosqpub|22763-Nobuyukin sending CONNECT
     Client mosqpub|22763-Nobuyukin received CONNACK
     Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/cmdexe', ... (40 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
+1. simulate to send `state` cmd result from `tablet of guide_robot(floor 1)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000001_tablet/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000001_tablet@state|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot_0000000000000001_tablet/cmdexe', ... (49 bytes))
     Client mosqpub|22763-Nobuyukin sending DISCONNECT
     ```
 
@@ -1948,9 +2049,9 @@
 
         ```bash
         mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(2).pretty()'
-        MongoDB shell version v3.6.5
+        MongoDB shell version v3.6.6
         connecting to: mongodb://127.0.0.1:27017/ledger
-        MongoDB server version: 3.6.5
+        MongoDB server version: 3.6.6
         {
           "_id" : ObjectId("5b6bfe2355d7fb0013c57183"),
           "status" : "busy",
@@ -2004,6 +2105,14 @@
       theta: 9.1
     "
     ```
+    * receive MQTT message, but don't send `action|on` message to `dest_led` authomatically
+
+        ```bash
+        Client mosqsub|86059-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/attrs', ... (98 bytes))
+        2018-08-08T19:10:40.602383+0900|time|2018-09-08 07:06:15|r_mode|Standby|x|-10.01|y|10.02|theta|9.1
+        Client mosqsub|86059-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001_tablet/cmd', ... (52 bytes))
+        guide_robot_0000000000000001_tablet@state|Suspending
+        ```
     * update `r_state` to `Suspending` automatically
 
         ```bash
@@ -2019,6 +2128,15 @@
           }
         }
         ```
+1. simulate to send `state` cmd result from `tablet of guide_robot(floor 1)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000001_tablet/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000001_tablet@state|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot_0000000000000001_tablet/cmdexe', ... (49 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
 1. simuate visitor arriving at the destination
 
     ```bash
@@ -2039,6 +2157,8 @@
         guide_robot_0000000000000001@robot_request|r_cmd|Navi|x|0.0|y|0.0
         Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/cmdexe', ... (105 bytes))
         guide_robot_0000000000000001@robot_request|result,success/time,2018-08-09 17:48:56/r_cmd,Navi/x,0.0/y,0.0
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001_tablet/cmd', ... (51 bytes))
+        guide_robot_0000000000000001_tablet@state|Returning
         ```
     * send ros message to ros topic `/robot_1f_1/request` automatically
 
@@ -2070,9 +2190,9 @@
 
         ```bash
         mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(2).pretty()'
-        MongoDB shell version v3.6.5
+        MongoDB shell version v3.6.6
         connecting to: mongodb://127.0.0.1:27017/ledger
-        MongoDB server version: 3.6.5
+        MongoDB server version: 3.6.6
         {
           "_id" : ObjectId("5b6bfe2355d7fb0013c57183"),
           "status" : "busy",
@@ -2112,6 +2232,15 @@
           "arrivalDatetime" : ISODate("2018-08-09T08:48:56.202Z")
         }
         ```
+1. simulate to send `state` cmd result from `tablet of guide_robot(floor 1)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000001_tablet/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000001_tablet@state|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot_0000000000000001_tablet/cmdexe', ... (49 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
 
 ## robot busy (floor 1): clean robot
 1. set `r_state` of guide robot as `Waiting`
@@ -2265,9 +2394,9 @@
 
         ```bash
         mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(1).pretty()'
-        MongoDB shell version v3.6.5
+        MongoDB shell version v3.6.6
         connecting to: mongodb://127.0.0.1:27017/ledger
-        MongoDB server version: 3.6.5
+        MongoDB server version: 3.6.6
         {
           "_id" : ObjectId("5b6c01ed55d7fb0013c57185"),
           "status" : "reception",
@@ -2333,6 +2462,8 @@
         pepper_0000000000000002@handover|continue
         Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/cmd', ... (67 bytes))
         guide_robot_0000000000000002@robot_request|r_cmd|Navi|x|20.0|y|20.0
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002_tablet/cmd', ... (49 bytes))
+        guide_robot_0000000000000002_tablet@state|Guiding
         Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/cmdexe', ... (107 bytes))
         guide_robot_0000000000000002@robot_request|result,success/time,2018-08-09 18:01:32/r_cmd,Navi/x,20.0/y,20.0
         ```
@@ -2395,6 +2526,15 @@
     Client mosqpub|48779-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000002/cmdexe', ... (40 bytes))
     Client mosqpub|48779-Nobuyukin sending DISCONNECT
     ```
+1. simulate to send `state` cmd result from `tablet of guide_robot(floor 2)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000002_tablet/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000002_tablet@state|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot_0000000000000002_tablet/cmdexe', ... (49 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
 
 ## robot busy (floor 2) face detect: guidance another visitor while guiding previous visitor
 1. simulate to be called `/storage/faces/` REST API by pepper(floor 1)
@@ -2426,9 +2566,9 @@
 
         ```bash
         mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(2).pretty()'
-        MongoDB shell version v3.6.5
+        MongoDB shell version v3.6.6
         connecting to: mongodb://127.0.0.1:27017/ledger
-        MongoDB server version: 3.6.5
+        MongoDB server version: 3.6.6
         {
           "_id" : ObjectId("5b6c0488caee090013dcbf44"),
           "status" : "reception",
@@ -2548,9 +2688,9 @@
 
         ```bash
         mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(2).pretty()'
-        MongoDB shell version v3.6.5
+        MongoDB shell version v3.6.6
         connecting to: mongodb://127.0.0.1:27017/ledger
-        MongoDB server version: 3.6.5
+        MongoDB server version: 3.6.6
         {
           "_id" : ObjectId("5b6c0488caee090013dcbf44"),
           "status" : "busy",
@@ -2608,6 +2748,14 @@
       theta: 19.5
     "
     ```
+    * receive mqtt message, but don't send `action|on` message to `dest_led` authomatically
+
+        ```bash
+        client mosqsub|86059-nobuyukin received publish (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/attrs', ... (96 bytes))
+        2018-08-08t19:54:22.826260+0900|time|2018-10-09 08:07:16|r_mode|standby|x|20.0|y|20.2|theta|19.5
+        client mosqsub|86059-nobuyukin received publish (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002_tablet/cmd', ... (52 bytes))
+        guide_robot_0000000000000002_tablet@state|suspending
+        ```
     * update `r_state` to `Suspending` automatically
 
         ```bash
@@ -2623,6 +2771,15 @@
           }
         }
         ```
+1. simulate to send `state` cmd result from `tablet of guide_robot(floor 2)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000002_tablet/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000002_tablet@state|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot_0000000000000002_tablet/cmdexe', ... (49 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
 1. simuate visitor arriving at the destination
 
     ```bash
@@ -2643,6 +2800,8 @@
         guide_robot_0000000000000002@robot_request|r_cmd|Navi|x|0.0|y|0.0
         Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/cmdexe', ... (105 bytes))
         guide_robot_0000000000000002@robot_request|result,success/time,2018-08-09 18:19:11/r_cmd,Navi/x,0.0/y,0.0
+        Client mosqsub|86059-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002_tablet/cmd', ... (51 bytes))
+        guide_robot_0000000000000002_tablet@state|Returning
         ```
     * send ros message to ros topic `/robot_2f_1/request` automatically
 
@@ -2674,9 +2833,9 @@
 
         ```bash
         mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(2).pretty()'
-        MongoDB shell version v3.6.5
+        MongoDB shell version v3.6.6
         connecting to: mongodb://127.0.0.1:27017/ledger
-        MongoDB server version: 3.6.5
+        MongoDB server version: 3.6.6
         {
           "_id" : ObjectId("5b6c0488caee090013dcbf44"),
           "status" : "busy",
@@ -2720,6 +2879,15 @@
           "arrivalDatetime" : ISODate("2018-08-09T09:19:11.133Z")
         }
         ```
+1. simulate to send `state` cmd result from `tablet of guide_robot(floor 2)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000002_tablet/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000002_tablet@state|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot_0000000000000002_tablet/cmdexe', ... (49 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
 
 ## robot busy (floor 2) face detect: clean robot
 1. set `r_state` of guide robot as `Waiting`
@@ -2873,9 +3041,9 @@
 
         ```bash
         mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(1).pretty()'
-        MongoDB shell version v3.6.5
+        MongoDB shell version v3.6.6
         connecting to: mongodb://127.0.0.1:27017/ledger
-        MongoDB server version: 3.6.5
+        MongoDB server version: 3.6.6
         {
           "_id" : ObjectId("5b6c08f0caee090013dcbf47"),
           "status" : "reception",
@@ -2939,6 +3107,8 @@
         2018-08-09T18:29:59.1533806999+0900|face|/shared/faces/FVD2pA2SxSni0pum.JPEG
         Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/pepper/pepper_0000000000000002/cmd', ... (41 bytes))
         pepper_0000000000000002@handover|continue
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002_tablet/cmd', ... (49 bytes))
+        guide_robot_0000000000000002_tablet@state|Guiding
         Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/cmd', ... (67 bytes))
         guide_robot_0000000000000002@robot_request|r_cmd|Navi|x|20.0|y|20.0
         Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/cmdexe', ... (107 bytes))
@@ -3003,6 +3173,15 @@
     Client mosqpub|48779-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000002/cmdexe', ... (40 bytes))
     Client mosqpub|48779-Nobuyukin sending DISCONNECT
     ```
+1. simulate to send `state` cmd result from `tablet of guide_robot(floor 2)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000002_tablet/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000002_tablet@state|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot_0000000000000002_tablet/cmdexe', ... (49 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
 
 ## robot busy (floor 2) face verify failure: guidance another visitor while guiding previous visitor
 1. simulate to be called `/storage/faces/` REST API by pepper(floor 1)
@@ -3034,9 +3213,9 @@
 
         ```bash
         mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(2).pretty()'
-        MongoDB shell version v3.6.5
+        MongoDB shell version v3.6.6
         connecting to: mongodb://127.0.0.1:27017/ledger
-        MongoDB server version: 3.6.5
+        MongoDB server version: 3.6.6
         {
           "_id" : ObjectId("5b6c0a6a55d7fb0013c57187"),
           "status" : "reception",
@@ -3215,9 +3394,9 @@
 
         ```bash
         mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(2).pretty()'
-        MongoDB shell version v3.6.5
+        MongoDB shell version v3.6.6
         connecting to: mongodb://127.0.0.1:27017/ledger
-        MongoDB server version: 3.6.5
+        MongoDB server version: 3.6.6
         {
           "_id" : ObjectId("5b6c0a6a55d7fb0013c57187"),
           "status" : "reception",
@@ -3261,9 +3440,9 @@
         ```
         ```bash
         mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"reaskDatetime":-1}).limit(1).pretty()'
-        MongoDB shell version v3.6.5
+        MongoDB shell version v3.6.6
         connecting to: mongodb://127.0.0.1:27017/ledger
-        MongoDB server version: 3.6.5
+        MongoDB server version: 3.6.6
         {
           "_id" : ObjectId("5b6c0caf55d7fb0013c57189"),
           "status" : "busy",
@@ -3299,6 +3478,14 @@
       theta: 19.5
     "
     ```
+    * receive mqtt message, but don't send `action|on` message to `dest_led` authomatically
+
+        ```bash
+        client mosqsub|86059-nobuyukin received publish (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/attrs', ... (96 bytes))
+        2018-08-08t19:54:22.826260+0900|time|2018-10-09 08:07:16|r_mode|standby|x|20.0|y|20.2|theta|19.5
+        client mosqsub|86059-nobuyukin received publish (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002_tablet/cmd', ... (52 bytes))
+        guide_robot_0000000000000002_tablet@state|suspending
+        ```
     * update `r_state` to `Suspending` automatically
 
         ```bash
@@ -3314,6 +3501,15 @@
           }
         }
         ```
+1. simulate to send `state` cmd result from `tablet of guide_robot(floor 2)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000002_tablet/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000002_tablet@state|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot_0000000000000002_tablet/cmdexe', ... (49 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
 1. simuate visitor arriving at the destination
 
     ```bash
@@ -3334,6 +3530,8 @@
         guide_robot_0000000000000002@robot_request|r_cmd|Navi|x|0.0|y|0.0
         Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/cmdexe', ... (105 bytes))
         guide_robot_0000000000000002@robot_request|result,success/time,2018-08-09 18:49:39/r_cmd,Navi/x,0.0/y,0.0
+        Client mosqsub|27602-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002_tablet/cmd', ... (51 bytes))
+        guide_robot_0000000000000002_tablet@state|Returning
         ```
     * send ros message to ros topic `/robot_2f_1/request` automatically
 
@@ -3365,9 +3563,9 @@
 
         ```bash
         mac:$ kubectl exec mongodb-0 -c mongodb -- mongo ledger --eval 'db.visitors.find().sort({"receptionDatetime":-1}).limit(2).pretty()'
-        MongoDB shell version v3.6.5
+        MongoDB shell version v3.6.6
         connecting to: mongodb://127.0.0.1:27017/ledger
-        MongoDB server version: 3.6.5
+        MongoDB server version: 3.6.6
         {
           "_id" : ObjectId("5b6c0a6a55d7fb0013c57187"),
           "status" : "reception",
@@ -3410,6 +3608,15 @@
           "arrivalDatetime" : ISODate("2018-08-09T09:49:39.457Z")
         }
         ```
+1. simulate to send `state` cmd result from `tablet of guide_robot(floor 2)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000002_tablet/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000002_tablet@state|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot_0000000000000002_tablet/cmdexe', ... (49 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
 
 ## robot busy (floor 2) face verify failure: clean robot
 1. set `r_state` of guide robot as `Waiting`
@@ -3554,6 +3761,8 @@
         guide_robot_0000000000000001@robot_request|r_cmd|Navi|x|-10.0|y|10.0
         Client mosqsub|94929-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/cmdexe', ... (108 bytes))
         guide_robot_0000000000000001@robot_request|result,success/time,2018-08-23 16:47:47/r_cmd,Navi/x,-10.0/y,10.0
+        Client mosqsub|94929-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001_tablet/cmd', ... (49 bytes))
+        guide_robot_0000000000000001_tablet@state|Guiding
         ```
     * send ros message to ros topic `/robot_1f_1/request` automatically
 
@@ -3640,6 +3849,15 @@
     Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000001/cmdexe', ... (40 bytes))
     Client mosqpub|22763-Nobuyukin sending DISCONNECT
     ```
+1. simulate to send `state` cmd result from `tablet of guide_robot(floor 1)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000001_tablet/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000001_tablet@state|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot_0000000000000001_tablet/cmdexe', ... (49 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
 
 ## auto-return (floor 1): navigating a visitor & auto-return
 1. simulate to receive robot state (Standby)
@@ -3660,6 +3878,8 @@
         ```bash
         Client mosqsub|94929-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001/attrs', ... (98 bytes))
         2018-08-23T16:51:09.055745+0900|time|2018-09-08 07:06:15|r_mode|Standby|x|-10.01|y|10.02|theta|9.1
+        Client mosqsub|94929-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001_tablet/cmd', ... (52 bytes))
+        guide_robot_0000000000000001_tablet@state|Suspending
         ```
     * update `r_state` to `Suspending` automatically
 
@@ -3676,6 +3896,15 @@
           }
         }
         ```
+1. simulate to send `state` cmd result from `tablet of guide_robot(floor 1)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000001_tablet/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000001_tablet@state|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot_0000000000000001_tablet/cmdexe', ... (49 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
 1. after 15 seconds, robot return automatically
     * receive MQTT message and send `action|off` message to `dest_led_0000000000000001` and `robot_request` command to `guide_robot_0000000000000001` automatically
 
@@ -3686,6 +3915,8 @@
         guide_robot_0000000000000001@robot_request|result,success/time,2018-08-23 16:51:24/r_cmd,Navi/x,0.0/y,0.0
         Client mosqsub|94929-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/dest_led/dest_led_0000000000000001/cmd', ... (36 bytes))
         dest_led_0000000000000001@action|off
+        Client mosqsub|92929-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000001_tablet/cmd', ... (51 bytes))
+        guide_robot_0000000000000001_tablet@state|Returning
         ```
     * send ros message to ros topic `/robot_1f_1/request` automatically
 
@@ -3754,6 +3985,15 @@
           "receptionDatetime" : ISODate("2018-08-23T07:47:47.010Z")
         }
         ```
+1. simulate to send `state` cmd result from `tablet of guide_robot(floor 1)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000001_tablet/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000001_tablet@state|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot_0000000000000001_tablet/cmdexe', ... (49 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
 
 ## auto-return (floor 1): clean robot
 1. set `r_state` of guide robot as `Waiting`
@@ -3977,6 +4217,8 @@
         guide_robot_0000000000000002@robot_request|r_cmd|Navi|x|20.0|y|20.0
         Client mosqsub|94929-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/cmdexe', ... (107 bytes))
         guide_robot_0000000000000002@robot_request|result,success/time,2018-08-23 17:11:47/r_cmd,Navi/x,20.0/y,20.0
+        Client mosqsub|94929-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002_tablet/cmd', ... (49 bytes))
+        guide_robot_0000000000000002_tablet@state|Guiding
         ```
     * send ros message to ros topic `/robot_2f_1/request` automatically
 
@@ -4037,6 +4279,15 @@
     Client mosqpub|48779-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/pepper/pepper_0000000000000002/cmdexe', ... (40 bytes))
     Client mosqpub|48779-Nobuyukin sending DISCONNECT
     ```
+1. simulate to send `state` cmd result from `tablet of guide_robot(floor 2)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000002_tablet/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000002_tablet@state|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot_0000000000000002_tablet/cmdexe', ... (49 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
 
 ## auto-return (floor 2): navigating a visitor & auto-return
 1. simulate to receive robot state (Standby)
@@ -4057,6 +4308,8 @@
         ```bash
         Client mosqsub|94929-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002/attrs', ... (96 bytes))
         2018-08-23T17:16:53.393796+0900|time|2018-10-09 08:07:16|r_mode|Standby|x|20.0|y|20.2|theta|19.5
+        client mosqsub|94929-nobuyukin received publish (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002_tablet/cmd', ... (52 bytes))
+        guide_robot_0000000000000002_tablet@state|suspending
         ```
     * update `r_state` to `Suspending` automatically
 
@@ -4073,6 +4326,15 @@
           }
         }
         ```
+1. simulate to send `state` cmd result from `tablet of guide_robot(floor 2)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000002_tablet/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000002_tablet@state|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot_0000000000000002_tablet/cmdexe', ... (49 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
 1. after 15 seconds, robot return automatically
     * receive MQTT message and send `action|off` message to `dest_led_0000000000000002` and `robot_request` command to `guide_robot_0000000000000002` automatically
 
@@ -4083,6 +4345,8 @@
         guide_robot_0000000000000002@robot_request|result,success/time,2018-08-23 17:17:08/r_cmd,Navi/x,0.0/y,0.0
         Client mosqsub|94929-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/dest_led/dest_led_0000000000000002/cmd', ... (36 bytes))
         dest_led_0000000000000002@action|off
+        Client mosqsub|94929-Nobuyukin received PUBLISH (d0, q0, r0, m0, '/guide_robot/guide_robot_0000000000000002_tablet/cmd', ... (51 bytes))
+        guide_robot_0000000000000002_tablet@state|Returning
         ```
     * send ros message to ros topic `/robot_2f_1/request` automatically
 
@@ -4152,6 +4416,15 @@
           "receptionDatetime" : ISODate("2018-08-23T08:07:19.274Z")
         }
         ```
+1. simulate to send `state` cmd result from `tablet of guide_robot(floor 2)`
+
+    ```bash
+    mac:$ mosquitto_pub -h mqtt.tech-sketch.jp -p 8883 --cafile ./secrets/DST_Root_CA_X3.pem -d -t /guide_robot/guide_robot_0000000000000002_tablet/cmdexe -u iotagent -P XXXXXXXX -m "guide_robot_0000000000000002_tablet@state|success"
+    Client mosqpub|22763-Nobuyukin sending CONNECT
+    Client mosqpub|22763-Nobuyukin received CONNACK
+    Client mosqpub|22763-Nobuyukin sending PUBLISH (d0, q0, r0, m1, '/guide_robot/guide_robot_0000000000000002_tablet/cmdexe', ... (49 bytes))
+    Client mosqpub|22763-Nobuyukin sending DISCONNECT
+    ```
 
 ## auto-return (floor 2): clean robot
 1. set `r_state` of guide robot as `Waiting`

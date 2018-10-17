@@ -51,6 +51,8 @@ spec:
           value: "${DEST_LED_SERVICEPATH}"
         - name: DEST_LED_TYPE
           value: "${DEST_LED_TYPE}"
+        - name: ROBOT_STATE_CHECK_WAIT_SEC
+          value: "5"
         ports:
           - name: guidance
             containerPort: 8888
