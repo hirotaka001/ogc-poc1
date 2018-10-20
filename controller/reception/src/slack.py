@@ -7,18 +7,23 @@ logger = getLogger(__name__)
 
 
 def send_message_to_slack(webhook, room):
-    message = f'来客がいらっしゃいました。{room}までご案内いたしております'
+    dest = {'ProjectRoom 1': 'プロジェクトルーム1',
+            'ProjectRoom 2': 'プロジェクトルーム2',
+            'ProjectRoom 3': 'プロジェクトルーム3'}
+    if room not in dest:
+        logger.error(f'The destination does not exist : {room}')
+        return room
+    message = f'来客がいらっしゃいました。{dest[room]}までご案内いたしております'
     logger.info(message)
     payload_dic = {
         "text":    message
     }
-    r = requests.post(webhook, data=json.dumps(payload_dic))
     try:
+        r = requests.post(webhook, data=json.dumps(payload_dic))
         r.raise_for_status()
         return r
-    except requests.exceptions.HTTPError as e:
-        logger.error(f'Slack API return Error : {str(r.status_code)}')
-        logger.error(type(e))
-        raise e
+    except requests.exceptions.RequestException as e:
+        logger.error(e)
+        return e
     else:
-        logger.info(r)
+        logger.debug(r)
