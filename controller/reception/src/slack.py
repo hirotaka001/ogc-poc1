@@ -24,6 +24,6 @@ def send_message_to_slack(webhook, room):
         return r
     except requests.exceptions.RequestException as e:
         logger.error(e)
-        return e
+        raise e
     else:
         logger.debug(r)

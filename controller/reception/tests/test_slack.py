@@ -56,44 +56,50 @@ class test_send_message_to_slack(unittest.TestCase):
         self.assertEqual(multi_args[0], 'http://url_200')
         assert json.loads(multi_kwargs['data'])['text'] == "来客がいらっしゃいました。プロジェクトルーム1までご案内いたしております"
 
-        r = send_message_to_slack('http://url_400', 'ProjectRoom 1')
-        assert type(r) is requests.exceptions.HTTPError
+        with self.assertRaises(requests.exceptions.HTTPError):
+            r = send_message_to_slack('http://url_400', 'ProjectRoom 1')
         multi_args, multi_kwargs = self.mock_post.call_args
         self.assertEqual(multi_args[0], 'http://url_400')
         assert json.loads(multi_kwargs['data'])['text'] == "来客がいらっしゃいました。プロジェクトルーム1までご案内いたしております"
 
-        r = send_message_to_slack('http://url_403', 'ProjectRoom 1')
-        assert type(r) is requests.exceptions.HTTPError
+        with self.assertRaises(requests.exceptions.HTTPError):
+            r = send_message_to_slack('http://url_403', 'ProjectRoom 1')
         multi_args, multi_kwargs = self.mock_post.call_args
         self.assertEqual(multi_args[0], 'http://url_403')
         assert json.loads(multi_kwargs['data'])['text'] == "来客がいらっしゃいました。プロジェクトルーム1までご案内いたしております"
 
-        r = send_message_to_slack('http://url_404', 'ProjectRoom 1')
-        assert type(r) is requests.exceptions.HTTPError
+        with self.assertRaises(requests.exceptions.HTTPError):
+            r = send_message_to_slack('http://url_404', 'ProjectRoom 1')
         multi_args, multi_kwargs = self.mock_post.call_args
         self.assertEqual(multi_args[0], 'http://url_404')
         assert json.loads(multi_kwargs['data'])['text'] == "来客がいらっしゃいました。プロジェクトルーム1までご案内いたしております"
 
-        r = send_message_to_slack('http://url_410', 'ProjectRoom 1')
-        assert type(r) is requests.exceptions.HTTPError
+        with self.assertRaises(requests.exceptions.HTTPError):
+            r = send_message_to_slack('http://url_410', 'ProjectRoom 1')
         multi_args, multi_kwargs = self.mock_post.call_args
         self.assertEqual(multi_args[0], 'http://url_410')
         assert json.loads(multi_kwargs['data'])['text'] == "来客がいらっしゃいました。プロジェクトルーム1までご案内いたしております"
 
-        r = send_message_to_slack('http://url_500', 'ProjectRoom 1')
-        assert type(r) is requests.exceptions.HTTPError
+        with self.assertRaises(requests.exceptions.HTTPError):
+            r = send_message_to_slack('http://url_500', 'ProjectRoom 1')
         multi_args, multi_kwargs = self.mock_post.call_args
         self.assertEqual(multi_args[0], 'http://url_500')
         assert json.loads(multi_kwargs['data'])['text'] == "来客がいらっしゃいました。プロジェクトルーム1までご案内いたしております"
 
-        r = send_message_to_slack('http://service_not_known', 'ProjectRoom 1')
-        assert type(r) is requests.exceptions.ConnectionError
+        with self.assertRaises(requests.exceptions.ConnectionError):
+            r = send_message_to_slack('http://service_not_known', 'ProjectRoom 1')
         multi_args, multi_kwargs = self.mock_post.call_args
         self.assertEqual(multi_args[0], 'http://service_not_known')
         assert json.loads(multi_kwargs['data'])['text'] == "来客がいらっしゃいました。プロジェクトルーム1までご案内いたしております"
 
-        r = send_message_to_slack('', 'ProjectRoom 1')
-        assert type(r) is requests.exceptions.MissingSchema
+        with self.assertRaises(requests.exceptions.MissingSchema):
+            r = send_message_to_slack('', 'ProjectRoom 1')
         multi_args, multi_kwargs = self.mock_post.call_args
         self.assertEqual(multi_args[0], '')
+        assert json.loads(multi_kwargs['data'])['text'] == "来客がいらっしゃいました。プロジェクトルーム1までご案内いたしております"
+
+        with self.assertRaises(requests.exceptions.MissingSchema):
+            r = send_message_to_slack(None, 'ProjectRoom 1')
+        multi_args, multi_kwargs = self.mock_post.call_args
+        self.assertEqual(multi_args[0], None)
         assert json.loads(multi_kwargs['data'])['text'] == "来客がいらっしゃいました。プロジェクトルーム1までご案内いたしております"
