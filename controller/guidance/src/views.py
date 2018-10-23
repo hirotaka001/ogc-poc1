@@ -122,15 +122,23 @@ class CheckDestinationAPI(RobotFloorMapMixin, MethodView):
             floor = self.get_floor_by_robot(deviceid)
             logger.info(f'received position: r_mode={r_mode}, posx={posx}, posy={posy}, robot_id={deviceid}, floor={floor}')
 
-            current_state = self.robot_orion.get_attrs(deviceid, 'r_state')['r_state']['value'].strip()
+            robot_attrs = self.robot_orion.get_attrs(deviceid, 'r_state,destx,desty')
+            current_state = robot_attrs['r_state']['value'].strip()
+            destx = robot_attrs['destx']['value'].strip()
+            desty = robot_attrs['desty']['value'].strip()
 
             if posx is not None and posy is not None and floor is not None and current_state == const.GUIDING:
-                destination = Destination().get_destination_by_dest_led_pos(posx, posy, floor)
-                if destination is not None and const.DEST_LED_ID in destination and destination[const.DEST_LED_ID] is not None:
-                    dest_led_id = destination[const.DEST_LED_ID]
-                    message = self.dest_led_orion.send_cmd(dest_led_id, self.dest_led_type, 'action', 'on')
-                    result['result'] = 'success'
-                    result['message'] = message
+                destinations = Destination().get_destinations_by_dest_led_pos(posx, posy, floor)
+                if destinations is not None:
+                    for destination in destinations:
+                        if 'dest_pos_x' in destination and str(destination['dest_pos_x']) == destx and \
+                                'dest_pos_y' in destination and str(destination['dest_pos_y']) == desty:
+                            if const.DEST_LED_ID in destination and destination[const.DEST_LED_ID] is not None:
+                                dest_led_id = destination[const.DEST_LED_ID]
+                                message = self.dest_led_orion.send_cmd(dest_led_id, self.dest_led_type, 'action', 'on')
+                                result['result'] = 'success'
+                                result['message'] = message
+                                break
         except AttrDoesNotExist as e:
             logger.error(f'AttrDoesNotExist: {str(e)}')
             raise BadRequest(str(e))
