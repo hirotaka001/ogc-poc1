@@ -21,6 +21,7 @@ Configure fiware on AKS by following steps:
 1. [register `record-arrival` of "ledger" as a subscriber of "DEST-HUMAN-SENSOR"](#register-record-arrival-of-ledger-as-a-subscriber-of-dest-human-sensor)
 1. [register `arrival` of "guidance" as a subscriber of "DEST-HUMAN-SENSOR"](#register-arrival-of-guidance-as-a-subscriber-of-dest-human-sensor)
 1. [register desinations](#register-destinations)
+1. [register "ROBOT" to cygnus-elasticseatch](#register-robot-to-cygnus-elasticsearch)
 
 ## register BUTTON-SENSOR to cygnus
 ```bash
@@ -1975,4 +1976,231 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "slack_webhook": "https://hooks.slack.com/services/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 }
 __EOS__
+```
+
+## register ROBOT to cygnus-elasticsearch
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
+{
+  "subject": {
+    "entities": [{
+      "idPattern": "guide_robot.*",
+      "type": "guide_robot"
+    }],
+    "condition": {
+      "attrs": ["time", "r_mode", "x", "y", "theta", "r_state"]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://cygnus-elasticsearch:5050/notify"
+    },
+    "attrs": [
+      "time",
+      "r_mode",
+      "x",
+      "y",
+      "theta",
+      "r_state"
+    ],
+    "attrsFormat": "legacy"
+  }
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-ServicePath: /" https://api.tech-sketch.jp/orion/v2/subscriptions/ | jq .
+[
+  {
+    "id": "5b723fc3cce8da6ea14fd67f",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "guide_robot.*",
+          "type": "guide_robot"
+        }
+      ],
+      "condition": {
+        "attrs": []
+      }
+    },
+    "notification": {
+      "timesSent": 14704,
+      "lastNotification": "2018-10-22T01:32:41.00Z",
+      "attrs": [
+        "time",
+        "r_mode",
+        "x",
+        "y",
+        "theta",
+        "r_state",
+        "destx",
+        "desty",
+        "visitor",
+        "robot_request_status",
+        "robot_request_info"
+      ],
+      "attrsFormat": "legacy",
+      "http": {
+        "url": "http://cygnus:5050/notify"
+      },
+      "lastFailure": "2018-10-22T01:32:35.00Z",
+      "lastSuccess": "2018-10-22T01:32:41.00Z"
+    }
+  },
+  {
+    "id": "5b7240e3cce8da6ea14fd683",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "guide_robot.*",
+          "type": "guide_robot"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "r_mode",
+          "x",
+          "y",
+          "theta"
+        ],
+        "expression": {
+          "q": "r_mode==Navi"
+        }
+      }
+    },
+    "notification": {
+      "timesSent": 2792,
+      "lastNotification": "2018-10-16T05:07:19.00Z",
+      "attrs": [
+        "r_mode",
+        "x",
+        "y",
+        "theta",
+        "r_state",
+        "destx",
+        "desty",
+        "visitor"
+      ],
+      "attrsFormat": "normalized",
+      "http": {
+        "url": "http://guidance:8888/notify/check-destination/"
+      },
+      "lastFailure": "2018-10-10T01:30:58.00Z",
+      "lastSuccess": "2018-10-16T05:07:19.00Z"
+    }
+  },
+  {
+    "id": "5b7240f5cce8da6ea14fd684",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "guide_robot.*",
+          "type": "guide_robot"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "r_mode",
+          "x",
+          "y",
+          "theta"
+        ],
+        "expression": {
+          "q": "r_mode==Standby"
+        }
+      }
+    },
+    "notification": {
+      "timesSent": 11260,
+      "lastNotification": "2018-10-18T07:20:14.00Z",
+      "attrs": [
+        "r_mode",
+        "x",
+        "y",
+        "theta",
+        "r_state",
+        "destx",
+        "desty",
+        "visitor"
+      ],
+      "attrsFormat": "normalized",
+      "http": {
+        "url": "http://guidance:8888/notify/stop-movement/"
+      },
+      "lastFailure": "2018-10-10T01:33:23.00Z",
+      "lastSuccess": "2018-10-18T07:20:15.00Z"
+    }
+  },
+  {
+    "id": "5bc535fa1797ff091b693505",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "guide_robot.*",
+          "type": "guide_robot"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "r_state"
+        ]
+      }
+    },
+    "notification": {
+      "timesSent": 80,
+      "lastNotification": "2018-10-22T01:32:41.00Z",
+      "attrs": [
+        "r_state"
+      ],
+      "attrsFormat": "normalized",
+      "http": {
+        "url": "http://guidance:8888/notify/change-robot-state/"
+      },
+      "lastSuccess": "2018-10-22T01:32:41.00Z"
+    }
+  },
+  {
+    "id": "5bce832b1797ff091b693507",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "guide_robot.*",
+          "type": "guide_robot"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "time",
+          "r_mode",
+          "x",
+          "y",
+          "theta",
+          "r_state"
+        ]
+      }
+    },
+    "notification": {
+      "timesSent": 1,
+      "lastNotification": "2018-10-23T02:10:51.00Z",
+      "attrs": [
+        "time",
+        "r_mode",
+        "x",
+        "y",
+        "theta",
+        "r_state"
+      ],
+      "attrsFormat": "legacy",
+      "http": {
+        "url": "http://cygnus-elasticsearch:5050/notify"
+      }
+    }
+  }
+]
 ```
