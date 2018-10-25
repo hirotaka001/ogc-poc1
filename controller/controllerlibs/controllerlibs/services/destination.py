@@ -80,6 +80,20 @@ class Destination:
         except json.JSONDecodeError as e:
             raise DestinationFormatError(str(e))
 
+    def get_destinations_by_dest_led_pos(self, posx, posy, floor):
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        params = {
+            'pos.x': str(posx),
+            'pos.y': str(posy),
+            'floor': str(floor),
+        }
+        try:
+            return requests.get(Destination.get_destination_list_url(), headers=headers, params=params).json()
+        except json.JSONDecodeError as e:
+            raise DestinationFormatError(str(e))
+
     def get_destination_by_dest_human_sensor_id(self, dest_human_sensor_id):
         headers = {
             'Content-Type': 'application/json'

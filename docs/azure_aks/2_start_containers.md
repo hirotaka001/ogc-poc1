@@ -19,6 +19,7 @@ Start pods & services on AKS by following steps:
 1. [start monitoring](#start-monitoring-on-aks)
 1. [start logging](#start-logging-on-aks)
 1. [start cronjob](#start-cronjob-on-aks)
+1. [start fiware cygnus for elasticsearch](#start-fiware-cygnus-elasticsearch-on-aks)
 
 ## start rabbitmq cluster on AKS
 
@@ -1088,4 +1089,24 @@ NAME                          READY     STATUS    RESTARTS   AGE
 iotagent-ul-7fbd59976-g9djb   1/1       Running   0          5h
 iotagent-ul-7fbd59976-ltcd2   1/1       Running   0          5h
 iotagent-ul-7fbd59976-rgk6g   1/1       Running   0          5h
+```
+
+## start fiware cygnus-elasticsearch on AKS
+
+```bash
+mac:$ kubectl apply -f cygnus/cygnus-elasticsearch.yaml
+```
+
+```bash
+mac:$ kubectl get pods -l app=cygnus-elasticsearch
+NAME                                    READY   STATUS    RESTARTS   AGE
+cygnus-elasticsearch-689b7f5fd8-5vdmf   1/1     Running   0          1m
+cygnus-elasticsearch-689b7f5fd8-6gcwm   1/1     Running   0          1m
+cygnus-elasticsearch-689b7f5fd8-967jr   1/1     Running   0          1m
+```
+
+```bash
+mac:$ kubectl get services -l app=cygnus-elasticsearch
+NAME                   TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)             AGE
+cygnus-elasticsearch   ClusterIP   10.0.84.84   <none>        5050/TCP,8081/TCP   1m
 ```

@@ -21,6 +21,7 @@ Configure fiware on AKS by following steps:
 1. [register `record-arrival` of "ledger" as a subscriber of "DEST-HUMAN-SENSOR"](#register-record-arrival-of-ledger-as-a-subscriber-of-dest-human-sensor)
 1. [register `arrival` of "guidance" as a subscriber of "DEST-HUMAN-SENSOR"](#register-arrival-of-guidance-as-a-subscriber-of-dest-human-sensor)
 1. [register desinations](#register-destinations)
+1. [register "ROBOT" to cygnus-elasticseatch](#register-robot-to-cygnus-elasticsearch)
 
 ## register BUTTON-SENSOR to cygnus
 ```bash
@@ -1922,13 +1923,13 @@ __EOS__
 ```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl https://api.tech-sketch.jp/destinations/ -H "Authorization: bearer ${TOKEN}" -H "Content-Type: application/json" -X POST -d @- <<__EOS__ | jq .
 {
-    "name":"管理センター",
+    "name":"dest 1-1",
     "floor": 1,
-    "dest_pos_x": -10.0,
-    "dest_pos_y": 10.0,
+    "dest_pos_x": -12.388,
+    "dest_pos_y": 7.51,
     "dest_led_id": "dest_led_0000000000000001",
-    "dest_led_pos_x": -9.0,
-    "dest_led_pos_y": 9.0,
+    "dest_led_pos_x": -8.388,
+    "dest_led_pos_y": 7.51,
     "dest_human_sensor_id": "dest_human_sensor_0000000000000001"
 }
 __EOS__
@@ -1936,28 +1937,14 @@ __EOS__
 ```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl https://api.tech-sketch.jp/destinations/ -H "Authorization: bearer ${TOKEN}" -H "Content-Type: application/json" -X POST -d @- <<__EOS__ | jq .
 {
-    "name":"203号室",
+    "name":"dest 2-1",
     "floor": 2,
-    "dest_pos_x": 20.0,
-    "dest_pos_y": 20.0,
+    "dest_pos_x": 11.642,
+    "dest_pos_y": 0,
     "dest_led_id": "dest_led_0000000000000002",
-    "dest_led_pos_x": 19.0,
-    "dest_led_pos_y": 19.0,
+    "dest_led_pos_x": 7.642,
+    "dest_led_pos_y": 0,
     "dest_human_sensor_id": "dest_human_sensor_0000000000000002"
-}
-__EOS__
-```
-```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl https://api.tech-sketch.jp/destinations/ -H "Authorization: bearer ${TOKEN}" -H "Content-Type: application/json" -X POST -d @- <<__EOS__ | jq .
-{
-    "name":"204号室",
-    "floor": 2,
-    "dest_pos_x": 20.0,
-    "dest_pos_y": -10.0,
-    "dest_led_id": "dest_led_0000000000000003",
-    "dest_led_pos_x": 19.0,
-    "dest_led_pos_y": -19.0,
-    "dest_human_sensor_id": "dest_human_sensor_0000000000000003"
 }
 __EOS__
 ```
@@ -1975,4 +1962,301 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "slack_webhook": "https://hooks.slack.com/services/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 }
 __EOS__
+```
+```bash
+TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl https://api.tech-sketch.jp/destinations/ -H "Authorization: bearer ${TOKEN}" -H "Content-Type: application/json" -X POST -d @- <<__EOS__ | jq .
+{
+    "name":"dest 1-2",
+    "floor": 1,
+    "dest_pos_x": -10.68,
+    "dest_pos_y": 7.51,
+    "dest_led_id": "dest_led_0000000000000003",
+    "dest_led_pos_x": -6.68,
+    "dest_led_pos_y": 7.51,
+    "dest_human_sensor_id": "dest_human_sensor_0000000000000003"
+}
+__EOS__
+```
+```bash
+TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl https://api.tech-sketch.jp/destinations/ -H "Authorization: bearer ${TOKEN}" -H "Content-Type: application/json" -X POST -d @- <<__EOS__ | jq .
+{
+    "name":"dest 1-3",
+    "floor": 1,
+    "dest_pos_x": -9.58,
+    "dest_pos_y": 7.51,
+    "dest_led_id": "dest_led_0000000000000004",
+    "dest_led_pos_x": -5.58,
+    "dest_led_pos_y": 7.51,
+    "dest_human_sensor_id": "dest_human_sensor_0000000000000004"
+}
+__EOS__
+```
+```bash
+TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl https://api.tech-sketch.jp/destinations/ -H "Authorization: bearer ${TOKEN}" -H "Content-Type: application/json" -X POST -d @- <<__EOS__ | jq .
+{
+    "name":"dest 1-4",
+    "floor": 1,
+    "dest_pos_x": -6.41,
+    "dest_pos_y": 7.51,
+    "dest_led_id": "dest_led_0000000000000005",
+    "dest_led_pos_x": -2.41,
+    "dest_led_pos_y": 7.51,
+    "dest_human_sensor_id": "dest_human_sensor_0000000000000005"
+}
+__EOS__
+```
+```bash
+TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl https://api.tech-sketch.jp/destinations/ -H "Authorization: bearer ${TOKEN}" -H "Content-Type: application/json" -X POST -d @- <<__EOS__ | jq .
+{
+    "name":"dest 2-2",
+    "floor": 2,
+    "dest_pos_x": 15.325,
+    "dest_pos_y": 0,
+    "dest_led_id": "dest_led_0000000000000006",
+    "dest_led_pos_x": 11.325,
+    "dest_led_pos_y": 0,
+    "dest_human_sensor_id": "dest_human_sensor_0000000000000006"
+}
+__EOS__
+```
+```bash
+TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl https://api.tech-sketch.jp/destinations/ -H "Authorization: bearer ${TOKEN}" -H "Content-Type: application/json" -X POST -d @- <<__EOS__ | jq .
+{
+    "name":"dest 2-3",
+    "floor": 2,
+    "dest_pos_x": 18.72,
+    "dest_pos_y": 0,
+    "dest_led_id": "dest_led_0000000000000007",
+    "dest_led_pos_x": 14.72,
+    "dest_led_pos_y": 0,
+    "dest_human_sensor_id": "dest_human_sensor_0000000000000007"
+}
+__EOS__
+```
+
+## register ROBOT to cygnus-elasticsearch
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/orion/v2/subscriptions/ -X POST -d @- <<__EOS__
+{
+  "subject": {
+    "entities": [{
+      "idPattern": "guide_robot.*",
+      "type": "guide_robot"
+    }],
+    "condition": {
+      "attrs": ["time", "r_mode", "x", "y", "theta", "r_state"]
+    }
+  },
+  "notification": {
+    "http": {
+      "url": "http://cygnus-elasticsearch:5050/notify"
+    },
+    "attrs": [
+      "time",
+      "r_mode",
+      "x",
+      "y",
+      "theta",
+      "r_state"
+    ],
+    "attrsFormat": "legacy"
+  }
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-ServicePath: /" https://api.tech-sketch.jp/orion/v2/subscriptions/ | jq .
+[
+  {
+    "id": "5b723fc3cce8da6ea14fd67f",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "guide_robot.*",
+          "type": "guide_robot"
+        }
+      ],
+      "condition": {
+        "attrs": []
+      }
+    },
+    "notification": {
+      "timesSent": 14704,
+      "lastNotification": "2018-10-22T01:32:41.00Z",
+      "attrs": [
+        "time",
+        "r_mode",
+        "x",
+        "y",
+        "theta",
+        "r_state",
+        "destx",
+        "desty",
+        "visitor",
+        "robot_request_status",
+        "robot_request_info"
+      ],
+      "attrsFormat": "legacy",
+      "http": {
+        "url": "http://cygnus:5050/notify"
+      },
+      "lastFailure": "2018-10-22T01:32:35.00Z",
+      "lastSuccess": "2018-10-22T01:32:41.00Z"
+    }
+  },
+  {
+    "id": "5b7240e3cce8da6ea14fd683",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "guide_robot.*",
+          "type": "guide_robot"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "r_mode",
+          "x",
+          "y",
+          "theta"
+        ],
+        "expression": {
+          "q": "r_mode==Navi"
+        }
+      }
+    },
+    "notification": {
+      "timesSent": 2792,
+      "lastNotification": "2018-10-16T05:07:19.00Z",
+      "attrs": [
+        "r_mode",
+        "x",
+        "y",
+        "theta",
+        "r_state",
+        "destx",
+        "desty",
+        "visitor"
+      ],
+      "attrsFormat": "normalized",
+      "http": {
+        "url": "http://guidance:8888/notify/check-destination/"
+      },
+      "lastFailure": "2018-10-10T01:30:58.00Z",
+      "lastSuccess": "2018-10-16T05:07:19.00Z"
+    }
+  },
+  {
+    "id": "5b7240f5cce8da6ea14fd684",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "guide_robot.*",
+          "type": "guide_robot"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "r_mode",
+          "x",
+          "y",
+          "theta"
+        ],
+        "expression": {
+          "q": "r_mode==Standby"
+        }
+      }
+    },
+    "notification": {
+      "timesSent": 11260,
+      "lastNotification": "2018-10-18T07:20:14.00Z",
+      "attrs": [
+        "r_mode",
+        "x",
+        "y",
+        "theta",
+        "r_state",
+        "destx",
+        "desty",
+        "visitor"
+      ],
+      "attrsFormat": "normalized",
+      "http": {
+        "url": "http://guidance:8888/notify/stop-movement/"
+      },
+      "lastFailure": "2018-10-10T01:33:23.00Z",
+      "lastSuccess": "2018-10-18T07:20:15.00Z"
+    }
+  },
+  {
+    "id": "5bc535fa1797ff091b693505",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "guide_robot.*",
+          "type": "guide_robot"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "r_state"
+        ]
+      }
+    },
+    "notification": {
+      "timesSent": 80,
+      "lastNotification": "2018-10-22T01:32:41.00Z",
+      "attrs": [
+        "r_state"
+      ],
+      "attrsFormat": "normalized",
+      "http": {
+        "url": "http://guidance:8888/notify/change-robot-state/"
+      },
+      "lastSuccess": "2018-10-22T01:32:41.00Z"
+    }
+  },
+  {
+    "id": "5bce832b1797ff091b693507",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": "guide_robot.*",
+          "type": "guide_robot"
+        }
+      ],
+      "condition": {
+        "attrs": [
+          "time",
+          "r_mode",
+          "x",
+          "y",
+          "theta",
+          "r_state"
+        ]
+      }
+    },
+    "notification": {
+      "timesSent": 1,
+      "lastNotification": "2018-10-23T02:10:51.00Z",
+      "attrs": [
+        "time",
+        "r_mode",
+        "x",
+        "y",
+        "theta",
+        "r_state"
+      ],
+      "attrsFormat": "legacy",
+      "http": {
+        "url": "http://cygnus-elasticsearch:5050/notify"
+      }
+    }
+  }
+]
 ```
