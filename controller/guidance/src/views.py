@@ -131,14 +131,17 @@ class CheckDestinationAPI(RobotFloorMapMixin, MethodView):
                 destinations = Destination().get_destinations_by_dest_led_pos(posx, posy, floor)
                 if destinations is not None:
                     for destination in destinations:
-                        if 'dest_pos_x' in destination and str(destination['dest_pos_x']) == destx and \
-                                'dest_pos_y' in destination and str(destination['dest_pos_y']) == desty:
-                            if const.DEST_LED_ID in destination and destination[const.DEST_LED_ID] is not None:
-                                dest_led_id = destination[const.DEST_LED_ID]
-                                message = self.dest_led_orion.send_cmd(dest_led_id, self.dest_led_type, 'action', 'on')
-                                result['result'] = 'success'
-                                result['message'] = message
-                                break
+                        try:
+                            if const.DEST_POS_X in destination and float(destination[const.DEST_POS_X]) == float(destx) and \
+                                    const.DEST_POS_Y in destination and float(destination[const.DEST_POS_Y]) == float(desty):
+                                if const.DEST_LED_ID in destination and destination[const.DEST_LED_ID] is not None:
+                                    dest_led_id = destination[const.DEST_LED_ID]
+                                    message = self.dest_led_orion.send_cmd(dest_led_id, self.dest_led_type, 'action', 'on')
+                                    result['result'] = 'success'
+                                    result['message'] = message
+                                    break
+                        except (ValueError, TypeError):
+                            pass
         except AttrDoesNotExist as e:
             logger.error(f'AttrDoesNotExist: {str(e)}')
             raise BadRequest(str(e))
