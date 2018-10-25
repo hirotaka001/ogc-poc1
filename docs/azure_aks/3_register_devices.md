@@ -87,6 +87,9 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 __EOS__
 ```
+
+* confirm registrations
+
 ```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: button_sensor" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/button_sensor_0000000000000001/ | jq .
 {
@@ -286,6 +289,9 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 __EOS__
 ```
+
+* confirm registrations
+
 ```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: pepper" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/ | jq .
 {
@@ -1034,6 +1040,9 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 __EOS__
 ```
+
+* confirm registrations
+
 ```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/guide_robot_0000000000000001/ | jq .
 {
@@ -1224,6 +1233,8 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 __EOS__
 ```
+
+* confirm registrations
 
 ```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: robot" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/guide_robot_0000000000000001_tablet/ | jq .
@@ -2054,6 +2065,9 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 __EOS__
 ```
+
+* confirm registrations
+
 ```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: camera" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/external_camera_0000000000000011/ | jq .
 {
@@ -2484,6 +2498,119 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 __EOS__
 ```
 ```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: dest_led" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/ -X POST -d @- <<__EOS__
+{
+  "devices": [
+    {
+      "device_id": "dest_led_0000000000000003",
+      "entity_name": "dest_led_0000000000000003",
+      "entity_type": "dest_led",
+      "timezone": "Asia/Tokyo",
+      "protocol": "UL20",
+      "commands": [
+        {
+          "name": "action",
+          "type": "string"
+        }
+      ],
+      "transport": "AMQP"
+    }
+  ]
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: dest_led" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/ -X POST -d @- <<__EOS__
+{
+  "devices": [
+    {
+      "device_id": "dest_led_0000000000000004",
+      "entity_name": "dest_led_0000000000000004",
+      "entity_type": "dest_led",
+      "timezone": "Asia/Tokyo",
+      "protocol": "UL20",
+      "commands": [
+        {
+          "name": "action",
+          "type": "string"
+        }
+      ],
+      "transport": "AMQP"
+    }
+  ]
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: dest_led" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/ -X POST -d @- <<__EOS__
+{
+  "devices": [
+    {
+      "device_id": "dest_led_0000000000000005",
+      "entity_name": "dest_led_0000000000000005",
+      "entity_type": "dest_led",
+      "timezone": "Asia/Tokyo",
+      "protocol": "UL20",
+      "commands": [
+        {
+          "name": "action",
+          "type": "string"
+        }
+      ],
+      "transport": "AMQP"
+    }
+  ]
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: dest_led" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/ -X POST -d @- <<__EOS__
+{
+  "devices": [
+    {
+      "device_id": "dest_led_0000000000000006",
+      "entity_name": "dest_led_0000000000000006",
+      "entity_type": "dest_led",
+      "timezone": "Asia/Tokyo",
+      "protocol": "UL20",
+      "commands": [
+        {
+          "name": "action",
+          "type": "string"
+        }
+      ],
+      "transport": "AMQP"
+    }
+  ]
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: dest_led" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/ -X POST -d @- <<__EOS__
+{
+  "devices": [
+    {
+      "device_id": "dest_led_0000000000000007",
+      "entity_name": "dest_led_0000000000000007",
+      "entity_type": "dest_led",
+      "timezone": "Asia/Tokyo",
+      "protocol": "UL20",
+      "commands": [
+        {
+          "name": "action",
+          "type": "string"
+        }
+      ],
+      "transport": "AMQP"
+    }
+  ]
+}
+__EOS__
+```
+
+* confirm registrations
+
+```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: dest_led" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/dest_led_0000000000000001/ | jq .
 {
   "device_id": "dest_led_0000000000000001",
@@ -2533,7 +2660,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 ```
 
-* check `dest_led_0000000000000002` by the same procedure.
+* check `dest_led_0000000000000002` - `dest_led_0000000000000002` by the same procedure.
 
 ## test DEST-LED command
 ```bash
@@ -2648,7 +2775,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 ```
 
-* test `dest_led_0000000000000002` by the same procedure.
+* test `dest_led_0000000000000002` - `dest_led_0000000000000007` by the same procedure.
 
 ## register DEST-HUMAN-SENSOR service
 ```bash
@@ -2734,6 +2861,119 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 __EOS__
 ```
 ```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: dest_human_sensor" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/ -X POST -d @- <<__EOS__
+{
+  "devices": [
+    {
+      "device_id": "dest_human_sensor_0000000000000003",
+      "entity_name": "dest_human_sensor_0000000000000003",
+      "entity_type": "dest_human_sensor",
+      "timezone": "Asia/Tokyo",
+      "protocol": "UL20",
+      "attributes": [
+        {
+          "name": "arrival",
+          "type": "string"
+        }
+      ],
+      "transport": "AMQP"
+    }
+  ]
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: dest_human_sensor" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/ -X POST -d @- <<__EOS__
+{
+  "devices": [
+    {
+      "device_id": "dest_human_sensor_0000000000000004",
+      "entity_name": "dest_human_sensor_0000000000000004",
+      "entity_type": "dest_human_sensor",
+      "timezone": "Asia/Tokyo",
+      "protocol": "UL20",
+      "attributes": [
+        {
+          "name": "arrival",
+          "type": "string"
+        }
+      ],
+      "transport": "AMQP"
+    }
+  ]
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: dest_human_sensor" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/ -X POST -d @- <<__EOS__
+{
+  "devices": [
+    {
+      "device_id": "dest_human_sensor_0000000000000005",
+      "entity_name": "dest_human_sensor_0000000000000005",
+      "entity_type": "dest_human_sensor",
+      "timezone": "Asia/Tokyo",
+      "protocol": "UL20",
+      "attributes": [
+        {
+          "name": "arrival",
+          "type": "string"
+        }
+      ],
+      "transport": "AMQP"
+    }
+  ]
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: dest_human_sensor" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/ -X POST -d @- <<__EOS__
+{
+  "devices": [
+    {
+      "device_id": "dest_human_sensor_0000000000000006",
+      "entity_name": "dest_human_sensor_0000000000000006",
+      "entity_type": "dest_human_sensor",
+      "timezone": "Asia/Tokyo",
+      "protocol": "UL20",
+      "attributes": [
+        {
+          "name": "arrival",
+          "type": "string"
+        }
+      ],
+      "transport": "AMQP"
+    }
+  ]
+}
+__EOS__
+```
+```bash
+mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: dest_human_sensor" -H "Fiware-ServicePath: /" -H "Content-Type: application/json" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/ -X POST -d @- <<__EOS__
+{
+  "devices": [
+    {
+      "device_id": "dest_human_sensor_0000000000000007",
+      "entity_name": "dest_human_sensor_0000000000000007",
+      "entity_type": "dest_human_sensor",
+      "timezone": "Asia/Tokyo",
+      "protocol": "UL20",
+      "attributes": [
+        {
+          "name": "arrival",
+          "type": "string"
+        }
+      ],
+      "transport": "AMQP"
+    }
+  ]
+}
+__EOS__
+```
+
+* confirm registrations
+
+```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl -sS -H "Authorization: bearer ${TOKEN}" -H "Fiware-Service: dest_human_sensor" -H "Fiware-Servicepath: /" https://api.tech-sketch.jp/idas/ul20/manage/iot/devices/dest_human_sensor_0000000000000001/ | jq .
 {
   "device_id": "dest_human_sensor_0000000000000001",
@@ -2773,7 +3013,7 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 ```
 
-* check `dest_human_sensor_0000000000000002` by the same procedure.
+* check `dest_human_sensor_0000000000000002` - `dest_human_sensor_0000000000000007` by the same procedure.
 
 ## test DEST-HUMAN-SENSOR attribute
 ```bash
@@ -2815,4 +3055,4 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
 }
 ```
 
-* test `dest_human_sensor_0000000000000002` by the same procedure.
+* test `dest_human_sensor_0000000000000002` - `dest_human_sensor_0000000000000007` by the same procedure.

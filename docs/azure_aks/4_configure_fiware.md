@@ -1923,13 +1923,13 @@ __EOS__
 ```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl https://api.tech-sketch.jp/destinations/ -H "Authorization: bearer ${TOKEN}" -H "Content-Type: application/json" -X POST -d @- <<__EOS__ | jq .
 {
-    "name":"管理センター",
+    "name":"dest 1-1",
     "floor": 1,
-    "dest_pos_x": -10.0,
-    "dest_pos_y": 10.0,
+    "dest_pos_x": -12.388,
+    "dest_pos_y": 7.51,
     "dest_led_id": "dest_led_0000000000000001",
-    "dest_led_pos_x": -9.0,
-    "dest_led_pos_y": 9.0,
+    "dest_led_pos_x": -8.388,
+    "dest_led_pos_y": 7.51,
     "dest_human_sensor_id": "dest_human_sensor_0000000000000001"
 }
 __EOS__
@@ -1937,28 +1937,14 @@ __EOS__
 ```bash
 mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl https://api.tech-sketch.jp/destinations/ -H "Authorization: bearer ${TOKEN}" -H "Content-Type: application/json" -X POST -d @- <<__EOS__ | jq .
 {
-    "name":"203号室",
+    "name":"dest 2-1",
     "floor": 2,
-    "dest_pos_x": 20.0,
-    "dest_pos_y": 20.0,
+    "dest_pos_x": 11.642,
+    "dest_pos_y": 0,
     "dest_led_id": "dest_led_0000000000000002",
-    "dest_led_pos_x": 19.0,
-    "dest_led_pos_y": 19.0,
+    "dest_led_pos_x": 7.642,
+    "dest_led_pos_y": 0,
     "dest_human_sensor_id": "dest_human_sensor_0000000000000002"
-}
-__EOS__
-```
-```bash
-mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl https://api.tech-sketch.jp/destinations/ -H "Authorization: bearer ${TOKEN}" -H "Content-Type: application/json" -X POST -d @- <<__EOS__ | jq .
-{
-    "name":"204号室",
-    "floor": 2,
-    "dest_pos_x": 20.0,
-    "dest_pos_y": -10.0,
-    "dest_led_id": "dest_led_0000000000000003",
-    "dest_led_pos_x": 19.0,
-    "dest_led_pos_y": -19.0,
-    "dest_human_sensor_id": "dest_human_sensor_0000000000000003"
 }
 __EOS__
 ```
@@ -1974,6 +1960,76 @@ mac:$ TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);cu
     "dest_led_pos_y": null,
     "dest_human_sensor_id": null,
     "slack_webhook": "https://hooks.slack.com/services/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+}
+__EOS__
+```
+```bash
+TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl https://api.tech-sketch.jp/destinations/ -H "Authorization: bearer ${TOKEN}" -H "Content-Type: application/json" -X POST -d @- <<__EOS__ | jq .
+{
+    "name":"dest 1-2",
+    "floor": 1,
+    "dest_pos_x": -10.68,
+    "dest_pos_y": 7.51,
+    "dest_led_id": "dest_led_0000000000000003",
+    "dest_led_pos_x": -6.68,
+    "dest_led_pos_y": 7.51,
+    "dest_human_sensor_id": "dest_human_sensor_0000000000000003"
+}
+__EOS__
+```
+```bash
+TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl https://api.tech-sketch.jp/destinations/ -H "Authorization: bearer ${TOKEN}" -H "Content-Type: application/json" -X POST -d @- <<__EOS__ | jq .
+{
+    "name":"dest 1-3",
+    "floor": 1,
+    "dest_pos_x": -9.58,
+    "dest_pos_y": 7.51,
+    "dest_led_id": "dest_led_0000000000000004",
+    "dest_led_pos_x": -5.58,
+    "dest_led_pos_y": 7.51,
+    "dest_human_sensor_id": "dest_human_sensor_0000000000000004"
+}
+__EOS__
+```
+```bash
+TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl https://api.tech-sketch.jp/destinations/ -H "Authorization: bearer ${TOKEN}" -H "Content-Type: application/json" -X POST -d @- <<__EOS__ | jq .
+{
+    "name":"dest 1-4",
+    "floor": 1,
+    "dest_pos_x": -6.41,
+    "dest_pos_y": 7.51,
+    "dest_led_id": "dest_led_0000000000000005",
+    "dest_led_pos_x": -2.41,
+    "dest_led_pos_y": 7.51,
+    "dest_human_sensor_id": "dest_human_sensor_0000000000000005"
+}
+__EOS__
+```
+```bash
+TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl https://api.tech-sketch.jp/destinations/ -H "Authorization: bearer ${TOKEN}" -H "Content-Type: application/json" -X POST -d @- <<__EOS__ | jq .
+{
+    "name":"dest 2-2",
+    "floor": 2,
+    "dest_pos_x": 15.325,
+    "dest_pos_y": 0,
+    "dest_led_id": "dest_led_0000000000000006",
+    "dest_led_pos_x": 11.325,
+    "dest_led_pos_y": 0,
+    "dest_human_sensor_id": "dest_human_sensor_0000000000000006"
+}
+__EOS__
+```
+```bash
+TOKEN=$(cat secrets/auth-tokens.json | jq '.bearer_tokens[0].token' -r);curl https://api.tech-sketch.jp/destinations/ -H "Authorization: bearer ${TOKEN}" -H "Content-Type: application/json" -X POST -d @- <<__EOS__ | jq .
+{
+    "name":"dest 2-3",
+    "floor": 2,
+    "dest_pos_x": 18.72,
+    "dest_pos_y": 0,
+    "dest_led_id": "dest_led_0000000000000007",
+    "dest_led_pos_x": 14.72,
+    "dest_led_pos_y": 0,
+    "dest_human_sensor_id": "dest_human_sensor_0000000000000007"
 }
 __EOS__
 ```
