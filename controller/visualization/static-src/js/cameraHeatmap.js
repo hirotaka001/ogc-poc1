@@ -1,5 +1,6 @@
 'use strict';
 
+import 'bootstrap';
 import $ from 'jquery';
 
 class Heatmap {
