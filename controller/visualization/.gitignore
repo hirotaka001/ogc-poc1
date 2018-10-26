@@ -1,4 +1,6 @@
 .node-version
 **/node_modules
-static/js/*.js
-static/css/*.css
+static/js/*
+static/css/*
+static/webfonts/*
+!.gitkeep

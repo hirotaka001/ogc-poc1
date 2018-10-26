@@ -1,7 +1,10 @@
 @import "~bootstrap/scss/bootstrap.scss";
+@import "~flatpickr/dist/flatpickr.min.css";
+@import "~@fortawesome/fontawesome-free/scss/fontawesome.scss";
+@import "~@fortawesome/fontawesome-free/scss/regular.scss";
 
-div.test {
-  h1 {
-    color: #ffbb00;
+div.input-group-append {
+  a.input-group-text {
+    cursor: pointer;
   }
 }

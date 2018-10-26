@@ -1,5 +1,6 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = [
     {
@@ -59,7 +60,13 @@ module.exports = [
             ]
         },
         plugins: [
-            new MiniCssExtractPlugin({filename: '../css/cameraHeatmap.css'})
+            new MiniCssExtractPlugin({filename: '../css/cameraHeatmap.css'}),
+            new CopyWebpackPlugin([
+                {
+                    from: path.resolve(__dirname, 'node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.woff2'),
+                    to: path.resolve(__dirname, 'static/webfonts')
+                },
+            ])
         ],
         performance: {
             maxEntrypointSize: 512000,

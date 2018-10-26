@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-import datetime
 from logging import getLogger
 
 from pytz import timezone
@@ -39,5 +38,22 @@ class CameraHeatmapAPI(MethodView):
     NAME = 'camera-heatmap-api'
 
     def get(self):
-        logger.info('CameraHeatmapAPI#get')
+        logger.info(f'CameraHeatmapAPI#get')
+        st = request.args.get('st')
+        et = request.args.get('et')
+
+        tz = current_app.config['TIMEZONE']
+
+        logger.info(f'RobotPositionAPI, st={st} et={et}')
+        if not st or not et:
+            raise BadRequest({'message': 'empty query parameter "st" and/or "et"'})
+
+        try:
+            start_dt = parser.parse(st).astimezone(timezone(tz))
+            end_dt = parser.parse(et).astimezone(timezone(tz))
+        except (TypeError, ValueError):
+            raise BadRequest({'message': 'invalid query parameter "st" and/or "et"'})
+
+        logger.info(f'start_dt={start_dt}, end_dt={end_dt}')
+
         return jsonify({})
