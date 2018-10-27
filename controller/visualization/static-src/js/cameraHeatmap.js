@@ -3,7 +3,10 @@
 import $ from "jquery";
 import "bootstrap";
 import flatpickr from "flatpickr";
+import * as d3 from 'd3';
 
+const ROW = 9;
+const COLUMN = 12;
 
 class Heatmap {
     show() {
@@ -30,6 +33,46 @@ class Heatmap {
         }).catch((xhr, status, e) => {
             console.error("error", xhr, ":", status, ":", e);
         });
+
+        let dataset = [];
+        for (let i = 0; i < ROW; i++) {
+            for (let j = 0; j < COLUMN; j++) {
+                if (i == 1 && j == 3) {
+                    dataset.push(5);
+                } else if (i == 7 && j == 10) {
+                    dataset.push(3);
+                } else {
+                    dataset.push(0);
+                }
+            }
+        }
+
+        let $svg = $("svg#chart-camera");
+        let w = $svg.width();
+        let h = $svg.height();
+
+        let tooltip = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
+
+        let chart = d3.select("svg#chart-camera").selectAll("rect").data(dataset);
+        let color = d3.interpolate("white", "red");
+        let maxValue=d3.max(dataset);
+        chart.enter()
+             .append("rect")
+             .attr("class", "block")
+             .attr("x", (d, i) => (i % COLUMN) * w / COLUMN)
+             .attr("y", (d, i) => Math.floor(i / COLUMN) * h / ROW)
+             .attr("width", (d, i) => w / COLUMN)
+             .attr("height", (d, i) => h / ROW)
+             .style("fill", (d, i) => color(d / maxValue))
+             .style('opacity',0.3)
+             .on("mouseover", (d) => {
+                 tooltip.transition().duration(500).style("opacity", 0);
+                 tooltip.transition().duration(200).style("opacity", 0.7);
+                 tooltip.transition().delay(1000).duration(200).style("opacity", 0);
+                 tooltip.html("<b>" + d + "</b>")
+                        .style("left", d3.event.pageX + "px")
+                        .style("top", d3.event.pageY + "px");
+             });
     }
 }
 

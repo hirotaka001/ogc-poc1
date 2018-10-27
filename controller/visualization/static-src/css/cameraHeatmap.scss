@@ -8,3 +8,31 @@ div.input-group-append {
     cursor: pointer;
   }
 }
+
+div.chart-parent {
+  $w: 640px;
+  $h: 480px;
+
+  width: $w;
+  height: $h;
+  position:relative;
+
+  svg.chart {
+    width: $w;
+    height: $h;
+  }
+
+  .chart {
+    position:absolute;
+  }
+}
+
+div.tooltip {
+  position: absolute;
+  text-align: center;
+  color: #FFFFFF;
+  padding: 5px;
+  background: #000000;
+  border-radius: 3px;
+  font-size: 10px;
+}
