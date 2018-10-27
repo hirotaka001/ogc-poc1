@@ -56,11 +56,17 @@
         <div class="container">
             <div class="row">
                 <div class="col-sm-3">
-                    <h4 class="text-muted">1F-1</h4>
+                    <div class="form-group">
+                        <select class="form-control" id="camera_id">
+                            <option value="1f-1" selected>1F-1</option>
+                            <option value="1f-2">1F-2</option>
+                            <option value="2f-1">2F-1</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="col-sm-7">
                     <div class="chart-parent">
-                        <img class="chart" src="/static/img/camera-fake.jpg" alt="camera">
+                        <img class="chart" src="/static/img/camera-1f-1.jpg" alt="camera">
                         <svg class="chart camera" id="chart-camera"></svg>
                     </div>
                 </div>

@@ -9,10 +9,19 @@ import * as d3Legend from 'd3-svg-legend';
 const ROW = 9;
 const COLUMN = 12;
 const DATA_OPACITY = 0.3;
+const CAMERA_IMAGE_MAP = {
+    "1f-1": "/static/img/camera-1f-1.jpg",
+    "1f-2": "/static/img/camera-1f-2.jpg",
+    "2f-1": "/static/img/camera-2f-1.jpg",
+}
 
 class Heatmap {
+    constructor() {
+        this.cameraId = "";
+    }
+
     show() {
-        console.log("Heatmap#show()");
+        console.log("Heatmap#show(), cameraId=" + this.cameraId);
         const bearer = $("input#bearer").val();
         const path = $("input#path").val();
 
@@ -135,9 +144,22 @@ const initFlatPickr = () => {
     $("div.et_datetime input#et_datetime_value").on("change", onChangeDatetime);
 };
 
-$(() => {
-    initFlatPickr();
+const initCameraSelector = (heatmap) => {
+    let $camera = $("select#camera_id");
+    let $image = $("div.chart-parent img.chart");
+    heatmap.cameraId = $camera.val();
 
+    $("select#camera_id").on("change", (event) => {
+        heatmap.cameraId = $camera.val();
+        $image.attr("src", CAMERA_IMAGE_MAP[heatmap.cameraId]);
+    });
+}
+
+$(() => {
     let heatmap = new Heatmap();
+
+    initFlatPickr();
+    initCameraSelector(heatmap);
+
     $("button#show_button").on("click", event => heatmap.show());
 });
