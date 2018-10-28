@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
+import json
 import os
+import re
 from logging import getLogger
 
 from pytz import timezone
 from dateutil import parser
+
+from pymongo import MongoClient
 
 from flask import request, render_template, jsonify, current_app, url_for
 from flask.views import MethodView
@@ -37,6 +41,17 @@ class CameraHeatmapPage(MethodView):
 class CameraHeatmapAPI(MethodView):
     NAME = 'camera-heatmap-api'
 
+    ENDPOINT = os.environ[const.MONGODB_ENDPOINT]
+    REPLICASET = os.environ[const.MONGODB_REPLICASET]
+    DB = os.environ[const.MONGODB_DATABASE]
+    COLLECTION_MAP = os.environ[const.MONGODB_COLLECTION_MAP]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        client = MongoClient(CameraHeatmapAPI.ENDPOINT, replicaset=CameraHeatmapAPI.REPLICASET)
+        self.db = client[CameraHeatmapAPI.DB]
+        self.collection_map = json.loads(CameraHeatmapAPI.COLLECTION_MAP)
+
     def get(self):
         logger.info(f'CameraHeatmapAPI#get')
         st = request.args.get('st')
@@ -57,18 +72,22 @@ class CameraHeatmapAPI(MethodView):
 
         logger.info(f'start_dt={start_dt}, end_dt={end_dt}')
 
-        # dummy data
-        dataset = []
-        for i in range(const.CAMERA_ROW):
-            for j in range(const.CAMERA_COLUMN):
-                if camera == const.CAMERA_1F_1:
-                    dataset.append(i + j)
-                elif camera == const.CAMERA_1F_2:
-                    dataset.append(i * j)
-                elif camera == const.CAMERA_2F_1:
-                    dataset.append(i + 10 * j)
-                else:
-                    raise BadRequest({'message': 'unknown query parameter "camera"'})
+        if camera not in self.collection_map:
+            raise BadRequest({'message': 'unknown query parameter "camera"'})
+
+        collection = self.db[self.collection_map[camera]]
+
+        dataset = [0] * const.CAMERA_ROW * const.CAMERA_COLUMN
+        for data in collection.find({'c_mode': const.TARGET_C_MODE, 'recvTime': {'$gte': start_dt, '$lt': end_dt}}):
+            if const.POSITION in data and const.NUM_P in data and data[const.NUM_P].isdecimal():
+                for i in range(int(data[const.NUM_P])):
+                    r = r'x\[{}\],(\d+).5/y\[{}\],(\d+)\.5'.format(i, i)
+                    m = re.search(r, data['position'])
+                    if m:
+                        col = int(m.group(1))
+                        row = int(m.group(2))
+                        if col < const.CAMERA_COLUMN and row < const.CAMERA_ROW:
+                            dataset[row * const.CAMERA_COLUMN + col] += 1
 
         result = {
             'row': const.CAMERA_ROW,
