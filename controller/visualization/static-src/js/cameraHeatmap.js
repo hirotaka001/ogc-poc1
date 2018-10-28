@@ -80,40 +80,44 @@ class Heatmap {
     plot(dataset) {
         console.log("Heatmap#plot()");
 
-        let maxValue=d3.max(dataset);
-        let colorScale = d3.scaleSequential(d3.interpolate("white", "red")).domain([0, maxValue]);
+        let maxValue = d3.max(dataset);
+        if (maxValue > 0) {
+            let colorScale = d3.scaleSequential(d3.interpolate("white", "red")).domain([0, maxValue]);
 
-        this.chartArea.selectAll("rect")
-                      .data(dataset)
-                      .enter()
-                      .append("rect")
-                      .attr("class", "block")
-                      .attr("x", (d, i) => (i % this.column) * this.chartWidth / this.column)
-                      .attr("y", (d, i) => Math.floor(i / this.column) * this.chartHeight / this.row)
-                      .attr("width", (d, i) => this.chartWidth / this.column)
-                      .attr("height", (d, i) => this.chartHeight / this.row)
-                      .style("fill", (d, i) => colorScale(d))
-                      .style("opacity", DATA_OPACITY)
-                      .on("mouseover", (d) => {
-                          this.tooltip.transition().duration(500).style("opacity", 0);
-                          this.tooltip.transition().duration(200).style("opacity", 0.7);
-                          this.tooltip.transition().delay(1000).duration(200).style("opacity", 0);
-                          this.tooltip.html("<b>" + d + "</b>")
-                                      .style("left", d3.event.pageX + "px")
-                                      .style("top", d3.event.pageY + "px");
-                      });
-        this.legendArea.append("g")
-                       .attr("class", "legendSequential")
-                       .attr("transform", "translate(20,20)");
-        let legend = d3Legend.legendColor()
-            .shapeWidth(30)
-            .labelFormat(d3.format(".0f"))
-            .scale(colorScale);
-        this.legendArea.select(".legendSequential").call(legend);
+            this.chartArea.selectAll("rect")
+                          .data(dataset)
+                          .enter()
+                          .append("rect")
+                          .attr("class", "block")
+                          .attr("x", (d, i) => (i % this.column) * this.chartWidth / this.column)
+                          .attr("y", (d, i) => Math.floor(i / this.column) * this.chartHeight / this.row)
+                          .attr("width", (d, i) => this.chartWidth / this.column)
+                          .attr("height", (d, i) => this.chartHeight / this.row)
+                          .style("fill", (d, i) => colorScale(d))
+                          .style("opacity", DATA_OPACITY)
+                          .on("mouseover", (d) => {
+                              this.tooltip.transition().duration(500).style("opacity", 0);
+                              this.tooltip.transition().duration(200).style("opacity", 0.7);
+                              this.tooltip.transition().delay(1000).duration(200).style("opacity", 0);
+                              this.tooltip.html("<b>" + d + "</b>")
+                                          .style("left", d3.event.pageX + "px")
+                                          .style("top", d3.event.pageY + "px");
+                          });
+            let legendCells = d3.min([maxValue, 4]) + 1;
+            this.legendArea.append("g")
+                           .attr("class", "legendSequential")
+                           .attr("transform", "translate(20,20)");
+            let legend = d3Legend.legendColor()
+                .shapeWidth(30)
+                .cells(legendCells)
+                .labelFormat(d3.format(".0f"))
+                .scale(colorScale);
+            this.legendArea.select(".legendSequential").call(legend);
 
-        d3.selectAll("svg#legend-camera rect").each((d, i, nodes) => {
-            d3.select(nodes[i]).style("opacity", DATA_OPACITY);
-        });
+            d3.selectAll("svg#legend-camera rect").each((d, i, nodes) => {
+                d3.select(nodes[i]).style("opacity", DATA_OPACITY);
+            });
+        }
     }
 
     clear() {
