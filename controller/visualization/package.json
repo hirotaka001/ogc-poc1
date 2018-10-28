@@ -30,6 +30,7 @@
     "d3-svg-legend": "^2.25.6",
     "flatpickr": "^4.5.2",
     "jquery": "^3.3.1",
-    "popper.js": "^1.14.4"
+    "popper.js": "^1.14.4",
+    "spin": "0.0.1"
   }
 }

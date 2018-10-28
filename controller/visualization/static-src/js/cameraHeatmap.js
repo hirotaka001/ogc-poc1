@@ -5,6 +5,7 @@ import "bootstrap";
 import flatpickr from "flatpickr";
 import * as d3 from 'd3';
 import * as d3Legend from 'd3-svg-legend';
+import * as Spinner from 'spin';
 
 const DATA_OPACITY = 0.3;
 const CAMERA_IMAGE_MAP = {
@@ -28,10 +29,28 @@ class Heatmap {
         this.etVal = "";
         this.row = 0;
         this.column = 0;
+        this.spin_opts = {
+            lines: 13,
+            length: 18,
+            width: 7,
+            radius: 25,
+            scale: 1,
+            corners: 1,
+            color: '#f0f0f0',
+            fadeColor: 'transparent',
+            speed: 1,
+            rotate: 0,
+            direction: 1,
+            zIndex: 2e9,
+            className: 'spinner',
+            shadow: '0 0 1px transparent'
+        };
     }
 
     show() {
         console.log("Heatmap#show(), cameraId=" + this.cameraId);
+        let spinner = new Spinner(this.spin_opts);
+        spinner.spin($("div.chart-parent")[0]);
 
         $.ajax({
             type: "GET",
@@ -46,12 +65,15 @@ class Heatmap {
             },
             dataType: "json"
         }).then((data, status, xhr) => {
+            console.log("GET success path=" + this.path);
             this.row = data.row;
             this.column = data.column;
             this.clear();
             this.plot(data.dataset)
         }).catch((xhr, status, e) => {
-            console.error("error", xhr, ":", status, ":", e);
+            console.error("GET error", xhr, ":", status, ":", e);
+        }).then(() => {
+            spinner.stop();
         });
     }
 
@@ -172,7 +194,10 @@ const initButton = (heatmap) => {
     let $showButton = $("button#show_button");
     let $clearButton = $("button#clear_button");
 
-    $showButton.on("click", (event) => heatmap.show());
+    $showButton.on("click", (event) => {
+        heatmap.clear();
+        heatmap.show()
+    });
     $clearButton.on("click", (event) => {
         heatmap.clear();
         $stDatetime.val("");
