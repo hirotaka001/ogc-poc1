@@ -6,8 +6,6 @@ import flatpickr from "flatpickr";
 import * as d3 from 'd3';
 import * as d3Legend from 'd3-svg-legend';
 
-const ROW = 9;
-const COLUMN = 12;
 const DATA_OPACITY = 0.3;
 const CAMERA_IMAGE_MAP = {
     "1f-1": "/static/img/camera-1f-1.jpg",
@@ -28,6 +26,8 @@ class Heatmap {
         this.cameraId = "";
         this.stVal = "";
         this.etVal = "";
+        this.row = 0;
+        this.column = 0;
     }
 
     show() {
@@ -46,27 +46,10 @@ class Heatmap {
             },
             dataType: "json"
         }).then((data, status, xhr) => {
-            console.log("success", data, ":", status, ":", xhr);
-
-            /* dummy data */
-            let dataset = [];
-            for (let i = 0; i < ROW; i++) {
-                for (let j = 0; j < COLUMN; j++) {
-                    switch(this.cameraId) {
-                        case "1f-1":
-                            dataset.push(i + j);
-                            break;
-                        case "1f-2":
-                            dataset.push(i * j);
-                            break;
-                        case "2f-1":
-                            dataset.push(i + 10 * j);
-                            break;
-                    }
-                }
-            }
+            this.row = data.row;
+            this.column = data.column;
             this.clear();
-            this.plot(dataset)
+            this.plot(data.dataset)
         }).catch((xhr, status, e) => {
             console.error("error", xhr, ":", status, ":", e);
         });
@@ -83,10 +66,10 @@ class Heatmap {
                       .enter()
                       .append("rect")
                       .attr("class", "block")
-                      .attr("x", (d, i) => (i % COLUMN) * this.chartWidth / COLUMN)
-                      .attr("y", (d, i) => Math.floor(i / COLUMN) * this.chartHeight / ROW)
-                      .attr("width", (d, i) => this.chartWidth / COLUMN)
-                      .attr("height", (d, i) => this.chartHeight / ROW)
+                      .attr("x", (d, i) => (i % this.column) * this.chartWidth / this.column)
+                      .attr("y", (d, i) => Math.floor(i / this.column) * this.chartHeight / this.row)
+                      .attr("width", (d, i) => this.chartWidth / this.column)
+                      .attr("height", (d, i) => this.chartHeight / this.row)
                       .style("fill", (d, i) => colorScale(d))
                       .style("opacity", DATA_OPACITY)
                       .on("mouseover", (d) => {

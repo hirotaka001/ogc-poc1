@@ -41,10 +41,11 @@ class CameraHeatmapAPI(MethodView):
         logger.info(f'CameraHeatmapAPI#get')
         st = request.args.get('st')
         et = request.args.get('et')
+        camera = request.args.get('camera')
 
         tz = current_app.config['TIMEZONE']
 
-        logger.info(f'RobotPositionAPI, st={st} et={et}')
+        logger.info(f'RobotPositionAPI, st={st} et={et} camera={camera}')
         if not st or not et:
             raise BadRequest({'message': 'empty query parameter "st" and/or "et"'})
 
@@ -56,4 +57,23 @@ class CameraHeatmapAPI(MethodView):
 
         logger.info(f'start_dt={start_dt}, end_dt={end_dt}')
 
-        return jsonify({})
+        # dummy data
+        dataset = []
+        for i in range(const.CAMERA_ROW):
+            for j in range(const.CAMERA_COLUMN):
+                if camera == const.CAMERA_1F_1:
+                    dataset.append(i + j)
+                elif camera == const.CAMERA_1F_2:
+                    dataset.append(i * j)
+                elif camera == const.CAMERA_2F_1:
+                    dataset.append(i + 10 * j)
+                else:
+                    raise BadRequest({'message': 'unknown query parameter "camera"'})
+
+        result = {
+            'row': const.CAMERA_ROW,
+            'column': const.CAMERA_COLUMN,
+            'dataset': dataset,
+        }
+
+        return jsonify(result)
