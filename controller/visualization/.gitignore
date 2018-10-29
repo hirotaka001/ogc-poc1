@@ -1,0 +1,7 @@
+.node-version
+**/node_modules
+package-lock.json
+static/js/*
+static/css/*
+static/webfonts/*
+!.gitkeep

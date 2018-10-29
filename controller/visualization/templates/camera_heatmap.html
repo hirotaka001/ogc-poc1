@@ -1,0 +1,88 @@
+<!Doctype html>
+<html lang="ja">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="{{ prefix }}/static/css/cameraHeatmap.css">
+        <title>Visualization - camera heatmap</title>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h3 class="text-muted">Camera Heatmap</h3>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-5">
+                    <div class="form-group">
+                        <div class="input-group st_datetime">
+                            <input type="text" id="st_datetime_value" class="form-control" placeholder="start datetime" data-input />
+                            <div class="input-group-append" data-toggle>
+                                <a class="input-group-text"><i class="far fa-calendar-alt"></i></a>
+                            </div>
+                            <div class="input-group-append" data-clear>
+                                <a class="input-group-text"><i class="far fa-trash-alt"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-5">
+                    <div class="form-group">
+                        <div class="input-group et_datetime">
+                            <input type="text" id="et_datetime_value" class="form-control" placeholder="end datetime" data-input />
+                            <div class="input-group-append" data-toggle>
+                                <a class="input-group-text"><i class="far fa-calendar-alt"></i></a>
+                            </div>
+                            <div class="input-group-append" data-clear>
+                                <a class="input-group-text"><i class="far fa-trash-alt"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <div class="form-group">
+                        <button id="show_button" type="button" class="btn btn-light" disabled>Show</button>
+                        <button id="clear_button" type="button" class="btn btn-light">Clear</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <select class="form-control" id="camera_id">
+                            <option value="1f-1" selected>1F-1</option>
+                            <option value="1f-2">1F-2</option>
+                            <option value="2f-1">2F-1</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="col">
+                    <div class="chart-parent">
+                        <img class="chart" src="{{ prefix }}/static/img/camera-1f-1.jpg" alt="camera">
+                        <svg class="chart camera" id="chart-camera"></svg>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="col">
+                    <div class="legend-parent">
+                        <svg class="legend camera" id="legend-camera"></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <input type="hidden" id="bearer" value="{{ bearer }}"/>
+        <input type="hidden" id="path" value="{{ path }}"/>
+        <input type="hidden" id="prefix" value="{{ prefix }}"/>
+
+        <script src="{{ prefix }}/static/js/cameraHeatmap.combined.js"></script>
+    </body>
+</html>
