@@ -65,7 +65,7 @@
             <div>
                 <div class="col">
                     <div class="chart-parent">
-                        <img class="chart" src="/static/img/camera-1f-1.jpg" alt="camera">
+                        <img class="chart" src="{{ prefix }}/static/img/camera-1f-1.jpg" alt="camera">
                         <svg class="chart camera" id="chart-camera"></svg>
                     </div>
                 </div>
@@ -81,6 +81,7 @@
 
         <input type="hidden" id="bearer" value="{{ bearer }}"/>
         <input type="hidden" id="path" value="{{ path }}"/>
+        <input type="hidden" id="prefix" value="{{ prefix }}"/>
 
         <script src="{{ prefix }}/static/js/cameraHeatmap.combined.js"></script>
     </body>

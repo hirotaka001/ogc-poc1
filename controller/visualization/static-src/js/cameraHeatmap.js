@@ -184,13 +184,14 @@ const initFlatPickr = (heatmap) => {
 const initCameraSelector = (heatmap) => {
     let $camera = $("select#camera_id");
     let $image = $("div.chart-parent img.chart");
+    let prefix = $("input#prefix").val();
 
     heatmap.cameraId = $camera.val();
 
     $("select#camera_id").on("change", (event) => {
         heatmap.cameraId = $camera.val();
         heatmap.clear();
-        $image.attr("src", CAMERA_IMAGE_MAP[heatmap.cameraId]);
+        $image.attr("src", prefix + CAMERA_IMAGE_MAP[heatmap.cameraId]);
     });
 }
 
