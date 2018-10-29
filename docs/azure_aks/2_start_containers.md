@@ -20,6 +20,7 @@ Start pods & services on AKS by following steps:
 1. [start logging](#start-logging-on-aks)
 1. [start cronjob](#start-cronjob-on-aks)
 1. [start fiware cygnus for elasticsearch](#start-fiware-cygnus-elasticsearch-on-aks)
+1. [start visualization view](#start-visualization-view-on-aks)
 
 ## start rabbitmq cluster on AKS
 
@@ -1109,4 +1110,30 @@ cygnus-elasticsearch-689b7f5fd8-967jr   1/1     Running   0          1m
 mac:$ kubectl get services -l app=cygnus-elasticsearch
 NAME                   TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)             AGE
 cygnus-elasticsearch   ClusterIP   10.0.84.84   <none>        5050/TCP,8081/TCP   1m
+```
+
+## start visualization view on AKS
+```bash
+mac:$ az acr login --name ogcacr
+mac:$ docker build --build-arg SERVICE_PATH="./controller/visualization" -t ${REPOSITORY}/tech-sketch/visualization:0.1.0 -f ./controller/docker/Dockerfile_webpack .
+mac:$ docker push ${REPOSITORY}/tech-sketch/visualization:0.1.0
+```
+```bash
+mac:$ export BEARER_AUTH=$(cat secrets/auth-tokens.json | jq '.bearer_tokens | map(select(.allowed_paths[] | contains ("^/visualization/camera/.*$"))) | .[0].token' -r)
+mac:$ export MONGODB_DATABASE="sth_camera"
+mac:$ export MONGODB_COLLECTION_MAP="{\"1f-1\": \"sth_/_external_camera_0000000000000011_external_camera\", \"1f-2\": \"sth_/_external_camera_0000000000000012_external_camera\", \"2f-1\": \"sth_/_external_camera_0000000000000021_external_camera\"}"
+mac:$ export PIXEL_MAP="{\"1f-1\": {\"size\": 90, \"row\": 6, \"column\": 11}, \"1f-2\": {\"size\": 99, \"row\": 6 , \"column\": 10}, \"2f-1\": {\"size\": 93.5, \"row\": 6 , \"column\": 11}}"
+mac:$ envsubst < controller/visualization.yaml | kubectl apply -f -
+```
+```bash
+mac:$ kubectl get pods -l pod=visualization
+NAME                             READY     STATUS    RESTARTS   AGE
+visualization-5b5c675cc7-fhxbz   1/1       Running   0          1m
+visualization-5b5c675cc7-x7wss   1/1       Running   0          1m
+visualization-5b5c675cc7-xjh45   1/1       Running   0          1m
+```
+```bash
+mac:$ kubectl get services -l service=visualization
+NAME            TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
+visualization   ClusterIP   10.0.154.247   <none>        8888/TCP   1m
 ```
