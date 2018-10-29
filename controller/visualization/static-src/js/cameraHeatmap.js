@@ -68,6 +68,7 @@ class Heatmap {
             console.log("GET success path=" + this.path);
             this.row = data.row;
             this.column = data.column;
+            this.pixel = data.pixel;
             this.clear();
             this.plot(data.dataset)
         }).catch((xhr, status, e) => {
@@ -89,10 +90,10 @@ class Heatmap {
                           .enter()
                           .append("rect")
                           .attr("class", "block")
-                          .attr("x", (d, i) => (i % this.column) * this.chartWidth / this.column)
-                          .attr("y", (d, i) => Math.floor(i / this.column) * this.chartHeight / this.row)
-                          .attr("width", (d, i) => this.chartWidth / this.column)
-                          .attr("height", (d, i) => this.chartHeight / this.row)
+                          .attr("x", (d, i) => (i % this.column) * this.pixel)
+                          .attr("y", (d, i) => Math.floor(i / this.column) * this.pixel)
+                          .attr("width", (d, i) => this.pixel)
+                          .attr("height", (d, i) => this.pixel)
                           .style("fill", (d, i) => colorScale(d))
                           .style("opacity", DATA_OPACITY)
                           .on("mouseover", (d) => {

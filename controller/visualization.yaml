@@ -53,6 +53,8 @@ spec:
           value: "${MONGODB_DATABASE}"
         - name: MONGODB_COLLECTION_MAP
           value: '${MONGODB_COLLECTION_MAP}'
+        - name: PIXEL_MAP
+          value: '${PIXEL_MAP}'
         ports:
           - name: visualization
             containerPort: 8888

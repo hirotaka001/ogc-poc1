@@ -45,12 +45,14 @@ class CameraHeatmapAPI(MethodView):
     REPLICASET = os.environ[const.MONGODB_REPLICASET]
     DB = os.environ[const.MONGODB_DATABASE]
     COLLECTION_MAP = os.environ[const.MONGODB_COLLECTION_MAP]
+    PIXEL_MAP = os.environ[const.PIXEL_MAP]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         client = MongoClient(CameraHeatmapAPI.ENDPOINT, replicaset=CameraHeatmapAPI.REPLICASET)
         self.db = client[CameraHeatmapAPI.DB]
         self.collection_map = json.loads(CameraHeatmapAPI.COLLECTION_MAP)
+        self.pixel_map = json.loads(CameraHeatmapAPI.PIXEL_MAP)
 
     def get(self):
         logger.info(f'CameraHeatmapAPI#get')
@@ -75,23 +77,36 @@ class CameraHeatmapAPI(MethodView):
         if camera not in self.collection_map:
             raise BadRequest({'message': 'unknown query parameter "camera"'})
 
+        if camera not in self.pixel_map:
+            raise BadRequest({'message': 'unknown query parameter "camera"'})
+
+        if 'row' not in self.pixel_map[camera] \
+                or 'column' not in self.pixel_map[camera] \
+                or 'size' not in self.pixel_map[camera]:
+            raise BadRequest({'message': 'invalid pixel_map'})
+
+        row = self.pixel_map[camera]['row']
+        column = self.pixel_map[camera]['column']
+        pixel = self.pixel_map[camera]['size']
+
         collection = self.db[self.collection_map[camera]]
 
-        dataset = [0] * const.CAMERA_ROW * const.CAMERA_COLUMN
+        dataset = [0] * row * column
         for data in collection.find({'c_mode': const.TARGET_C_MODE, 'recvTime': {'$gte': start_dt, '$lt': end_dt}}):
             if const.POSITION in data and const.NUM_P in data and data[const.NUM_P].isdecimal():
                 for i in range(int(data[const.NUM_P])):
                     r = r'x\[{}\],(\d+).5/y\[{}\],(\d+)\.5'.format(i, i)
                     m = re.search(r, data['position'])
                     if m:
-                        col = int(m.group(1))
-                        row = int(m.group(2))
-                        if col < const.CAMERA_COLUMN and row < const.CAMERA_ROW:
-                            dataset[row * const.CAMERA_COLUMN + col] += 1
+                        col_data = int(m.group(1))
+                        row_data = int(m.group(2))
+                        if col_data < column and row_data < row:
+                            dataset[row_data * column + col_data] += 1
 
         result = {
-            'row': const.CAMERA_ROW,
-            'column': const.CAMERA_COLUMN,
+            'row': row,
+            'column': column,
+            'pixel': pixel,
             'dataset': dataset,
         }
 
