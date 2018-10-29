@@ -1,0 +1,38 @@
+@import "~bootstrap/scss/bootstrap.scss";
+@import "~flatpickr/dist/flatpickr.min.css";
+@import "~@fortawesome/fontawesome-free/scss/fontawesome.scss";
+@import "~@fortawesome/fontawesome-free/scss/regular.scss";
+
+div.input-group-append {
+  a.input-group-text {
+    cursor: pointer;
+  }
+}
+
+div.chart-parent {
+  $w: 960px;
+  $h: 540px;
+
+  width: $w;
+  height: $h;
+  position:relative;
+
+  svg.chart {
+    width: $w;
+    height: $h;
+  }
+
+  .chart {
+    position:absolute;
+  }
+}
+
+div.tooltip {
+  position: absolute;
+  text-align: center;
+  color: #FFFFFF;
+  padding: 5px;
+  background: #000000;
+  border-radius: 3px;
+  font-size: 10px;
+}
