@@ -111,6 +111,7 @@ class Heatmap {
                 .shapeWidth(30)
                 .cells(legendCells)
                 .labelFormat(d3.format(".0f"))
+                .orient("horizontal")
                 .scale(colorScale);
             this.legendArea.select(".legendSequential").call(legend);
 
@@ -183,6 +184,7 @@ const initFlatPickr = (heatmap) => {
 const initCameraSelector = (heatmap) => {
     let $camera = $("select#camera_id");
     let $image = $("div.chart-parent img.chart");
+
     heatmap.cameraId = $camera.val();
 
     $("select#camera_id").on("change", (event) => {
