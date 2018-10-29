@@ -112,7 +112,6 @@ class Heatmap {
                 .shapeWidth(30)
                 .cells(legendCells)
                 .labelFormat(d3.format(".0f"))
-                .orient("horizontal")
                 .scale(colorScale);
             this.legendArea.select(".legendSequential").call(legend);
 
