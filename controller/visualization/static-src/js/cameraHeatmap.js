@@ -161,7 +161,7 @@ const initFlatPickr = (heatmap) => {
         enableTime: true,
         enableSeconds: true,
         time_24hr: true,
-        dateFormat: "Y-m-d H:i:S",
+        dateFormat: "Y/m/d H:i:S",
         defaultHour: now.getHours(),
         defaultMinute: now.getMinutes(),
     };
