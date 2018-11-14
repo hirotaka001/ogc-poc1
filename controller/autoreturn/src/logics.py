@@ -76,8 +76,8 @@ class AutoReturner(RobotFloorMapMixin):
                 'filter': f'{const.DEST_POS_X}|{current_destx},{const.DEST_POS_Y}|{current_desty},{const.DEST_FLOOR}|{floor}'
             }
             destinations = self.destService.get_destinations(params)
-            if (destinations and len(destinations) == 1
-                    and const.DEST_LED_ID in destinations[0] and destinations[0][const.DEST_LED_ID] is not None):
-                dest_led_id = destinations[0][const.DEST_LED_ID]
-                self.dest_led_orion.send_cmd(dest_led_id, self.dest_led_type, 'action', 'off')
-                logger.info(f'destination led({dest_led_id}) turn to off automatically')
+            for target_dest in destinations:
+                if (const.DEST_LED_ID in target_dest and target_dest[const.DEST_LED_ID] is not None):
+                    dest_led_id = target_dest[const.DEST_LED_ID]
+                    self.dest_led_orion.send_cmd(dest_led_id, self.dest_led_type, 'action', 'off')
+                    logger.info(f'destination led({dest_led_id}) turn to off automatically')
